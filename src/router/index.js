@@ -1,9 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { auth } from '@/firebase/firebaseInit'
 
-
-
-import LoginHome from '@/views/LoginHome.vue' 
+import LoginHome from '@/views/LoginHome.vue'
 import Dashboard from '@/views/Dashboard.vue'
 import Objectives from '@/views/Objectives.vue'
 import SkillTracker from '@/views/SkillTracker.vue'
@@ -16,44 +14,48 @@ const routes = [
     path: '/login',
     name: 'login',
     component: LoginHome,
+    meta: { guestOnly: true }
   },
   {
     path: '/dashboard',
     name: 'dashboard',
-    component:Dashboard,
+    component: Dashboard,
     meta: { requiresAuth: true }
   },
   {
     path: '/objectives',
     name: 'objectives',
-    component:Objectives,
+    component: Objectives,
     meta: { requiresAuth: true }
   },
   {
     path: '/skillTracker',
     name: 'skillTracker',
-    component:SkillTracker,
+    component: SkillTracker,
     meta: { requiresAuth: true }
   },
   {
     path: '/timeline',
     name: 'timeline',
-    component:Timeline,
+    component: Timeline,
     meta: { requiresAuth: true }
   },
   {
     path: '/profile',
     name: 'profile',
-    component:Profile,
+    component: Profile,
     meta: { requiresAuth: true }
   },
   {
     path: '/projects',
     name: 'projects',
-    component:Projects,
+    component: Projects,
     meta: { requiresAuth: true }
   },
-
+  {
+    path: '/',
+    redirect: '/login'
+  }
 ]
 
 const router = createRouter({
@@ -85,6 +87,5 @@ router.beforeEach(async (to, from, next) => {
   
   next();
 });
-
 
 export default router

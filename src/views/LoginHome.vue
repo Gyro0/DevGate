@@ -24,55 +24,30 @@
         </div>
         
         <div class="auth-form">
-          <LoginForm v-if="activeTab === 'login'" @login-success="onLoginSuccess" />
-          <SignupForm v-else @signup-success="onSignupSuccess" />
+          <Login v-if="activeTab === 'login'" @login-success="onLoginSuccess" />
+          <Signin v-else @signup-success="onSignupSuccess" />
         </div>
-        
-        <div class="separator">
-          <span>OR</span>
-        </div>
-        
-        <SocialLoginButtons @login-success="onLoginSuccess" />
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import LoginForm from '../components/authentification/LoginForm.vue';
-import SignupForm from '../components/authentification/SignupForm.vue';
-import SocialLoginButtons from '../components/authentification/SocialLoginButtons.vue';
+import Login from '@/components/authentication/Login.vue';
+import Signin from '@/components/authentication/Signin.vue';
 
-export default {
-  name: 'LoginView',
-  components: {
-    LoginForm,
-    SignupForm,
-    SocialLoginButtons
-  },
-  setup() {
-    const activeTab = ref('login');
-    const router = useRouter();
+const activeTab = ref('login');
+const router = useRouter();
 
-    const onLoginSuccess = () => {
-      router.push('/dashboard');
-    };
+const onLoginSuccess = () => {
+  router.push('/dashboard');
+};
 
-    const onSignupSuccess = () => {
-      // Could redirect to profile setup or dashboard
-      router.push('/dashboard'); 
-    };
-
-    // Return reactive state and methods
-    return {
-      activeTab,
-      onLoginSuccess,
-      onSignupSuccess
-    };
-  }
-}
+const onSignupSuccess = () => {
+  router.push('/dashboard');
+};
 </script>
 
 <style scoped>
@@ -130,23 +105,7 @@ export default {
   font-weight: 600;
 }
 
-.separator {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin: 1.5rem 0;
-}
-
-.separator::before,
-.separator::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid #e1e4e8;
-}
-
-.separator span {
-  padding: 0 1rem;
-  color: #6b7280;
-  font-size: 0.875rem;
+.auth-form {
+  margin-top: 1.5rem;
 }
 </style>
