@@ -37,11 +37,14 @@
 
 <script>
 import useAuth from '@/composables/useAuth';
+import { ref } from 'vue';
 
 export default {
   name: 'UserSummary',
   setup() {
     const { user } = useAuth();
+    const lastActivity = ref(null); // Add this ref for "lastActivity"
+    const showTips = ref(false); // Add this ref for "showTips"
 
     // Get current time for greeting
     const getCurrentGreeting = () => {
@@ -53,7 +56,9 @@ export default {
 
     return {
       user,
-      getCurrentGreeting
+      getCurrentGreeting,
+      lastActivity,
+      showTips
     };
   }
 }

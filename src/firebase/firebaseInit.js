@@ -1,20 +1,30 @@
-// src/firebase/firebaseInit.js
-import firebase from 'firebase/app'
-import 'firebase/auth'
-import 'firebase/firestore'
-import 'firebase/storage'         // ← add this
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/firestore';
+import 'firebase/storage';
 
-import firebaseConfig from './firebaseConfig'
+import firebaseConfig from './firebaseConfig';
 
-const app = !firebase.apps.length
-  ? firebase.initializeApp(firebaseConfig)
-  : firebase.app()
+// Initialize Firebase
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
-export const auth    = firebase.auth()
-export const db      = firebase.firestore()
-export const storage = firebase.storage()   // ← and export storage
+// Initialize services and export them
+export const auth = firebase.auth();
+export const db = firebase.firestore();
+export const storage = firebase.storage();
 
-// enable persistence, etc.
-db.enablePersistence().catch(err => console.error(err.code))
+// Enable persistence for Firestore
+db.enablePersistence().catch(err => {
+  if (err.code == 'failed-precondition') {
+    console.warn('Firestore persistence failed: Multiple tabs open?');
+  } else if (err.code == 'unimplemented') {
+    console.warn('Firestore persistence failed: Browser does not support.');
+  } else {
+    console.error('Firestore persistence error:', err);
+  }
+});
 
-export default app
+// Export the firebase object itself if needed elsewhere
+export default firebase;

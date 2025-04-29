@@ -42,7 +42,7 @@
 
 <script>
 import { ref } from 'vue';
-import { getAuth, updateEmail, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import firebase, { auth } from '@/firebase/firebaseInit'; // Import firebase namespace
 
 export default {
   name: 'ChangeEmailModal',
@@ -52,7 +52,6 @@ export default {
     const currentPassword = ref('');
     const loading = ref(false);
     const error = ref('');
-    const auth = getAuth();
 
     const handleChangeEmail = async () => {
       if (!newEmail.value || !currentPassword.value) {
@@ -62,23 +61,17 @@ export default {
       
       loading.value = true;
       error.value = '';
-      
       try {
         const user = auth.currentUser;
-        if (!user || !user.email) {
-          throw new Error("User not found or email missing.");
-        }
+        // Use v8 firebase.auth.EmailAuthProvider
+        const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword.value);
+        // Use v8 user.reauthenticateWithCredential
+        await user.reauthenticateWithCredential(credential);
+        // Use v8 user.updateEmail
+        await user.updateEmail(newEmail.value);
 
-        // Re-authenticate user
-        const credential = EmailAuthProvider.credential(user.email, currentPassword.value);
-        await reauthenticateWithCredential(user, credential);
-        
-        // Update email
-        await updateEmail(user, newEmail.value);
-        
-        emit('email-changed');
+        alert('Email updated successfully!');
         emit('close');
-        
       } catch (err) {
         console.error("Error changing email:", err);
         if (err.code === 'auth/wrong-password') {
@@ -96,12 +89,22 @@ export default {
       }
     };
 
+    const closeModal = () => {
+      // Reset form fields
+      newEmail.value = '';
+      currentPassword.value = '';
+      error.value = '';
+      // Emit close event
+      emit('close');
+    };
+
     return {
       newEmail,
       currentPassword,
       loading,
       error,
-      handleChangeEmail
+      handleChangeEmail,
+      closeModal // Add this
     };
   }
 }

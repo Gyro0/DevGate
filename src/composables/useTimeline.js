@@ -1,18 +1,17 @@
 // src/composables/useTimeline.js
-import { ref, computed } from 'vue'
-import { db } from '@/firebase/firebaseInit'
-import { collection, query, where, orderBy, getDocs, addDoc } from 'firebase/firestore'
-import useAuth from './useAuth'
+import { ref, computed } from 'vue';
+import firebase, { db } from '@/firebase/firebaseInit'; // Import firebase namespace
+import useAuth from './useAuth';
 
 /**
  * Timeline management composable for activity tracking
  * @returns {Object} Timeline state and methods
  */
 export default function useTimeline() {
-  const { user } = useAuth()
-  const events = ref([])
-  const loading = ref(false)
-  const error = ref(null)
+  const { user } = useAuth();
+  const events = ref([]);
+  const loading = ref(false);
+  const error = ref(null);
   
   // Event types for filtering
   const eventTypes = [
@@ -31,23 +30,15 @@ export default function useTimeline() {
   
   // Fetch timeline events for user
   const fetchUserTimeline = async (limit = 50) => {
-    if (!user.value) return
-    
-    loading.value = true
-    error.value = null
-    
+    if (!user.value) return;
+    loading.value = true;
+    error.value = null;
     try {
-      const timelineQuery = query(
-        collection(db, 'timeline'),
-        where('userId', '==', user.value.uid),
-        orderBy('timestamp', 'desc')
-      )
-      
-      const snapshot = await getDocs(timelineQuery)
-      events.value = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }))
+      const timelineQuery = db.collection('timeline') // v8 collection
+                              .where('userId', '==', user.value.uid) // v8 where
+                              .orderBy('timestamp', 'desc'); // v8 orderBy
+      const snapshot = await timelineQuery.limit(limit).get(); // v8 get with limit
+      events.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (e) {
       error.value = e.message
       console.error('Error fetching timeline:', e)
@@ -58,19 +49,17 @@ export default function useTimeline() {
   
   // Record a timeline event
   const recordEvent = async (type, action, entityId, entityData) => {
-    if (!user.value) return
-    
+    if (!user.value) return;
     try {
       const newEvent = {
         userId: user.value.uid,
         type,
         action,
         entityId,
-        entityData,
-        timestamp: new Date()
-      }
-      
-      const docRef = await addDoc(collection(db, 'timeline'), newEvent)
+        entityData, // Ensure this doesn't contain undefined values for v8
+        timestamp: firebase.firestore.FieldValue.serverTimestamp() // v8 serverTimestamp
+      };
+      const docRef = await db.collection('timeline').add(newEvent); // v8 add
       const createdEvent = { id: docRef.id, ...newEvent }
       events.value.unshift(createdEvent) // Add to start of array
       

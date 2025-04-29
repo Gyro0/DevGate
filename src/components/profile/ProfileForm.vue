@@ -50,28 +50,29 @@
 </template>
 
 <script>
-import { useProfile } from '@/composables/useProfile';
+import useProfile from '@/composables/useProfile';
 
 export default {
   name: 'ProfileForm',
-  emits: ['cancel'], // Assuming cancelEdit emits an event
+  props: {
+    editedProfile: {
+      type: Object,
+      required: true
+    }
+  },
+  emits: ['saveProfile', 'cancel'],
   setup(props, { emit }) {
-    const { editedProfile, saveProfile: saveProfileFromComposable, loading } = useProfile();
+    const { loading } = useProfile();
 
-    // Wrapper for saveProfile to potentially handle local logic or emit events
     const saveProfile = async () => {
-      await saveProfileFromComposable();
-      // Optionally emit an event after saving
-      // emit('saved'); 
+      emit('saveProfile', props.editedProfile);
     };
 
     const cancelEdit = () => {
-      // Emit an event to the parent component to handle cancellation
       emit('cancel');
     };
 
     return {
-      editedProfile,
       saveProfile,
       loading,
       cancelEdit

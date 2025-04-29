@@ -29,7 +29,7 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/skillTracker',
+    path: '/skills',
     name: 'skillTracker',
     component: SkillTracker,
     meta: { requiresAuth: true }
@@ -50,6 +50,12 @@ const routes = [
     path: '/projects',
     name: 'projects',
     component: Projects,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: () => import('../views/Profile.vue'), // Reuse the Profile view or create a separate Settings.vue
     meta: { requiresAuth: true }
   },
   {

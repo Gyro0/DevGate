@@ -34,7 +34,7 @@
 
 <script>
 import { ref, computed } from 'vue';
-import { getAuth, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import firebase, { auth } from '@/firebase/firebaseInit'; // Import firebase namespace
 
 export default {
   name: 'ChangePasswordModal',
@@ -45,7 +45,6 @@ export default {
     const confirmPassword = ref('');
     const loading = ref(false);
     const error = ref('');
-    const auth = getAuth();
 
     const passwordsMatch = computed(() => {
       return newPassword.value === confirmPassword.value;
@@ -63,23 +62,17 @@ export default {
       
       loading.value = true;
       error.value = '';
-      
       try {
         const user = auth.currentUser;
-        if (!user || !user.email) {
-          throw new Error("User not found or email missing.");
-        }
+        // Use v8 firebase.auth.EmailAuthProvider
+        const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword.value);
+         // Use v8 user.reauthenticateWithCredential
+        await user.reauthenticateWithCredential(credential);
+        // Use v8 user.updatePassword
+        await user.updatePassword(newPassword.value);
 
-        // Re-authenticate user
-        const credential = EmailAuthProvider.credential(user.email, currentPassword.value);
-        await reauthenticateWithCredential(user, credential);
-        
-        // Update password
-        await updatePassword(user, newPassword.value);
-        
-        emit('password-changed');
+        alert('Password updated successfully!');
         emit('close');
-        
       } catch (err) {
         console.error("Error changing password:", err);
         if (err.code === 'auth/wrong-password') {
@@ -95,6 +88,16 @@ export default {
       }
     };
 
+    const closeModal = () => {
+      // Reset form fields
+      currentPassword.value = '';
+      newPassword.value = '';
+      confirmPassword.value = '';
+      error.value = '';
+      // Emit close event
+      emit('close');
+    };
+
     return {
       currentPassword,
       newPassword,
@@ -102,7 +105,8 @@ export default {
       loading,
       error,
       passwordsMatch,
-      handleChangePassword
+      handleChangePassword,
+      closeModal // Add this
     };
   }
 }

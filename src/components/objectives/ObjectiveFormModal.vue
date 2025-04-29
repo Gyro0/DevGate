@@ -87,8 +87,8 @@
 </template>
 
 <script>
-import { reactive, computed, onMounted, watch } from 'vue'; // Added watch
-import { Timestamp } from 'firebase/firestore';
+import { reactive, computed, watch } from 'vue';
+import firebase from '@/firebase/firebaseInit'; // Import firebase namespace for Timestamp
 
 export default {
   name: 'ObjectiveFormModal',
@@ -106,10 +106,11 @@ export default {
     const formatDateForInput = (dateValue) => {
       if (!dateValue) return '';
       let date;
-      if (dateValue instanceof Timestamp) {
+      // Check if it's a Firestore v8 Timestamp
+      if (dateValue && typeof dateValue.toDate === 'function') {
         date = dateValue.toDate();
       } else if (dateValue instanceof Date) {
-        date = dateValue;
+         date = dateValue;
       } else {
         try {
           date = new Date(dateValue); // Attempt to parse string/number
@@ -170,13 +171,13 @@ export default {
     const submitForm = () => {
       if (!isFormValid.value) return;
       
-      // Convert date strings back to Firestore Timestamps or null
+      // Convert date strings back to Firestore v8 Timestamps
       const dataToSave = {
         ...formData,
-        startDate: formData.startDate ? Timestamp.fromDate(new Date(formData.startDate)) : null,
-        deadline: formData.deadline ? Timestamp.fromDate(new Date(formData.deadline)) : null,
+        // Use v8 firebase.firestore.Timestamp
+        startDate: formData.startDate ? firebase.firestore.Timestamp.fromDate(new Date(formData.startDate)) : null,
+        deadline: formData.deadline ? firebase.firestore.Timestamp.fromDate(new Date(formData.deadline)) : null,
       };
-      
       emit('save', dataToSave);
     };
 

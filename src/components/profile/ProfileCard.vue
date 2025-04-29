@@ -48,7 +48,7 @@
 
 <script>
 import { ref } from 'vue';
-import { useProfile } from '@/composables/useProfile';
+import useProfile  from '@/composables/useProfile';
 
 export default {
   name: 'ProfileCard',

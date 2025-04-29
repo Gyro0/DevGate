@@ -1,18 +1,6 @@
 // src/composables/useSkills.js
 import { ref } from 'vue';
-import { db, auth } from '@/firebase/firebaseInit';
-import { 
-  collection, 
-  query, 
-  where, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
-  doc,
-  serverTimestamp,
-  Timestamp
-} from 'firebase/firestore';
+import firebase, { db, auth } from '@/firebase/firebaseInit'; // Import firebase namespace
 
 // Define skill categories and levels
 const skillCategories = [
@@ -36,16 +24,13 @@ export default function useSkills() {
   const skills = ref([]);
   const loading = ref(false);
   const error = ref(null);
+  const userId = auth.currentUser?.uid; // Get userId directly
 
-  // Get current user ID
-  const userId = auth.currentUser?.uid;
-
-  // Reference to the user's skills subcollection
-  const skillsCollectionRef = collection(db, `users/${userId}/skills`);
+  const skillsCollectionRef = userId ? db.collection(`users/${userId}/skills`) : null; // v8 collection
 
   // Fetch skills for the current user
   const fetchUserSkills = async () => {
-    if (!userId) {
+    if (!skillsCollectionRef) {
       error.value = 'User not authenticated';
       skills.value = [];
       return;
@@ -54,9 +39,8 @@ export default function useSkills() {
     loading.value = true;
     error.value = null;
     try {
-      const q = query(skillsCollectionRef);
-      const querySnapshot = await getDocs(q);
-      skills.value = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const snapshot = await skillsCollectionRef.get(); // v8 get
+      skills.value = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     } catch (err) {
       console.error("Error fetching skills:", err);
       error.value = 'Failed to load skills.';
@@ -68,18 +52,18 @@ export default function useSkills() {
 
   // Add a new skill
   const addSkill = async (skillData) => {
-    if (!userId) throw new Error('User not authenticated');
+    if (!skillsCollectionRef) throw new Error('User not authenticated');
     
     loading.value = true;
     try {
       const newSkill = {
         ...skillData,
-        userId: userId,
-        dateAcquired: serverTimestamp(),
-        lastUpdated: serverTimestamp(),
-        progressHistory: [{ level: skillData.level, date: Timestamp.now() }]
+        userId: userId, // Already have userId
+        dateAcquired: firebase.firestore.FieldValue.serverTimestamp(), // v8 serverTimestamp
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+        progressHistory: [{ level: skillData.level, date: firebase.firestore.Timestamp.now() }] // v8 Timestamp
       };
-      const docRef = await addDoc(skillsCollectionRef, newSkill);
+      const docRef = await skillsCollectionRef.add(newSkill); // v8 add
       
       // Add skill locally for immediate UI update
       const addedSkill = { id: docRef.id, ...newSkill, dateAcquired: new Date(), lastUpdated: new Date() }; // Approximate timestamp locally
@@ -97,27 +81,27 @@ export default function useSkills() {
 
   // Update an existing skill
   const updateSkill = async (skillId, skillData) => {
-    if (!userId) throw new Error('User not authenticated');
+    if (!skillsCollectionRef) throw new Error('User not authenticated');
     
     loading.value = true;
     try {
-      const skillRef = doc(db, `users/${userId}/skills`, skillId);
+      const skillRef = skillsCollectionRef.doc(skillId); // v8 doc
       const existingSkill = skills.value.find(s => s.id === skillId);
       
       const updatedData = {
         ...skillData,
-        lastUpdated: serverTimestamp()
+        lastUpdated: firebase.firestore.FieldValue.serverTimestamp() // v8 serverTimestamp
       };
 
       // Add to progress history if level changed
       if (existingSkill && existingSkill.level !== skillData.level) {
         updatedData.progressHistory = [
           ...(existingSkill.progressHistory || []),
-          { level: skillData.level, date: Timestamp.now() }
+          { level: skillData.level, date: firebase.firestore.Timestamp.now() } // v8 Timestamp
         ];
       }
 
-      await updateDoc(skillRef, updatedData);
+      await skillRef.update(updatedData); // v8 update
       
       // Update skill locally
       const index = skills.value.findIndex(s => s.id === skillId);
@@ -142,12 +126,11 @@ export default function useSkills() {
 
   // Delete a skill
   const deleteSkill = async (skillId) => {
-    if (!userId) throw new Error('User not authenticated');
+    if (!skillsCollectionRef) throw new Error('User not authenticated');
     
     loading.value = true;
     try {
-      const skillRef = doc(db, `users/${userId}/skills`, skillId);
-      await deleteDoc(skillRef);
+      await skillsCollectionRef.doc(skillId).delete(); // v8 delete
       
       // Remove skill locally
       skills.value = skills.value.filter(s => s.id !== skillId);

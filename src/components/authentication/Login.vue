@@ -1,4 +1,5 @@
 <template>
+  <!-- Keep the template exactly the same -->
   <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <div>
@@ -38,9 +39,15 @@
           <button
             type="submit"
             class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            :disabled="loading"
           >
-            Se connecter
+            <span v-if="loading">Chargement...</span>
+            <span v-else>Se connecter</span>
           </button>
+          
+          <div v-if="error" class="mt-2 text-red-600 text-sm text-center">
+            {{ error }}
+          </div>
         </div>
 
         <div class="mt-6">
@@ -63,23 +70,54 @@
   </div>
 </template>
 
-<script setup>
+<script>
+import useAuth from '@/composables/useAuth'
 import { ref } from 'vue'
 import SocialLoginButton from './SocialLoginButton.vue'
 
-const emit = defineEmits(['login-success'])
+export default {
+  name: 'Login',
+  components: {
+    SocialLoginButton
+  },
+  emits: ['login-success'],
+  setup(props, { emit }) {
+    // Get auth functions from composable
+    const { login, error: authError, loading } = useAuth()
 
-const email = ref('')
-const password = ref('')
+    const email = ref('')
+    const password = ref('')
+    const error = ref('')
 
-const handleSubmit = async () => {
-  // TODO: Implémenter la logique de connexion
-  console.log('Login attempt with:', { email: email.value, password: password.value })
-  // Simuler une connexion réussie pour le moment
-  emit('login-success')
+    const handleSubmit = async () => {
+      error.value = '' // Clear previous errors
+      
+      try {
+        // Call the login method from useAuth composable
+        await login(email.value, password.value)
+        
+        // If successful, emit success event
+        emit('login-success')
+      } catch (err) {
+        // Set error message for display
+        error.value = err.message || 'Failed to login. Please check your credentials.'
+        console.error('Login error:', err)
+      }
+    }
+
+    const handleSocialSuccess = () => {
+      emit('login-success')
+    }
+
+    // Return all reactive data and methods needed in the template
+    return {
+      email,
+      password,
+      error,
+      loading,
+      handleSubmit,
+      handleSocialSuccess
+    }
+  }
 }
-
-const handleSocialSuccess = () => {
-  emit('login-success')
-}
-</script> 
+</script>

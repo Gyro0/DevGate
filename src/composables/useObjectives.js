@@ -1,74 +1,67 @@
 // src/composables/useObjectives.js
-import { ref, computed } from 'vue'
-import { db } from '@/firebase/firebaseInit'
-import { collection, query, where, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore'
-import useAuth from './useAuth'
+import { ref, computed } from 'vue';
+import firebase, { db } from '@/firebase/firebaseInit'; // Import firebase namespace for Timestamp/FieldValue
+import useAuth from './useAuth';
 
 /**
  * Objectives management composable for handling technical goals
  * @returns {Object} Objectives state and methods
  */
 export default function useObjectives() {
-  const { user } = useAuth()
-  const objectives = ref([])
-  const loading = ref(false)
-  const error = ref(null)
-  
+  const { user } = useAuth();
+  const objectives = ref([]);
+  const loading = ref(false);
+  const error = ref(null);
+
   // Objective status options
   const objectiveStatuses = [
     { id: 'planned', label: 'Planned' },
     { id: 'in-progress', label: 'In Progress' },
     { id: 'completed', label: 'Completed' }
-  ]
-  
+  ];
+
   // Get objectives for current user
   const fetchUserObjectives = async () => {
-    if (!user.value) return
-    
-    loading.value = true
-    error.value = null
-    
+    if (!user.value) return;
+    loading.value = true;
+    error.value = null;
     try {
-      const objectivesQuery = query(
-        collection(db, 'objectives'),
-        where('userId', '==', user.value.uid)
-      )
-      
-      const snapshot = await getDocs(objectivesQuery)
+      // Use v8 collection().where().get()
+      const snapshot = await db.collection('objectives')
+                               .where('userId', '==', user.value.uid)
+                               .get();
       objectives.value = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }))
+      }));
     } catch (e) {
       error.value = e.message
       console.error('Error fetching objectives:', e)
     } finally {
       loading.value = false
     }
-  }
-  
+  };
+
   // Add a new objective
   const addObjective = async (objectiveData) => {
-    if (!user.value) return
-    
-    loading.value = true
-    error.value = null
-    
+    if (!user.value) return;
+    loading.value = true;
+    error.value = null;
     try {
       const newObjective = {
         ...objectiveData,
         userId: user.value.uid,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        // Use v8 FieldValue.serverTimestamp()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
         progress: 0,
         status: 'planned'
-      }
-      
-      const docRef = await addDoc(collection(db, 'objectives'), newObjective)
-      const createdObjective = { id: docRef.id, ...newObjective }
-      objectives.value.push(createdObjective)
-      
-      return createdObjective
+      };
+      // Use v8 collection().add()
+      const docRef = await db.collection('objectives').add(newObjective);
+      const createdObjective = { id: docRef.id, ...newObjective, createdAt: new Date(), updatedAt: new Date() }; // Approximate timestamp locally
+      objectives.value.push(createdObjective);
+      return createdObjective;
     } catch (e) {
       error.value = e.message
       console.error('Error adding objective:', e)
@@ -76,33 +69,28 @@ export default function useObjectives() {
     } finally {
       loading.value = false
     }
-  }
-  
+  };
+
   // Update existing objective
   const updateObjective = async (id, objectiveData) => {
-    loading.value = true
-    error.value = null
-    
+    loading.value = true;
+    error.value = null;
     try {
-      const objectiveRef = doc(db, 'objectives', id)
+      // Use v8 collection().doc()
+      const objectiveRef = db.collection('objectives').doc(id);
       const updatedObjective = {
         ...objectiveData,
-        updatedAt: new Date()
-      }
-      
-      await updateDoc(objectiveRef, updatedObjective)
-      
-      // Update local state
-      const index = objectives.value.findIndex(o => o.id === id)
+        // Use v8 FieldValue.serverTimestamp()
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      // Use v8 docRef.update()
+      await objectiveRef.update(updatedObjective);
+      const index = objectives.value.findIndex(o => o.id === id);
       if (index !== -1) {
-        objectives.value[index] = { 
-          id, 
-          ...objectives.value[index], 
-          ...updatedObjective 
-        }
+        // Approximate timestamp locally
+        objectives.value[index] = { ...objectives.value[index], ...objectiveData, updatedAt: new Date() };
       }
-      
-      return { id, ...updatedObjective }
+      return { id, ...updatedObjective };
     } catch (e) {
       error.value = e.message
       console.error('Error updating objective:', e)
@@ -110,16 +98,16 @@ export default function useObjectives() {
     } finally {
       loading.value = false
     }
-  }
-  
+  };
+
   // Delete an objective
   const deleteObjective = async (id) => {
-    loading.value = true
-    error.value = null
-    
+    loading.value = true;
+    error.value = null;
     try {
-      await deleteDoc(doc(db, 'objectives', id))
-      objectives.value = objectives.value.filter(objective => objective.id !== id)
+      // Use v8 collection().doc().delete()
+      await db.collection('objectives').doc(id).delete();
+      objectives.value = objectives.value.filter(objective => objective.id !== id);
     } catch (e) {
       error.value = e.message
       console.error('Error deleting objective:', e)
@@ -127,16 +115,15 @@ export default function useObjectives() {
     } finally {
       loading.value = false
     }
-  }
-  
+  };
+
   // Update objective progress
   const updateProgress = async (id, progress) => {
-    loading.value = true
-    error.value = null
-    
+    loading.value = true;
+    error.value = null;
     try {
-      const objectiveRef = doc(db, 'objectives', id)
-      
+      // Use v8 collection().doc()
+      const objectiveRef = db.collection('objectives').doc(id);
       // Determine status based on progress
       let status = 'in-progress'
       if (progress >= 100) {
@@ -144,22 +131,18 @@ export default function useObjectives() {
       } else if (progress <= 0) {
         status = 'planned'
       }
-      
-      await updateDoc(objectiveRef, { 
-        progress, 
+
+      // Use v8 docRef.update()
+      await objectiveRef.update({
+        progress,
         status,
-        updatedAt: new Date() 
-      })
-      
-      // Update local state
-      const index = objectives.value.findIndex(o => o.id === id)
+        // Use v8 FieldValue.serverTimestamp()
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      const index = objectives.value.findIndex(o => o.id === id);
       if (index !== -1) {
-        objectives.value[index] = { 
-          ...objectives.value[index], 
-          progress,
-          status,
-          updatedAt: new Date()
-        }
+         // Approximate timestamp locally
+        objectives.value[index] = { ...objectives.value[index], progress, status, updatedAt: new Date() };
       }
     } catch (e) {
       error.value = e.message
@@ -168,8 +151,8 @@ export default function useObjectives() {
     } finally {
       loading.value = false
     }
-  }
-  
+  };
+
   // Computed properties for objectives by status
   const plannedObjectives = computed(() => 
     objectives.value.filter(o => o.status === 'planned')

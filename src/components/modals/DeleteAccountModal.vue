@@ -26,7 +26,7 @@
 
 <script>
 import { ref } from 'vue';
-import { getAuth, deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
+import firebase, { auth } from '@/firebase/firebaseInit'; // Import firebase namespace
 
 export default {
   name: 'DeleteAccountModal',
@@ -36,7 +36,6 @@ export default {
     const confirmationText = ref('');
     const loading = ref(false);
     const error = ref('');
-    const auth = getAuth();
 
     const handleDeleteAccount = async () => {
       if (confirmationText.value !== 'DELETE') {
@@ -50,23 +49,22 @@ export default {
       
       loading.value = true;
       error.value = '';
-      
       try {
         const user = auth.currentUser;
-        if (!user || !user.email) {
-          throw new Error("User not found or email missing.");
-        }
+        if (!user) throw new Error('User not logged in');
 
-        // Re-authenticate user
-        const credential = EmailAuthProvider.credential(user.email, currentPassword.value);
-        await reauthenticateWithCredential(user, credential);
-        
-        // Delete user
-        await deleteUser(user);
-        
-        emit('account-deleted');
+        // Use v8 firebase.auth.EmailAuthProvider
+        const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword.value);
+        // Use v8 user.reauthenticateWithCredential
+        await user.reauthenticateWithCredential(credential);
+
+        // Use v8 user.delete()
+        await user.delete();
+
+        alert('Account deleted successfully.');
+        // Redirect or handle logout state
         emit('close');
-        
+        // Optionally call logout from useAuth here
       } catch (err) {
         console.error("Error deleting account:", err);
         if (err.code === 'auth/wrong-password') {
@@ -82,12 +80,22 @@ export default {
       }
     };
 
+    const closeModal = () => {
+      // Reset form fields
+      currentPassword.value = '';
+      confirmationText.value = '';
+      error.value = '';
+      // Emit close event
+      emit('close');
+    };
+
     return {
       currentPassword,
       confirmationText,
       loading,
       error,
-      handleDeleteAccount
+      handleDeleteAccount,
+      closeModal // Add this
     };
   }
 }

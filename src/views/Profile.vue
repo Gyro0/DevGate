@@ -3,8 +3,9 @@
       <AppHeader />
       <div class="main-layout">
         <AppSidebar :active-page="'profile'" />
-        
-        <div class="content-area">
+
+        <!-- Add v-if="userProfile" to the content area or specific components -->
+        <div class="content-area" v-if="userProfile">
           <div class="profile-header">
             <h1>User Profile</h1>
             <button @click="editMode = !editMode" class="edit-button">
@@ -12,27 +13,48 @@
               {{ editMode ? 'Cancel' : 'Edit Profile' }}
             </button>
           </div>
-          
+
+          <!-- These components rely on userProfile -->
           <ProfileCard :userProfile="userProfile" :editMode="editMode" @triggerPhotoUpload="triggerPhotoUpload" @handlePhotoChange="handlePhotoChange" />
-          
           <ProfileStats :stats="userStats" />
-          
-          <ProfileForm v-if="editMode" :editedProfile="editedProfile" @saveProfile="saveProfile" />
-          
+          <ProfileForm 
+  v-if="editMode" 
+  :editedProfile="editedProfile" 
+  @saveProfile="saveProfile" 
+  @cancel="cancelEditing" 
+/>
           <AccountSettings :userProfile="userProfile" @changeEmail="showChangeEmailModal = true" @changePassword="showChangePasswordModal = true" />
-          
-          <ConnectedAccounts :connectedAccounts="userProfile.connectedAccounts" />
+          <ConnectedAccounts :userProfile="userProfile" />
+
+        </div>
+        <!-- Optional: Add a loading indicator while userProfile is null -->
+        <div class="content-area" v-else>
+           <p>Loading profile...</p>
+           <!-- Or add a spinner component -->
         </div>
       </div>
-      
-      <ChangeEmailModal v-if="showChangeEmailModal" @close="showChangeEmailModal = false" />
-      <ChangePasswordModal v-if="showChangePasswordModal" @close="showChangePasswordModal = false" />
-      <DeleteAccountModal v-if="showDeleteAccountModal" @close="showDeleteAccountModal = false" />
+
+      <!-- Modals can stay outside the v-if as they depend on separate refs -->
+      <ChangeEmailModal 
+  v-if="showChangeEmailModal" 
+  @close="showChangeEmailModal = false" 
+  @email-changed="handleEmailChanged" 
+/>
+      <ChangePasswordModal 
+  v-if="showChangePasswordModal" 
+  @close="showChangePasswordModal = false" 
+  @password-changed="handlePasswordChanged" 
+/>
+      <DeleteAccountModal 
+  v-if="showDeleteAccountModal" 
+  @close="showDeleteAccountModal = false" 
+  @account-deleted="handleAccountDeleted" 
+/>
     </div>
   </template>
-  
+
   <script>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import AppHeader from '@/components/common/AppHeader.vue';
 import AppSidebar from '@/components/common/AppSidebar.vue';
 import ProfileCard from '@/components/profile/ProfileCard.vue';
@@ -43,11 +65,12 @@ import ConnectedAccounts from '@/components/profile/ConnectedAccounts.vue';
 import ChangeEmailModal from '@/components/modals/ChangeEmailModal.vue';
 import ChangePasswordModal from '@/components/modals/ChangePasswordModal.vue';
 import DeleteAccountModal from '@/components/modals/DeleteAccountModal.vue';
-import useProfile from '@/composables/useProfile'; // Import useProfile
-import useFileUpload from '@/composables/useFileUpload'; // Import useFileUpload
+import useProfile from '@/composables/useProfile';
+import useFileUpload from '@/composables/useFileUpload';
+import useAuth from '@/composables/useAuth';
+import { useRouter } from 'vue-router';
 
 export default {
-  name: 'ProfileView',
   components: {
     AppHeader,
     AppSidebar,
@@ -61,95 +84,136 @@ export default {
     DeleteAccountModal
   },
   setup() {
+    const router = useRouter();
+    // Get Profile data
     const { 
       userProfile, 
-      loading: profileLoading, 
-      error: profileError, 
-      fetchUserProfile, 
+      editedProfile, 
+      loading, 
+      error, 
+      fetchUserProfile,
       updateUserProfile 
     } = useProfile();
-    const { 
-      uploadFile, 
-      deleteFile, 
-      uploading: fileUploading, 
-      error: fileError 
-    } = useFileUpload();
-
-    const userStats = ref({}); // Placeholder for stats logic
-    const editedProfile = ref({});
+    
+    // Check auth status
+    const { user, isAuthenticated } = useAuth();
+    
+    // File upload functionality
+    const { uploadFile } = useFileUpload();
+    
+    // UI state
     const editMode = ref(false);
     const showChangeEmailModal = ref(false);
     const showChangePasswordModal = ref(false);
-    const showDeleteAccountModal = ref(false); // Added for completeness
-
-    // Fetch profile data on mount
-    onMounted(async () => {
-      await fetchUserProfile();
-      // TODO: Fetch or calculate userStats based on projects, skills, etc.
+    const showDeleteAccountModal = ref(false);
+    
+    // Computed stats for ProfileStats component
+    const userStats = computed(() => {
+      if (!userProfile.value) return { skills: 0, objectives: 0, completedProjects: 0 };
+      
+      return {
+        skills: userProfile.value.skillsCount || 0,
+        objectives: userProfile.value.objectivesCount || 0,
+        completedProjects: userProfile.value.completedProjectsCount || 0
+      };
+    });
+    
+    // Watch for authentication status changes
+    watch(isAuthenticated, (isAuth) => {
+      if (isAuth) {
+        fetchUserProfile();
+      }
+    }, { immediate: true });
+    
+    // Ensure profile is fetched when component mounts
+    onMounted(() => {
+      if (isAuthenticated.value) {
+        console.log('Fetching user profile on mount');
+        fetchUserProfile();
+      }
     });
 
-    // Watch for changes in userProfile to update the editable copy
-    watch(userProfile, (newProfile) => {
-      if (newProfile) {
-        editedProfile.value = { ...newProfile };
+    // Photo upload handlers
+    const triggerPhotoUpload = () => {
+      // Logic to trigger file input click
+      // This is just a placeholder, actual implementation handled by child component
+    };
+    
+    const handlePhotoChange = async (file) => {
+      try {
+        if (!file) return;
+        
+        console.log('Uploading profile photo:', file);
+        const uploadPath = `profile-photos/${user.value.uid}`;
+        
+        // Upload the file and wait for result
+        const result = await uploadFile(file, uploadPath);
+        console.log('Upload successful:', result);
+        
+        // Update the user profile with the new photo URL
+        await updateUserProfile({ 
+          photoURL: result.url
+        });
+        
+      } catch (err) {
+        console.error('Error updating profile photo:', err);
       }
-    }, { immediate: true, deep: true });
+    };
+    
+    // Save profile data
+    const saveProfile = async (formData) => {
+      try {
+        // Show loading state
+        loading.value = true;
+        
+        // Update user profile in Firestore
+        await updateUserProfile(formData);
+        
+        // Update the local userProfile with the new data
+        userProfile.value = { ...userProfile.value, ...formData };
+        
+        // Exit edit mode
+        editMode.value = false;
+        
+        // Show success message
+        alert('Profile updated successfully!');
+      } catch (err) {
+        console.error('Error saving profile:', err);
+        alert('Failed to save profile changes: ' + err.message);
+      } finally {
+        loading.value = false;
+      }
+    };
 
-    // Watch for editMode changes to reset editedProfile if canceling
-    watch(editMode, (newVal) => {
-      if (!newVal && userProfile.value) {
-        // Reset editedProfile to original when exiting edit mode
+    // Add this function to handle cancel button click
+    const cancelEditing = () => {
+      editMode.value = false;
+      // Reset the editedProfile back to userProfile
+      if (userProfile.value) {
         editedProfile.value = { ...userProfile.value };
       }
-    });
-
-    // Logic to trigger photo upload (likely handled within ProfileCard now)
-    const triggerPhotoUpload = () => {
-      // This might just be an event handler now, or could trigger input if needed
-      console.log('Trigger photo upload requested from parent');
     };
 
-    // Logic to handle photo change (received from ProfileCard)
-    const handlePhotoChange = async (file) => {
-      if (!file || !userProfile.value?.uid) return;
-
-      try {
-        const oldPhotoPath = userProfile.value.photoPath; // Get path if stored
-        const uploadResult = await uploadFile(file, `avatars/${userProfile.value.uid}`);
-        
-        if (uploadResult) {
-          await updateUserProfile({ 
-            photoURL: uploadResult.url, 
-            photoPath: uploadResult.path // Store path for deletion
-          });
-          // Optionally delete the old photo if path was stored
-          if (oldPhotoPath && oldPhotoPath !== uploadResult.path) {
-            await deleteFile(oldPhotoPath);
-          }
-        }
-      } catch (err) {
-        console.error("Error uploading/updating photo:", err);
-        // Handle error display
-      }
+    const handleEmailChanged = () => {
+      // Success notification or actions after email change
+      fetchUserProfile(); // Refresh user data
     };
 
-    // Logic to save profile changes (received from ProfileForm)
-    const saveProfile = async (updatedData) => {
-       if (!userProfile.value?.uid) return;
-       try {
-         await updateUserProfile(updatedData);
-         editMode.value = false; // Exit edit mode on successful save
-       } catch (err) {
-         console.error("Error saving profile:", err);
-         // Handle error display
-       }
+    const handlePasswordChanged = () => {
+      // Success notification or actions after password change
     };
 
-    // Return reactive state and methods
+    const handleAccountDeleted = () => {
+      // Handle account deletion (redirect to login, etc)
+      router.push('/login');
+    };
+    
     return {
       userProfile,
-      userStats,
       editedProfile,
+      loading,
+      error,
+      userStats,
       editMode,
       showChangeEmailModal,
       showChangePasswordModal,
@@ -157,45 +221,45 @@ export default {
       triggerPhotoUpload,
       handlePhotoChange,
       saveProfile,
-      profileLoading, // Expose loading/error states if needed for UI
-      profileError,
-      fileUploading,
-      fileError
+      cancelEditing,
+      handleEmailChanged,
+      handlePasswordChanged,
+      handleAccountDeleted
     };
   }
-}
+};
 </script>
-  
-  <style scoped>
-  .profile-view {
-    min-height: 100vh;
-    background-color: #f8f9fa;
-  }
-  
-  .main-layout {
-    display: flex;
-    min-height: calc(100vh - 64px);
-  }
-  
-  .content-area {
-    flex: 1;
-    padding: 1.5rem;
-    overflow-y: auto;
-  }
-  
-  .profile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-  }
-  
-  .edit-button {
-    background-color: #4f46e5;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 0.6rem 1.2rem;
-    cursor: pointer;
-  }
-  </style>
+
+<style scoped>
+.profile-view {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+.main-layout {
+  display: flex;
+  min-height: calc(100vh - 64px);
+}
+
+.content-area {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.edit-button {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+}
+</style>
