@@ -3,6 +3,8 @@
 ## Project setup
 ```
 npm install
+npm install firebase@8.0.0
+npm install chartjs
 ```
 
 ### Compiles and hot-reloads for development
