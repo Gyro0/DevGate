@@ -2,6 +2,22 @@
   <router-view/>
 </template>
 
+<script>
+import useAuth from '@/composables/useAuth';
+
+export default {
+  setup() {
+    // Initialize auth as soon as the app loads
+    const { initAuth } = useAuth();
+    
+    // The actual initAuth() call happens when the composable is imported
+    // so we don't need to call it again here
+    
+    return {};
+  }
+}
+</script>
+
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;

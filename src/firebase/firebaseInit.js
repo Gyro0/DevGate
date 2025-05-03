@@ -27,4 +27,4 @@ db.enablePersistence().catch(err => {
 });
 
 // Export the firebase object itself if needed elsewhere
-export default firebase;
+export { firebase as default };

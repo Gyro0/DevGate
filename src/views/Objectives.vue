@@ -15,12 +15,12 @@
         <div class="charts-section">
           <div class="chart-card">
             <h3>Completion Rate</h3>
-            <ObjectiveCompletionRate :objectives="objectives" />
+            <ObjectiveCompletionRate />
           </div>
           
           <div class="chart-card">
             <h3>Objective Timeline</h3>
-            <ObjectiveTimeline :objectives="objectives" />
+            <ObjectiveTimeline />
           </div>
         </div>
         
@@ -31,7 +31,7 @@
               :objectives="plannedObjectives"
               @edit="editObjective"
               @delete="confirmDeleteObjective"
-              @update-progress="updateObjectiveProgress"
+              @update-progress="handleUpdateProgress"
             />
             
             <ObjectiveColumn 
@@ -39,7 +39,7 @@
               :objectives="inProgressObjectives"
               @edit="editObjective"
               @delete="confirmDeleteObjective"
-              @update-progress="updateObjectiveProgress"
+              @update-progress="handleUpdateProgress"
             />
             
             <ObjectiveColumn 
@@ -47,7 +47,7 @@
               :objectives="completedObjectives"
               @edit="editObjective"
               @delete="confirmDeleteObjective"
-              @update-progress="updateObjectiveProgress"
+              @update-progress="handleUpdateProgress"
             />
           </div>
         </div>
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import AppHeader from '@/components/common/AppHeader.vue';
 import AppSidebar from '@/components/common/AppSidebar.vue';
 import ObjectiveColumn from '@/components/objectives/ObjectiveColumn.vue';
@@ -99,6 +99,8 @@ export default {
       plannedObjectives,
       inProgressObjectives, 
       completedObjectives,
+      loading,
+      error,
       fetchUserObjectives, 
       addObjective, 
       updateObjective, 
@@ -115,8 +117,23 @@ export default {
 
     // Fetch objectives on component mount
     onMounted(async () => {
+      console.log("ObjectivesView: Mounting, fetching objectives...");
       await fetchUserObjectives();
+      console.log("ObjectivesView: Fetch complete. Total objectives:", objectives.value.length);
+      console.log("ObjectivesView: Computed Planned:", plannedObjectives.value.length);
+      console.log("ObjectivesView: Computed In Progress:", inProgressObjectives.value.length);
+      console.log("ObjectivesView: Computed Completed:", completedObjectives.value.length);
     });
+
+    // Watch the main objectives array for changes
+    watch(objectives, (newObjectives, oldObjectives) => {
+        if (newObjectives !== oldObjectives) {
+            console.log("ObjectivesView: objectives ref updated, new count:", newObjectives.length);
+            console.log("ObjectivesView: Watched Planned:", plannedObjectives.value.length);
+            console.log("ObjectivesView: Watched In Progress:", inProgressObjectives.value.length);
+            console.log("ObjectivesView: Watched Completed:", completedObjectives.value.length);
+        }
+    }, { deep: false });
 
     // Open edit modal for an objective
     const editObjective = (objective) => {
@@ -146,11 +163,9 @@ export default {
     const saveObjective = async (objectiveData) => {
       try {
         if (selectedObjective.value?.id) {
-          // Update existing objective
           const updated = await updateObjective(selectedObjective.value.id, objectiveData);
           await recordEvent('objective', 'updated', updated.id, updated);
         } else {
-          // Add new objective
           const created = await addObjective(objectiveData);
           await recordEvent('objective', 'added', created.id, created);
         }
@@ -160,25 +175,21 @@ export default {
       }
     };
 
-    // Update objective progress
-    const updateObjectiveProgress = async (objectiveId, progress) => {
+    // Handler for the update-progress event from ObjectiveColumn
+    const handleUpdateProgress = async (objectiveId, progress) => {
+      console.log(`ObjectivesView: handleUpdateProgress called for ${objectiveId} with ${progress}%`);
       try {
         const updatedObjective = await updateProgress(objectiveId, progress);
-        
-        // If objective is completed, record a 'completed' event
-        // Check status from the returned updated objective or refetch/find
-        if (updatedObjective?.status === 'completed' || progress >= 100) { 
-          const objective = objectives.value.find(o => o.id === objectiveId) || updatedObjective;
-          if (objective) {
-             // Avoid duplicate 'completed' events if status was already 'completed'
-             // This check might need refinement based on how updateProgress handles status changes
-             if (objective.status !== 'completed' || progress >= 100) { 
-                await recordEvent('objective', 'completed', objectiveId, objective);
-             }
-          }
+
+        if (updatedObjective?.status === 'completed') {
+           console.log(`ObjectivesView: Objective ${objectiveId} completed, recording event.`);
+           await recordEvent('objective', 'completed', objectiveId, { title: updatedObjective.title });
+        } else {
+             await recordEvent('objective', 'progress_updated', objectiveId, { title: updatedObjective?.title, progress: updatedObjective?.progress });
         }
+
       } catch (error) {
-        console.error('Error updating objective progress:', error);
+        console.error('ObjectivesView: Error in handleUpdateProgress:', error);
       }
     };
 
@@ -194,6 +205,8 @@ export default {
       plannedObjectives,
       inProgressObjectives,
       completedObjectives,
+      loading,
+      error,
       showAddObjectiveModal,
       showDeleteConfirm,
       selectedObjective,
@@ -202,7 +215,7 @@ export default {
       confirmDeleteObjective,
       deleteObjective,
       saveObjective,
-      updateObjectiveProgress,
+      handleUpdateProgress,
       closeObjectiveModal
     };
   }
@@ -257,9 +270,9 @@ export default {
 
 .kanban-columns {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
-  min-height: 400px;
+  padding: 1rem;
 }
 
 .btn-primary {

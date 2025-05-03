@@ -27,7 +27,7 @@
           v-for="tech in availableTechnologies" 
           :key="tech"
           @click="toggleTechFilter(tech)" 
-          :class="['tech-chip', { selected: filters.tech.includes(tech) }]"
+          :class="['tech-chip', { selected: techIsSelected(tech) }]"
         >
           {{ tech }}
         </div>
@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { computed, reactive, watch } from 'vue'; // Removed ref as it's not used directly
+import { computed, reactive, watch } from 'vue';
 
 export default {
   name: 'ProjectFilterBar',
@@ -89,20 +89,33 @@ export default {
       'Docker', 'Kubernetes', 'AWS', 'Firebase'
     ];
     
-    // Create a reactive copy of the filters
-    const filters = reactive({ ...props.modelValue });
+    // Create a reactive copy of the filters with safe initialization
+    const filters = reactive({ 
+      search: props.modelValue.search || '',
+      tech: Array.isArray(props.modelValue.tech) ? [...props.modelValue.tech] : [],
+      dateRange: props.modelValue.dateRange || null
+    });
+    
+    // Safe check if a tech is selected
+    const techIsSelected = (tech) => {
+      return Array.isArray(filters.tech) && filters.tech.includes(tech);
+    };
     
     // Watch for external changes to modelValue
     watch(() => props.modelValue, (newVal) => {
-      Object.assign(filters, newVal);
+      if (newVal) {
+        // Safely update properties
+        filters.search = newVal.search || '';
+        filters.tech = Array.isArray(newVal.tech) ? [...newVal.tech] : [];
+        filters.dateRange = newVal.dateRange || null;
+      }
     }, { deep: true });
     
     // Computed properties for date inputs
     const formatDateForInput = (date) => {
       if (!date) return '';
-      // Ensure date is a Date object before calling toISOString
       const dateObj = date instanceof Date ? date : new Date(date);
-      if (isNaN(dateObj.getTime())) return ''; // Handle invalid dates
+      if (isNaN(dateObj.getTime())) return '';
       return dateObj.toISOString().split('T')[0];
     };
     
@@ -120,30 +133,35 @@ export default {
     
     // Methods
     const emitUpdate = () => {
-      // Ensure dateRange is structured correctly before emitting
+      // Ensure all properties exist and are properly initialized
       const dataToEmit = {
-        ...filters,
+        search: filters.search || '',
+        tech: Array.isArray(filters.tech) ? filters.tech : [],
         dateRange: filters.dateRange ? {
           start: filters.dateRange.start || null,
           end: filters.dateRange.end || null
         } : null
       };
+      
       // Remove dateRange if both start and end are null
       if (dataToEmit.dateRange && !dataToEmit.dateRange.start && !dataToEmit.dateRange.end) {
         dataToEmit.dateRange = null;
       }
+      
       emit('update:modelValue', dataToEmit);
     };
     
     const toggleTechFilter = (tech) => {
-      if (!Array.isArray(filters.tech)) { // Ensure filters.tech is an array
-         filters.tech = [];
+      if (!Array.isArray(filters.tech)) {
+        filters.tech = [];
       }
+      
       if (filters.tech.includes(tech)) {
         filters.tech = filters.tech.filter(t => t !== tech);
       } else {
         filters.tech = [...filters.tech, tech];
       }
+      
       emitUpdate();
     };
     
@@ -178,12 +196,13 @@ export default {
       startDateValue,
       endDateValue,
       hasDateFilter,
+      techIsSelected, // Add this new method
       toggleTechFilter,
       updateStartDate,
       updateEndDate,
       clearDateFilter,
       clearSearch,
-      emitUpdate // Expose if needed directly in template (e.g., @input)
+      emitUpdate
     };
   }
 }

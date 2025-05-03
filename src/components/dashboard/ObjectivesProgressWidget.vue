@@ -5,141 +5,234 @@
       <router-link to="/objectives" class="view-all">View All</router-link>
     </div>
     
-    <div class="objectives-content" v-if="!loading">
-      <div v-if="objectives.length > 0" class="objectives-container">
-        <div class="progress-overview">
+    <div class="objectives-content">
+      <!-- Loading state -->
+      <div v-if="loading" class="loading-state">
+        <div class="spinner"></div>
+        <span>Loading objectives...</span>
+      </div>
+      
+      <!-- Error state -->
+      <div v-else-if="error" class="error-state">
+        <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
+        <p>{{ error }}</p>
+        <button @click="loadObjectives" class="retry-btn">Retry</button>
+      </div>
+      
+      <!-- Objectives loaded successfully -->
+      <div v-else-if="objectives.length > 0" class="objectives-data">
+        <div class="objectives-summary">
           <div class="progress-container">
-            <div class="progress-label">
-              <span>{{ completionPercentage }}%</span>
-              <span>Complete</span>
+            <div class="progress-ring">
+              <div class="progress-circle">
+                <div class="progress-value">{{ completionPercentage }}%</div>
+                <div class="progress-label">Completed</div>
+              </div>
             </div>
-            <div class="progress-bar">
-              <div 
-                class="progress-value" 
-                :style="{ width: `${completionPercentage}%` }"
-              ></div>
-            </div>
-          </div>
-          <div class="objectives-stats">
-            <div class="stat-item">
-              <div class="stat-value">{{ objectives.length }}</div>
-              <div class="stat-label">Total</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value">{{ completedObjectives.length }}</div>
-              <div class="stat-label">Complete</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-value">{{ inProgressObjectives.length }}</div>
-              <div class="stat-label">In Progress</div>
+            <div class="status-summary">
+              <div class="status-item">
+                <div class="status-dot planned"></div>
+                <div class="status-label">Planned</div>
+                <div class="status-count">{{ plannedCount }}</div>
+              </div>
+              <div class="status-item">
+                <div class="status-dot in-progress"></div>
+                <div class="status-label">In Progress</div>
+                <div class="status-count">{{ inProgressCount }}</div>
+              </div>
+              <div class="status-item">
+                <div class="status-dot completed"></div>
+                <div class="status-label">Completed</div>
+                <div class="status-count">{{ completedCount }}</div>
+              </div>
             </div>
           </div>
         </div>
         
-        <h3>Current Goals</h3>
+        <h3>Recent Objectives</h3>
         <ul class="objectives-list">
-          <li v-for="objective in activeObjectives" :key="objective.id" class="objective-item">
+          <li v-for="objective in recentObjectives" :key="objective.id" class="objective-item">
             <div class="objective-info">
               <div class="objective-title">{{ objective.title }}</div>
-              <div class="objective-meta">
-                <div v-if="objective.deadline" class="deadline">
-                  <i class="fas fa-calendar"></i> Due {{ formatDate(objective.deadline) }}
-                </div>
-                <div v-if="objective.progress" class="objective-progress">
-                  <div class="progress-bar">
-                    <div 
-                      class="progress-value" 
-                      :style="{ width: `${objective.progress}%` }"
-                    ></div>
-                  </div>
-                  <span>{{ objective.progress }}%</span>
-                </div>
+              <div class="objective-details">
+                <span class="objective-status" :class="`status-${objective.status}`">
+                  {{ formatStatus(objective.status) }}
+                </span>
+                <span v-if="objective.dueDate" class="objective-due-date">
+                  Due {{ formatDate(objective.dueDate) }}
+                </span>
               </div>
             </div>
+            <router-link :to="`/objectives/${objective.id}`" class="view-objective">
+              <i class="fas fa-chevron-right"></i>
+            </router-link>
           </li>
         </ul>
       </div>
       
+      <!-- No objectives state -->
       <div v-else class="empty-state">
         <div class="empty-icon">
           <i class="fas fa-bullseye"></i>
         </div>
         <h3>No objectives yet</h3>
-        <p>Set clear objectives to guide your development journey.</p>
+        <p>Define your learning and career objectives to track your progress.</p>
         <router-link to="/objectives" class="add-btn">
           <i class="fas fa-plus"></i> Add Objective
         </router-link>
       </div>
     </div>
-    
-    <div v-else class="loading-state">
-      <div class="spinner"></div>
-      <span>Loading objectives...</span>
-    </div>
   </div>
 </template>
 
 <script>
-import { computed } from 'vue';
-import useObjectives from '@/composables/useObjectives';
+import { ref, computed, onMounted } from 'vue';
+import { db } from '@/firebase/firebaseInit';
+import useAuth from '@/composables/useAuth';
 
 export default {
   name: 'ObjectivesProgressWidget',
   setup() {
-    const { objectives, loading } = useObjectives();
-
+    // State
+    const objectives = ref([]);
+    const loading = ref(true);
+    const error = ref(null);
+    const { waitForAuth } = useAuth();
+    
     // Computed properties
-    const completedObjectives = computed(() => {
-      return objectives.value.filter(o => o.status === 'completed');
-    });
-
-    const inProgressObjectives = computed(() => {
-      return objectives.value.filter(o => o.status === 'in-progress');
-    });
-
-    const activeObjectives = computed(() => {
-      // Sort in-progress first, then planned, limit to 4
-      return [...inProgressObjectives.value, 
-              ...objectives.value.filter(o => o.status === 'planned')]
-        .sort((a, b) => {
-          // Sort by deadline if available
-          if (a.deadline && b.deadline) {
-            const dateA = a.deadline?.seconds ? new Date(a.deadline.seconds * 1000) : new Date(a.deadline);
-            const dateB = b.deadline?.seconds ? new Date(b.deadline.seconds * 1000) : new Date(b.deadline);
-            return dateA - dateB;
-          }
-          return 0;
-        })
-        .slice(0, 4);
-    });
-
+    const plannedCount = computed(() => 
+      objectives.value.filter(o => o.status === 'planned').length
+    );
+    
+    const inProgressCount = computed(() => 
+      objectives.value.filter(o => o.status === 'in-progress').length
+    );
+    
+    const completedCount = computed(() => 
+      objectives.value.filter(o => o.status === 'completed').length
+    );
+    
     const completionPercentage = computed(() => {
       if (objectives.value.length === 0) return 0;
-      return Math.round((completedObjectives.value.length / objectives.value.length) * 100);
+      return Math.round((completedCount.value / objectives.value.length) * 100);
     });
-
+    
+    const recentObjectives = computed(() => {
+      // Sort by createdAt date (newest first) and take top 3
+      return [...objectives.value]
+        .sort((a, b) => {
+          const dateA = new Date(a.createdAt || 0);
+          const dateB = new Date(b.createdAt || 0);
+          return dateB - dateA;
+        })
+        .slice(0, 3);
+    });
+    
     // Format date for display
     const formatDate = (timestamp) => {
-      if (!timestamp) return 'No deadline';
+      if (!timestamp) return 'N/A';
       
-      const date = timestamp?.seconds 
-        ? new Date(timestamp.seconds * 1000) 
-        : new Date(timestamp);
+      let date;
+      try {
+        if (timestamp.seconds) {
+          date = new Date(timestamp.seconds * 1000);
+        } else if (timestamp instanceof Date) {
+          date = timestamp;
+        } else {
+          date = new Date(timestamp);
+        }
         
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric'
-      });
+        if (isNaN(date.getTime())) {
+          return 'Invalid date';
+        }
+        
+        return date.toLocaleDateString();
+      } catch (err) {
+        console.error("Error formatting date:", err, timestamp);
+        return 'N/A';
+      }
     };
-
+    
+    // Format status
+    const formatStatus = (status) => {
+      const statusMap = {
+        'planned': 'Planned',
+        'in-progress': 'In Progress',
+        'completed': 'Completed',
+        'cancelled': 'Cancelled'
+      };
+      return statusMap[status] || status;
+    };
+    
+    // Load objectives directly from Firestore
+    const loadObjectives = async () => {
+      loading.value = true;
+      error.value = null;
+      
+      try {
+        console.log("ObjectivesWidget: Loading objectives...");
+        
+        // Wait for authentication
+        const currentUser = await waitForAuth();
+        
+        if (!currentUser) {
+          console.warn("ObjectivesWidget: No user logged in");
+          loading.value = false;
+          error.value = "Authentication required";
+          return;
+        }
+        
+        // Fetch objectives directly from Firestore
+        const snapshot = await db.collection('objectives')
+          .where('userId', '==', currentUser.uid)
+          .orderBy('createdAt', 'desc')
+          .limit(10) // Only need a few for the summary
+          .get();
+        
+        const fetchedObjectives = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            // Convert timestamps to JS Date objects
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : 
+              (data.createdAt ? new Date(data.createdAt) : new Date()),
+            updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : 
+              (data.updatedAt ? new Date(data.updatedAt) : new Date()),
+            dueDate: data.dueDate?.toDate ? data.dueDate.toDate() : 
+              (data.dueDate ? new Date(data.dueDate) : null),
+            completedAt: data.completedAt?.toDate ? data.completedAt.toDate() : 
+              (data.completedAt ? new Date(data.completedAt) : null)
+          };
+        });
+        
+        console.log(`ObjectivesWidget: Loaded ${fetchedObjectives.length} objectives`);
+        objectives.value = fetchedObjectives;
+      } catch (err) {
+        console.error("ObjectivesWidget: Error loading objectives", err);
+        error.value = "Failed to load objectives";
+      } finally {
+        loading.value = false;
+      }
+    };
+    
+    // Initialize data on component mount
+    onMounted(() => {
+      loadObjectives();
+    });
+    
     return {
       objectives,
       loading,
-      completedObjectives,
-      inProgressObjectives,
-      activeObjectives,
+      error,
+      plannedCount,
+      inProgressCount,
+      completedCount,
       completionPercentage,
-      formatDate
+      recentObjectives,
+      formatDate,
+      formatStatus,
+      loadObjectives
     };
   }
 }
@@ -156,19 +249,20 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .widget-header h2 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
+  color: #111827;
 }
 
 .view-all {
+  font-size: 0.875rem;
   color: #4f46e5;
   text-decoration: none;
-  font-size: 0.875rem;
 }
 
 .view-all:hover {
@@ -177,80 +271,114 @@ export default {
 
 .objectives-content {
   flex: 1;
+  overflow: auto;
 }
 
-.objectives-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.progress-overview {
+.objectives-summary {
   margin-bottom: 1.5rem;
 }
 
 .progress-container {
-  margin-bottom: 1rem;
-}
-
-.progress-label {
   display: flex;
-  justify-content: space-between;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.progress-bar {
-  height: 8px;
-  background-color: #e5e7eb;
-  border-radius: 4px;
-  overflow: hidden;
+.progress-ring {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.progress-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: conic-gradient(#4f46e5 0%, #4f46e5 calc(var(--percentage) * 1%), #e5e7eb calc(var(--percentage) * 1%), #e5e7eb 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  font-size: 0.875rem;
+  color: #4b5563;
+  --percentage: v-bind(completionPercentage);
+}
+
+.progress-circle::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: white;
+}
+
+.progress-value, .progress-label {
+  position: relative;
+  z-index: 1;
 }
 
 .progress-value {
-  height: 100%;
-  background-color: #4f46e5;
-  border-radius: 4px;
-  transition: width 0.3s ease;
-}
-
-.objectives-stats {
-  display: flex;
-  justify-content: space-between;
-}
-
-.stat-item {
-  text-align: center;
-}
-
-.stat-value {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: bold;
+  color: #111827;
 }
 
-.stat-label {
-  font-size: 0.75rem;
-  color: #6b7280;
+.status-summary {
+  flex: 1;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.status-dot.planned {
+  background-color: #9ca3af;
+}
+
+.status-dot.in-progress {
+  background-color: #3b82f6;
+}
+
+.status-dot.completed {
+  background-color: #10b981;
+}
+
+.status-label {
+  flex: 1;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.status-count {
+  font-weight: bold;
+  color: #111827;
 }
 
 h3 {
   font-size: 1rem;
-  font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 1rem;
+  margin: 1rem 0 0.5rem;
 }
 
 .objectives-list {
   list-style: none;
   padding: 0;
   margin: 0;
-  flex: 1;
-  overflow-y: auto;
 }
 
 .objective-item {
   display: flex;
-  padding: 0.75rem 0;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -258,119 +386,108 @@ h3 {
   border-bottom: none;
 }
 
-.objective-info {
-  flex: 1;
-}
-
 .objective-title {
   font-weight: 500;
+  color: #111827;
   margin-bottom: 0.25rem;
 }
 
-.objective-meta {
+.objective-details {
   display: flex;
-  align-items: center;
+  gap: 1rem;
   font-size: 0.75rem;
   color: #6b7280;
 }
 
-.deadline {
-  margin-right: 1rem;
+.objective-status {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
 }
 
-.deadline i {
-  margin-right: 0.25rem;
+.objective-status.status-planned {
+  color: #9ca3af;
 }
 
-.objective-progress {
+.objective-status.status-in-progress {
+  color: #3b82f6;
+}
+
+.objective-status.status-completed {
+  color: #10b981;
+}
+
+.objective-status.status-cancelled {
+  color: #ef4444;
+}
+
+.view-objective {
+  color: #9ca3af;
   display: flex;
   align-items: center;
-  width: 100px; /* Example width */
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
 }
 
-.objective-progress .progress-bar {
-  height: 6px;
-  flex: 1;
-  margin-right: 0.5rem;
+.view-objective:hover {
+  background-color: #f3f4f6;
+  color: #4f46e5;
 }
 
-.objective-progress .progress-value {
-  background-color: #34d399; /* Example color */
-}
-
-.empty-state {
-  width: 100%;
-  height: 100%;
+.loading-state, .error-state, .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  height: 100%;
+  padding: 1.5rem;
   text-align: center;
-  padding: 2rem 1rem;
+  color: #6b7280;
 }
 
-.empty-icon {
-  font-size: 3rem;
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-radius: 50%;
+  border-top-color: #6366f1;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.error-icon, .empty-icon {
+  font-size: 2rem;
   margin-bottom: 1rem;
   color: #d1d5db;
 }
 
-.empty-state h3 {
-  margin: 0;
-  margin-bottom: 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
+.error-state p {
+  margin-bottom: 1rem;
 }
 
-.empty-state p {
-  margin: 0;
-  margin-bottom: 1.5rem;
-  color: #6b7280;
-  max-width: 24rem;
-}
-
-.add-btn {
+.retry-btn, .add-btn {
   display: inline-flex;
   align-items: center;
+  gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: #4f46e5;
-  color: white;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
   border-radius: 0.375rem;
-  text-decoration: none;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.add-btn i {
-  margin-right: 0.5rem;
-}
-
-.add-btn:hover {
-  background-color: #4338ca;
-}
-
-.loading-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #6b7280;
+  color: #4b5563;
   font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-decoration: none;
 }
 
-.spinner {
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top: 3px solid #4f46e5;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 0.5rem;
+.retry-btn:hover, .add-btn:hover {
+  background-color: #e5e7eb;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

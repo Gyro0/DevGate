@@ -6,9 +6,9 @@
     </div>
     
     <div class="skills-content" v-if="!loading">
-      <div v-if="skills.length > 0" class="skills-data">
+      <div v-if="skills && skills.length > 0" class="skills-data">
         <div class="skill-chart">
-          <SkillRadarChart :chart-data="radarChartData" />
+          <SkillRadarChart :skills="topSkills" />
         </div>
         
         <div class="top-skills">
@@ -24,7 +24,7 @@
                     :class="['fas', n <= skill.level ? 'fa-star' : 'fa-star empty']"
                   ></i>
                 </div>
-                <div class="skill-category">{{ skill.category }}</div>
+                <div class="skill-category">{{ getCategoryName(skill.category) }}</div>
               </div>
             </li>
           </ul>
@@ -51,32 +51,46 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import useSkills from '@/composables/useSkills';
-import SkillRadarChart from '@/components/skills/SkillRadarChart.vue'; // Keep import
+import SkillRadarChart from '@/components/skills/SkillRadarChart.vue';
 
 export default {
   name: 'SkillSummaryWidget',
   components: {
-    SkillRadarChart // Register component
+    SkillRadarChart
   },
   setup() {
-    const { skills, loading } = useSkills();
+    const { skills, loading, skillCategories, fetchUserSkills } = useSkills();
+
+    // Ensure we have skills data
+    onMounted(async () => {
+      if (!skills.value || skills.value.length === 0) {
+        await fetchUserSkills();
+      }
+    });
+
+    // Get category name from category ID
+    const getCategoryName = (categoryId) => {
+      const category = skillCategories.find(cat => cat.id === categoryId);
+      return category ? category.name : categoryId;
+    };
 
     // Computed properties
     const topSkills = computed(() => {
-      return [...skills.value]
+      return [...(skills.value || [])]
         .sort((a, b) => (b.level || 0) - (a.level || 0))
         .slice(0, 5);
     });
 
     const averageLevel = computed(() => {
-      if (skills.value.length === 0) return 0;
+      if (!skills.value || skills.value.length === 0) return 0;
       const totalLevel = skills.value.reduce((sum, skill) => sum + (skill.level || 0), 0);
       return (totalLevel / skills.value.length).toFixed(1);
     });
 
-    const skillCategories = computed(() => {
+    const skillCategoriesUsed = computed(() => {
+      if (!skills.value) return [];
       const categories = new Set(skills.value.map(s => s.category));
       return Array.from(categories);
     });
@@ -108,8 +122,9 @@ export default {
       loading,
       topSkills,
       averageLevel,
-      skillCategories,
-      radarChartData
+      skillCategoriesUsed,
+      radarChartData,
+      getCategoryName
     };
   }
 }
@@ -161,7 +176,6 @@ export default {
   position: relative;
   margin-bottom: 1.5rem;
 }
-
 .top-skills h3 {
   font-size: 1rem;
   font-weight: 600;

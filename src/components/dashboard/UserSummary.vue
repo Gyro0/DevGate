@@ -6,7 +6,7 @@
       </div>
       <div class="greeting-text">
         <h1>👋 {{ getCurrentGreeting() }}, {{ user?.displayName || 'Developer' }}</h1>
-        <p>Last activity: {{ lastActivity }}</p>
+        <p>Last activity: {{ formattedLastActivity }}</p>
       </div>
     </div>
     
@@ -21,31 +21,45 @@
         <i class="fas fa-plus"></i> New Objective
       </button>
     </div>
-    
-    <div class="tips-section">
-      <div class="tip" v-if="showTips">
-        <i class="fas fa-lightbulb tip-icon"></i>
-        <div class="tip-content">
-          <p>{{ currentTip }}</p>
-          <button @click="nextTip">Next tip <i class="fas fa-chevron-right"></i></button>
-        </div>
-        <button class="close-tip" @click="closeTip"><i class="fas fa-times"></i></button>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
 import useAuth from '@/composables/useAuth';
-import { ref } from 'vue';
+import useTimeline from '@/composables/useTimeline';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'UserSummary',
   setup() {
     const { user } = useAuth();
-    const lastActivity = ref(null); // Add this ref for "lastActivity"
-    const showTips = ref(false); // Add this ref for "showTips"
-
+    const { events, fetchUserTimeline } = useTimeline();
+    const router = useRouter();
+    const lastActivity = ref(null);
+    
+    // Format the last activity timestamp for display
+    const formattedLastActivity = computed(() => {
+      if (!lastActivity.value) return "No recent activity";
+      
+      // Handle Firebase Timestamp or JavaScript Date
+      const date = lastActivity.value.seconds 
+        ? new Date(lastActivity.value.seconds * 1000) 
+        : new Date(lastActivity.value);
+        
+      // Check if the date is valid
+      if (isNaN(date.getTime())) return "No recent activity";
+      
+      // Format the date
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    });
+    
     // Get current time for greeting
     const getCurrentGreeting = () => {
       const hour = new Date().getHours();
@@ -53,12 +67,26 @@ export default {
       if (hour < 18) return 'Good afternoon';
       return 'Good evening';
     };
+    
+    // Navigation function
+    const navigateTo = (path) => {
+      router.push(path);
+    };
+
+    // Fetch last activity on component mount
+    onMounted(async () => {
+      await fetchUserTimeline(1); // Fetch just the most recent event
+      
+      if (events.value && events.value.length > 0) {
+        lastActivity.value = events.value[0].timestamp;
+      }
+    });
 
     return {
       user,
       getCurrentGreeting,
-      lastActivity,
-      showTips
+      formattedLastActivity,
+      navigateTo
     };
   }
 }
@@ -108,84 +136,25 @@ export default {
 }
 
 .action-button {
-  padding: 0.75rem 1rem;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
+  padding: 0.6rem 1.2rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
   border-radius: 6px;
-  color: #374151;
   font-size: 0.875rem;
   font-weight: 500;
   display: flex;
   align-items: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
 }
 
 .action-button i {
   margin-right: 0.5rem;
-  color: #4f46e5;
 }
 
 .action-button:hover {
-  background-color: #f3f4f6;
-  border-color: #d1d5db;
-}
-
-.tips-section {
-  margin-top: 1rem;
-}
-
-.tip {
-  display: flex;
-  align-items: center;
-  background-color: #f0f9ff;
-  border: 1px solid #bae6fd;
-  border-radius: 6px;
-  padding: 1rem;
-  position: relative;
-}
-
-.tip-icon {
-  color: #0284c7;
-  font-size: 1.25rem;
-  margin-right: 1rem;
-}
-
-.tip-content {
-  flex: 1;
-}
-
-.tip-content p {
-  margin: 0;
-  margin-bottom: 0.5rem;
-  color: #0c4a6e;
-}
-
-.tip-content button {
-  background: none;
-  border: none;
-  color: #0284c7;
-  padding: 0;
-  font-size: 0.875rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-.tip-content button i {
-  margin-left: 0.25rem;
-  font-size: 0.75rem;
-}
-
-.close-tip {
-  background: none;
-  border: none;
-  color: #64748b;
-  padding: 0.25rem;
-  cursor: pointer;
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  background-color: #4338ca;
 }
 
 @media (max-width: 768px) {

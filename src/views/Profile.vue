@@ -1,70 +1,66 @@
 <template>
-    <div class="profile-view">
-      <AppHeader />
-      <div class="main-layout">
-        <AppSidebar :active-page="'profile'" />
+  <div class="profile-view">
+    <AppHeader />
+    <div class="main-layout">
+      <AppSidebar :active-page="'profile'" />
 
-        <!-- Add v-if="userProfile" to the content area or specific components -->
-        <div class="content-area" v-if="userProfile">
-          <div class="profile-header">
-            <h1>User Profile</h1>
-            <button @click="editMode = !editMode" class="edit-button">
-              <i :class="editMode ? 'fas fa-times' : 'fas fa-pen'"></i>
-              {{ editMode ? 'Cancel' : 'Edit Profile' }}
-            </button>
-          </div>
-
-          <!-- These components rely on userProfile -->
-          <ProfileCard :userProfile="userProfile" :editMode="editMode" @triggerPhotoUpload="triggerPhotoUpload" @handlePhotoChange="handlePhotoChange" />
-          <ProfileStats :stats="userStats" />
-          <ProfileForm 
-  v-if="editMode" 
-  :editedProfile="editedProfile" 
-  @saveProfile="saveProfile" 
-  @cancel="cancelEditing" 
-/>
-          <AccountSettings :userProfile="userProfile" @changeEmail="showChangeEmailModal = true" @changePassword="showChangePasswordModal = true" />
-          <ConnectedAccounts :userProfile="userProfile" />
-
+      <div class="content-area" v-if="userProfile">
+        <div class="profile-header">
+          <h1>User Profile</h1>
+          <button @click="editMode = !editMode" class="edit-button">
+            <i :class="editMode ? 'fas fa-times' : 'fas fa-pen'"></i>
+            {{ editMode ? 'Cancel' : 'Edit Profile' }}
+          </button>
         </div>
-        <!-- Optional: Add a loading indicator while userProfile is null -->
-        <div class="content-area" v-else>
-           <p>Loading profile...</p>
-           <!-- Or add a spinner component -->
+
+        <!-- Profile Info -->
+        <ProfileCard :userProfile="userProfile" :editMode="editMode" @triggerPhotoUpload="triggerPhotoUpload" @handlePhotoChange="handlePhotoChange" />
+        <ProfileStats :stats="userStats" />
+
+        <!-- Profile Edit Form (only shows in edit mode) -->
+        <ProfileForm
+          v-if="editMode"
+          :editedProfile="editedProfile"
+          @saveProfile="saveProfile"
+          @cancel="cancelEditing"
+        />
+
+        <!-- Dashboard Components Section (shows when not editing) -->
+        <div v-if="!editMode" class="profile-dashboard-section">
+          <div class="profile-widget">
+             <UserSummary />
+          </div>
+          <div class="profile-widget">
+            <ActivityFeedWidget />
+          </div>
+           <div class="profile-widget">
+             <ObjectivesProgressWidget />
+           </div>
         </div>
       </div>
-
-      <!-- Modals can stay outside the v-if as they depend on separate refs -->
-      <ChangeEmailModal 
-  v-if="showChangeEmailModal" 
-  @close="showChangeEmailModal = false" 
-  @email-changed="handleEmailChanged" 
-/>
-      <ChangePasswordModal 
-  v-if="showChangePasswordModal" 
-  @close="showChangePasswordModal = false" 
-  @password-changed="handlePasswordChanged" 
-/>
-      <DeleteAccountModal 
-  v-if="showDeleteAccountModal" 
-  @close="showDeleteAccountModal = false" 
-  @account-deleted="handleAccountDeleted" 
-/>
+      <!-- Loading/Error States -->
+      <div class="content-area loading-state" v-else-if="loading">
+         <p>Loading profile...</p>
+      </div>
+       <div class="content-area error-state" v-else>
+         <p>Could not load user profile. {{ error }}</p>
+         <button @click="fetchUserProfile">Retry</button>
+      </div>
     </div>
-  </template>
+  </div>
+</template>
 
-  <script>
+<script>
 import { ref, onMounted, watch, computed } from 'vue';
 import AppHeader from '@/components/common/AppHeader.vue';
 import AppSidebar from '@/components/common/AppSidebar.vue';
 import ProfileCard from '@/components/profile/ProfileCard.vue';
 import ProfileStats from '@/components/profile/ProfileStats.vue';
 import ProfileForm from '@/components/profile/ProfileForm.vue';
-import AccountSettings from '@/components/profile/AccountSettings.vue';
-import ConnectedAccounts from '@/components/profile/ConnectedAccounts.vue';
-import ChangeEmailModal from '@/components/modals/ChangeEmailModal.vue';
-import ChangePasswordModal from '@/components/modals/ChangePasswordModal.vue';
-import DeleteAccountModal from '@/components/modals/DeleteAccountModal.vue';
+import UserSummary from '@/components/dashboard/UserSummary.vue';
+import ActivityFeedWidget from '@/components/dashboard/ActivityFeedWidget.vue';
+import ObjectivesProgressWidget from '@/components/dashboard/ObjectivesProgressWidget.vue';
+
 import useProfile from '@/composables/useProfile';
 import useFileUpload from '@/composables/useFileUpload';
 import useAuth from '@/composables/useAuth';
@@ -77,137 +73,55 @@ export default {
     ProfileCard,
     ProfileStats,
     ProfileForm,
-    AccountSettings,
-    ConnectedAccounts,
-    ChangeEmailModal,
-    ChangePasswordModal,
-    DeleteAccountModal
+    UserSummary,
+    ActivityFeedWidget,
+    ObjectivesProgressWidget,
   },
   setup() {
     const router = useRouter();
-    // Get Profile data
-    const { 
-      userProfile, 
-      editedProfile, 
-      loading, 
-      error, 
+    const {
+      userProfile,
+      editedProfile,
+      loading,
+      error,
       fetchUserProfile,
-      updateUserProfile 
+      updateUserProfile
     } = useProfile();
-    
-    // Check auth status
     const { user, isAuthenticated } = useAuth();
-    
-    // File upload functionality
     const { uploadFile } = useFileUpload();
-    
-    // UI state
+
     const editMode = ref(false);
-    const showChangeEmailModal = ref(false);
-    const showChangePasswordModal = ref(false);
-    const showDeleteAccountModal = ref(false);
-    
-    // Computed stats for ProfileStats component
+
     const userStats = computed(() => {
       if (!userProfile.value) return { skills: 0, objectives: 0, completedProjects: 0 };
-      
       return {
         skills: userProfile.value.skillsCount || 0,
         objectives: userProfile.value.objectivesCount || 0,
         completedProjects: userProfile.value.completedProjectsCount || 0
       };
     });
-    
-    // Watch for authentication status changes
+
     watch(isAuthenticated, (isAuth) => {
       if (isAuth) {
         fetchUserProfile();
+      } else {
+        userProfile.value = null;
       }
     }, { immediate: true });
-    
-    // Ensure profile is fetched when component mounts
+
     onMounted(() => {
       if (isAuthenticated.value) {
-        console.log('Fetching user profile on mount');
         fetchUserProfile();
       }
     });
 
-    // Photo upload handlers
-    const triggerPhotoUpload = () => {
-      // Logic to trigger file input click
-      // This is just a placeholder, actual implementation handled by child component
-    };
-    
-    const handlePhotoChange = async (file) => {
-      try {
-        if (!file) return;
-        
-        console.log('Uploading profile photo:', file);
-        const uploadPath = `profile-photos/${user.value.uid}`;
-        
-        // Upload the file and wait for result
-        const result = await uploadFile(file, uploadPath);
-        console.log('Upload successful:', result);
-        
-        // Update the user profile with the new photo URL
-        await updateUserProfile({ 
-          photoURL: result.url
-        });
-        
-      } catch (err) {
-        console.error('Error updating profile photo:', err);
-      }
-    };
-    
-    // Save profile data
-    const saveProfile = async (formData) => {
-      try {
-        // Show loading state
-        loading.value = true;
-        
-        // Update user profile in Firestore
-        await updateUserProfile(formData);
-        
-        // Update the local userProfile with the new data
-        userProfile.value = { ...userProfile.value, ...formData };
-        
-        // Exit edit mode
-        editMode.value = false;
-        
-        // Show success message
-        alert('Profile updated successfully!');
-      } catch (err) {
-        console.error('Error saving profile:', err);
-        alert('Failed to save profile changes: ' + err.message);
-      } finally {
-        loading.value = false;
-      }
-    };
+    const triggerPhotoUpload = () => { /* ... */ };
+    const handlePhotoChange = async (file) => { /* ... */ };
 
-    // Add this function to handle cancel button click
-    const cancelEditing = () => {
-      editMode.value = false;
-      // Reset the editedProfile back to userProfile
-      if (userProfile.value) {
-        editedProfile.value = { ...userProfile.value };
-      }
-    };
+    const saveProfile = async (formData) => { /* ... */ };
 
-    const handleEmailChanged = () => {
-      // Success notification or actions after email change
-      fetchUserProfile(); // Refresh user data
-    };
+    const cancelEditing = () => { /* ... */ };
 
-    const handlePasswordChanged = () => {
-      // Success notification or actions after password change
-    };
-
-    const handleAccountDeleted = () => {
-      // Handle account deletion (redirect to login, etc)
-      router.push('/login');
-    };
-    
     return {
       userProfile,
       editedProfile,
@@ -215,16 +129,10 @@ export default {
       error,
       userStats,
       editMode,
-      showChangeEmailModal,
-      showChangePasswordModal,
-      showDeleteAccountModal,
       triggerPhotoUpload,
       handlePhotoChange,
       saveProfile,
       cancelEditing,
-      handleEmailChanged,
-      handlePasswordChanged,
-      handleAccountDeleted
     };
   }
 };
@@ -261,5 +169,29 @@ export default {
   border-radius: 6px;
   padding: 0.6rem 1.2rem;
   cursor: pointer;
+}
+
+.profile-dashboard-section {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.profile-widget {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.loading-state, .error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 64px);
 }
 </style>

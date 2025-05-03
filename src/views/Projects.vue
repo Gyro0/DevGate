@@ -34,22 +34,53 @@
           <ProjectFilterBar v-model="filters" />
         </div>
         
-        <ProjectGallery
-          v-if="viewMode === 'gallery'"
-          :projects="filteredProjects"
-          @edit="editProject"
-          @delete="confirmDeleteProject"
-        />
+        <div v-if="loading" class="loading-container">
+          <div class="spinner"></div>
+          <p>Loading projects...</p>
+        </div>
         
-        <ProjectList
-          v-else
-          :projects="filteredProjects"
-          @edit="editProject"
-          @delete="confirmDeleteProject"
-        />
+        <!-- Project lists with nullcheck for projects array -->
+        <template v-else>
+          <div v-if="filteredProjects && filteredProjects.length > 0">
+            <!-- Gallery view -->
+            <div v-if="viewMode === 'gallery'" class="projects-gallery">
+              <ProjectCard 
+                v-for="project in filteredProjects" 
+                :key="project.id" 
+                :project="project"
+                @edit="editProject"
+                @delete="confirmDeleteProject"
+              />
+            </div>
+            
+            <!-- List view -->
+            <div v-else class="projects-list">
+              <ProjectListItem 
+                v-for="project in filteredProjects" 
+                :key="project.id" 
+                :project="project"
+                @edit="editProject"
+                @delete="confirmDeleteProject"
+              />
+            </div>
+          </div>
+          
+          <!-- No projects state -->
+          <div v-else class="empty-state">
+            <div class="empty-icon">
+              <i class="fas fa-folder-open"></i>
+            </div>
+            <h3>No Projects Found</h3>
+            <p>Create your first project to get started!</p>
+            <button @click="showAddProjectModal = true" class="action-btn">
+              <i class="fas fa-plus"></i> Add Project
+            </button>
+          </div>
+        </template>
       </div>
     </div>
     
+    <!-- Project form modal for add/edit -->
     <ProjectFormModal
       v-if="showAddProjectModal"
       :project="selectedProject"
@@ -57,11 +88,12 @@
       @close="closeProjectModal"
     />
     
+    <!-- Confirmation dialog -->
     <ConfirmDialog
       v-if="showDeleteConfirm"
       :message="`Delete project '${projectToDelete?.title}'?`"
       @confirm="deleteProject"
-      @cancel="showDeleteConfirm = false"
+      @cancel="cancelDelete"
     />
   </div>
 </template>
@@ -70,149 +102,155 @@
 import { ref, computed, onMounted } from 'vue';
 import AppHeader from '@/components/common/AppHeader.vue';
 import AppSidebar from '@/components/common/AppSidebar.vue';
-import ProjectGallery from '@/components/projects/ProjectGallery.vue';
-import ProjectList from '@/components/projects/ProjectList.vue';
 import ProjectFilterBar from '@/components/projects/ProjectFilterBar.vue';
+import ProjectCard from '@/components/projects/ProjectCard.vue';
+import ProjectListItem from '@/components/projects/ProjectListItem.vue';
 import ProjectFormModal from '@/components/projects/ProjectFormModal.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
 import useProjects from '@/composables/useProjects';
 import useTimeline from '@/composables/useTimeline';
+import useAuth from '@/composables/useAuth';
 
 export default {
   name: 'ProjectsView',
   components: {
     AppHeader,
     AppSidebar,
-    ProjectGallery,
-    ProjectList,
     ProjectFilterBar,
+    ProjectCard,
+    ProjectListItem,
     ProjectFormModal,
     ConfirmDialog
   },
   setup() {
     const { 
       projects, 
-      loading: projectsLoading, 
-      error: projectsError, 
+      loading,
+      error,
       fetchUserProjects, 
       addProject, 
       updateProject, 
-      deleteProject: removeProject 
+      deleteProject: removeProject  
     } = useProjects();
+    
     const { recordEvent } = useTimeline();
-
+    const { isAuthenticated, loading: authLoading } = useAuth();
+    
+    // UI state management
     const viewMode = ref('gallery');
-    const filters = ref({ tech: [], dateRange: null, search: '' });
+    const filters = ref({ status: 'all', search: '' });
     const showAddProjectModal = ref(false);
     const showDeleteConfirm = ref(false);
     const selectedProject = ref(null);
     const projectToDelete = ref(null);
-
-    // Filter projects based on user filters
+    
+    // Combined loading state
+    const isLoading = computed(() => loading.value || authLoading.value);
+    
+    // Load projects on component mount with better error handling
+    onMounted(async () => {
+      console.log("Projects component mounted, fetching projects...");
+      try {
+        await fetchUserProjects();
+        console.log("Projects loaded:", projects.value?.length || 0);
+      } catch (error) {
+        console.error("Error in Projects onMounted:", error);
+      }
+    });
+    
+    // Filter projects based on selected filters
     const filteredProjects = computed(() => {
+      if (!projects.value) return [];
+      
       return projects.value.filter(project => {
-        // Filter by tech stack
-        if (filters.value.tech.length > 0) {
-          const projectTech = project.techStack || []; // Ensure techStack exists
-          const hasTech = filters.value.tech.some(tech => 
-            projectTech.includes(tech)
-          );
-          if (!hasTech) return false;
-        }
-        
-        // Filter by date range (assuming createdAt is a Timestamp)
-        if (filters.value.dateRange && project.createdAt?.seconds) {
-          const { start, end } = filters.value.dateRange;
-          const projectDate = new Date(project.createdAt.seconds * 1000);
-          
-          if ((start && projectDate < new Date(start)) || (end && projectDate > new Date(end))) {
-            return false;
-          }
+        // Filter by status
+        if (filters.value.status !== 'all' && project.status !== filters.value.status) {
+          return false;
         }
         
         // Filter by search term
-        if (filters.value.search && !project.title.toLowerCase().includes(filters.value.search.toLowerCase())) {
+        if (filters.value.search && 
+            !project.title.toLowerCase().includes(filters.value.search.toLowerCase()) &&
+            !project.description?.toLowerCase().includes(filters.value.search.toLowerCase())) {
           return false;
         }
         
         return true;
       });
     });
-
-    // Fetch projects on component mount
-    onMounted(async () => {
-      await fetchUserProjects();
-    });
-
-    // Open edit modal for a project
+    
+    // Project actions
     const editProject = (project) => {
       selectedProject.value = { ...project };
       showAddProjectModal.value = true;
     };
-
-    // Initialize deletion process for a project
+    
     const confirmDeleteProject = (project) => {
       projectToDelete.value = project;
       showDeleteConfirm.value = true;
     };
-
-    // Delete the project after confirmation
-    const deleteProject = async () => {
-      if (!projectToDelete.value?.id) return;
-      try {
-        await removeProject(projectToDelete.value.id);
-        await recordEvent('project', 'deleted', projectToDelete.value.id, { title: projectToDelete.value.title }); // Record minimal data
-        showDeleteConfirm.value = false;
-        projectToDelete.value = null;
-      } catch (error) {
-        console.error('Error deleting project:', error);
-        // Handle error display
-      }
+    
+    const cancelDelete = () => {
+      projectToDelete.value = null;
+      showDeleteConfirm.value = false;
     };
-
-    // Save new or updated project
+    
     const saveProject = async (projectData, imageFile) => {
+      console.log("Saving project:", projectData);
       try {
-        let savedProject;
         if (selectedProject.value?.id) {
           // Update existing project
-          savedProject = await updateProject(selectedProject.value.id, projectData, imageFile);
-          await recordEvent('project', 'updated', savedProject.id, { title: savedProject.title });
+          const updatedProject = await updateProject(selectedProject.value.id, projectData, imageFile);
+          await recordEvent('project', 'updated', updatedProject.id, { title: updatedProject.title });
         } else {
           // Add new project
-          savedProject = await addProject(projectData, imageFile);
-          await recordEvent('project', 'added', savedProject.id, { title: savedProject.title });
+          const newProject = await addProject(projectData, imageFile);
+          console.log("Project created:", newProject);
+          await recordEvent('project', 'added', newProject.id, { title: newProject.title });
         }
         closeProjectModal();
-      } catch (error) {
-        console.error('Error saving project:', error);
-        // Handle error display
+      } catch (err) {
+        console.error("Error saving project:", err);
+        alert(`Failed to save project: ${err.message}`);
       }
     };
-
-    // Close project modal and reset selection
-    const closeProjectModal = () => {
-      selectedProject.value = null;
-      showAddProjectModal.value = false;
+    
+    const deleteProject = async () => {
+      if (!projectToDelete.value?.id) return;
+      
+      try {
+        await removeProject(projectToDelete.value.id);
+        await recordEvent('project', 'deleted', projectToDelete.value.id, { title: projectToDelete.value.title });
+        showDeleteConfirm.value = false;
+        projectToDelete.value = null;
+      } catch (err) {
+        console.error("Error deleting project:", err);
+        alert(`Failed to delete project: ${err.message}`);
+      }
     };
-
-    // Return reactive state and methods
+    
+    const closeProjectModal = () => {
+      showAddProjectModal.value = false;
+      selectedProject.value = null;
+    };
+    
     return {
-      projects, // Raw projects if needed
-      filteredProjects,
+      projects,
+      loading: isLoading, // Use the combined loading state
+      error,
       viewMode,
       filters,
+      filteredProjects,
       showAddProjectModal,
       showDeleteConfirm,
       selectedProject,
       projectToDelete,
       editProject,
       confirmDeleteProject,
-      deleteProject,
       saveProject,
-      closeProjectModal,
-      projectsLoading, // Expose loading/error if needed
-      projectsError
+      deleteProject,
+      cancelDelete,
+      closeProjectModal
     };
   }
 }
@@ -226,7 +264,7 @@ export default {
 
 .main-layout {
   display: flex;
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px); /* Subtract header height */
 }
 
 .content-area {
@@ -242,6 +280,13 @@ export default {
   margin-bottom: 1.5rem;
 }
 
+.page-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #111827;
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -250,7 +295,7 @@ export default {
 
 .view-toggle {
   display: flex;
-  border: 1px solid #e1e4e8;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
   overflow: hidden;
 }
@@ -258,15 +303,13 @@ export default {
 .view-toggle button {
   background: white;
   border: none;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem;
   cursor: pointer;
-  display: flex;
-  align-items: center;
 }
 
 .view-toggle button.active {
-  background-color: #4f46e5;
-  color: white;
+  background-color: #f3f4f6;
+  color: #4f46e5;
 }
 
 .filter-bar {
@@ -274,33 +317,97 @@ export default {
   background: white;
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.btn-primary {
+.projects-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.loading-container, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.empty-icon {
+  font-size: 3.5rem;
+  color: #e5e7eb;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+.empty-state p {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #4f46e5;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.btn-primary, .action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
   background-color: #4f46e5;
   color: white;
   border: none;
   border-radius: 6px;
-  padding: 0.6rem 1.2rem;
+  font-size: 0.875rem;
   font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
   cursor: pointer;
+  transition: background-color 0.2s;
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .action-btn:hover {
   background-color: #4338ca;
 }
 
 .icon {
-  font-size: 1.2rem;
-  font-weight: bold;
+  font-size: 1rem;
 }
 
-/* For material icons */
-.material-icons {
-  font-size: 18px;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  
+  .projects-gallery {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

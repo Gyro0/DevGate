@@ -58,12 +58,12 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue';
-import AppHeader from '@/components/common/AppHeader.vue'; // Assuming these are still needed
-import AppSidebar from '@/components/common/AppSidebar.vue'; // Assuming these are still needed
+import AppHeader from '@/components/common/AppHeader.vue';
+import AppSidebar from '@/components/common/AppSidebar.vue';
 import SkillCard from '@/components/skills/SkillCard.vue';
-import SkillFilterBar from '@/components/skills/SkillFilterBar.vue'; // Assuming this exists
-import SkillRadarChart from '@/components/skills/SkillRadarChart.vue'; // Assuming this exists
-import SkillProgressChart from '@/components/skills/SkillProgressChart.vue'; // Assuming this exists
+import SkillFilterBar from '@/components/skills/SkillFilterBar.vue';
+import SkillRadarChart from '@/components/skills/SkillRadarChart.vue';
+import SkillProgressChart from '@/components/skills/SkillProgressChart.vue';
 import SkillFormModal from '@/components/skills/SkillFormModal.vue';
 import ConfirmDialog from '@/components/common/ConfirmDialog.vue';
 import useSkills from '@/composables/useSkills';
@@ -72,12 +72,12 @@ import useTimeline from '@/composables/useTimeline';
 export default {
   name: 'SkillTrackerView',
   components: {
-    // AppHeader, // Remove if not used in template
-    // AppSidebar, // Remove if not used in template
+    AppHeader,
+    AppSidebar,
     SkillCard,
-    // SkillFilterBar, // Remove if not used in template
-    // SkillRadarChart, // Remove if not used in template
-    // SkillProgressChart, // Remove if not used in template
+    SkillFilterBar,
+    SkillRadarChart,
+    SkillProgressChart,
     SkillFormModal,
     ConfirmDialog
   },
@@ -93,15 +93,14 @@ export default {
     } = useSkills();
     const { recordEvent } = useTimeline();
 
-    const filters = ref({ category: 'all', level: 'all', search: '' }); // Keep filters if SkillFilterBar is used
+    const filters = ref({ category: 'all', level: 'all', search: '' });
     const showAddSkillModal = ref(false);
     const showDeleteConfirm = ref(false);
     const selectedSkill = ref(null);
     const skillToDelete = ref(null);
 
-    // Filter skills based on user filters (adjust if filters are removed)
+    // Filter skills based on user filters
     const filteredSkills = computed(() => {
-      // If filters are removed, just return skills.value
       if (!filters.value) return skills.value; 
 
       return skills.value.filter(skill => {
@@ -131,7 +130,7 @@ export default {
 
     // Open add/edit modal for a skill
     const openSkillModal = (skill = null) => {
-      selectedSkill.value = skill ? { ...skill } : null; // Create copy if editing
+      selectedSkill.value = skill ? { ...skill } : null;
       showAddSkillModal.value = true;
     };
 
@@ -151,7 +150,6 @@ export default {
         skillToDelete.value = null;
       } catch (error) {
         console.error('Error deleting skill:', error);
-        // Handle error display
       }
     };
 
@@ -171,7 +169,6 @@ export default {
         closeSkillModal();
       } catch (error) {
         console.error('Error saving skill:', error);
-        // Handle error display
       }
     };
 
@@ -181,22 +178,20 @@ export default {
       showAddSkillModal.value = false;
     };
 
-    // Return reactive state and methods
     return {
-      skills, // Raw skills if needed
-      filteredSkills, // Use this in the template's v-for
-      filters, // If filter bar is used
+      skills,
+      filteredSkills,
+      filters,
       showAddSkillModal,
       showDeleteConfirm,
       selectedSkill,
       skillToDelete,
-      openSkillModal, // Renamed from editSkill for clarity
-      editSkill: openSkillModal, // Keep alias if template uses @edit
+      openSkillModal,
       confirmDeleteSkill,
       deleteSkill,
       saveSkill,
       closeSkillModal,
-      skillsLoading, // Expose loading/error if needed
+      skillsLoading,
       skillsError
     };
   }

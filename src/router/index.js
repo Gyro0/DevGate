@@ -8,6 +8,8 @@ import SkillTracker from '@/views/SkillTracker.vue'
 import Timeline from '@/views/Timeline.vue'
 import Profile from '@/views/Profile.vue'
 import Projects from '@/views/Projects.vue'
+import Settings from '../views/Settings.vue'; // Import the new view
+import PostDetail from '../views/PostDetail.vue'; // Import the new view
 
 const routes = [
   {
@@ -18,7 +20,7 @@ const routes = [
   },
   {
     path: '/dashboard',
-    name: 'dashboard',
+    name: 'Dashboard',
     component: Dashboard,
     meta: { requiresAuth: true }
   },
@@ -55,8 +57,14 @@ const routes = [
   {
     path: '/settings',
     name: 'Settings',
-    component: () => import('../views/Profile.vue'), // Reuse the Profile view or create a separate Settings.vue
-    meta: { requiresAuth: true }
+    component: Settings,
+    meta: { requiresAuth: true } // Assuming settings requires login
+  },
+  {
+    path: '/posts/:id', // Route for single post view
+    name: 'PostDetail',
+    component: PostDetail,
+    meta: { requiresAuth: true } // Or false if public posts allowed
   },
   {
     path: '/',

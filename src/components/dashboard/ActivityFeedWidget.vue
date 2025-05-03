@@ -6,7 +6,7 @@
     </div>
     
     <div class="activities-content" v-if="!loading">
-      <div v-if="events.length > 0" class="activity-list-container">
+      <div v-if="events && events.length > 0" class="activity-list-container">
         <ul class="activity-list">
           <li v-for="event in recentEvents" :key="event.id" class="activity-item">
             <div class="activity-icon" :class="eventTypeClass(event)">
@@ -41,15 +41,22 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import useTimeline from '@/composables/useTimeline';
 
 export default {
   name: 'ActivityFeedWidget',
   setup() {
-    const { events, loading } = useTimeline();
+    const { events, loading, fetchUserTimeline } = useTimeline();
 
-    // Get only recent events
+    // Ensure we have timeline data
+    onMounted(async () => {
+      if (!events.value || events.value.length === 0) {
+        await fetchUserTimeline(10); // Fetch 10 most recent events
+      }
+    });
+
+    // Get only recent events, with nullchecking
     const recentEvents = computed(() => {
       // Ensure events.value is an array before slicing
       return Array.isArray(events.value) ? events.value.slice(0, 6) : [];

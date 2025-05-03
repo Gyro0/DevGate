@@ -5,8 +5,22 @@
       <router-link to="/projects" class="view-all">View All</router-link>
     </div>
     
-    <div class="projects-content" v-if="!loading">
-      <div v-if="projects.length > 0" class="projects-list-container">
+    <div class="projects-content">
+      <!-- Loading state -->
+      <div v-if="loading" class="loading-state">
+        <div class="spinner"></div>
+        <span>Loading projects...</span>
+      </div>
+      
+      <!-- Error state -->
+      <div v-else-if="error" class="error-state">
+        <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
+        <p>{{ error }}</p>
+        <button @click="loadProjects" class="retry-btn">Retry</button>
+      </div>
+      
+      <!-- Projects loaded successfully -->
+      <div v-else-if="projects.length > 0" class="projects-list-container">
         <div class="project-stats">
           <div class="stat-box">
             <div class="stat-value">{{ projects.length }}</div>
@@ -30,7 +44,7 @@
               <div class="project-name">{{ project.title }}</div>
               <div class="project-details">
                 <span class="project-status" :class="statusClass(project)">
-                  {{ project.status }}
+                  {{ formatStatus(project.status || 'active') }}
                 </span>
                 <span class="project-date">
                   {{ formatDate(project.updatedAt || project.createdAt) }}
@@ -44,9 +58,10 @@
         </ul>
       </div>
       
+      <!-- No projects state -->
       <div v-else class="empty-state">
         <div class="empty-icon">
-          <i class="fas fa-code"></i>
+          <i class="fas fa-folder-open"></i>
         </div>
         <h3>No projects yet</h3>
         <p>Add projects to track your portfolio and showcase your work.</p>
@@ -55,68 +70,159 @@
         </router-link>
       </div>
     </div>
-    
-    <div v-else class="loading-state">
-      <div class="spinner"></div>
-      <span>Loading projects...</span>
-    </div>
   </div>
 </template>
 
-<script setup>
-import { computed } from 'vue';
-import useProjects from '@/composables/useProjects';
+<script>
+import { ref, computed, onMounted } from 'vue';
+import { db } from '@/firebase/firebaseInit';
+import firebase from 'firebase/app';
+import useAuth from '@/composables/useAuth';
 
-const { projects, loading } = useProjects();
-
-// Computed properties
-const recentProjects = computed(() => {
-  return [...projects.value]
-    .sort((a, b) => {
-      const dateA = a.createdAt?.seconds ? new Date(a.createdAt.seconds * 1000) : new Date(a.createdAt);
-      const dateB = b.createdAt?.seconds ? new Date(b.createdAt.seconds * 1000) : new Date(b.createdAt);
-      return dateB - dateA;
-    })
-    .slice(0, 4);
-});
-
-const activeProjects = computed(() => {
-  return projects.value.filter(p => p.status === 'in-progress');
-});
-
-const completedProjects = computed(() => {
-  return projects.value.filter(p => p.status === 'completed');
-});
-
-// Format date for display
-const formatDate = (timestamp) => {
-  if (!timestamp) return 'N/A';
-  
-  const date = timestamp?.seconds 
-    ? new Date(timestamp.seconds * 1000) 
-    : new Date(timestamp);
+export default {
+  name: 'ProjectSummaryWidget',
+  setup() {
+    // State
+    const projects = ref([]);
+    const loading = ref(true);
+    const error = ref(null);
+    const { user, waitForAuth } = useAuth();
     
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric'
-  });
-};
+    // Computed properties
+    const activeProjects = computed(() => {
+      return projects.value.filter(p => p.status === 'active' || p.status === 'in-progress');
+    });
+    
+    const completedProjects = computed(() => {
+      return projects.value.filter(p => p.status === 'completed');
+    });
+    
+    const recentProjects = computed(() => {
+      // Sort by createdAt date (newest first) and take top 3
+      return [...projects.value]
+        .sort((a, b) => {
+          const dateA = new Date(a.createdAt || 0);
+          const dateB = new Date(b.createdAt || 0);
+          return dateB - dateA;
+        })
+        .slice(0, 3);
+    });
 
-// Get CSS class for project status
-const statusClass = (project) => {
-  const status = project.status || 'planning';
-  
-  switch (status) {
-    case 'completed':
-      return 'status-completed';
-    case 'in-progress':
-      return 'status-active';
-    case 'paused':
-      return 'status-paused';
-    default:
-      return 'status-planning';
+    // Format date for display
+    const formatDate = (timestamp) => {
+      if (!timestamp) return 'N/A';
+      
+      let date;
+      try {
+        if (timestamp.seconds) {
+          date = new Date(timestamp.seconds * 1000);
+        } else if (timestamp instanceof Date) {
+          date = timestamp;
+        } else {
+          date = new Date(timestamp);
+        }
+        
+        if (isNaN(date.getTime())) {
+          return 'Invalid date';
+        }
+        
+        return date.toLocaleDateString();
+      } catch (err) {
+        console.error("Error formatting date:", err, timestamp);
+        return 'N/A';
+      }
+    };
+    
+    // Format status
+    const formatStatus = (status) => {
+      const statusMap = {
+        'active': 'Active',
+        'in-progress': 'In Progress',
+        'completed': 'Completed',
+        'paused': 'Paused',
+        'archived': 'Archived'
+      };
+      return statusMap[status] || status;
+    };
+    
+    // Get CSS class for status
+    const statusClass = (project) => {
+      return `status-${project.status || 'active'}`;
+    };
+    
+    // Handle image errors
+    const onImageError = (event) => {
+      event.target.src = '/img/default-project.png';
+    };
+    
+    // Load projects directly from Firestore
+    const loadProjects = async () => {
+      loading.value = true;
+      error.value = null;
+      
+      try {
+        console.log("ProjectSummaryWidget: Loading projects...");
+        
+        // Wait for authentication
+        const currentUser = await waitForAuth();
+        
+        if (!currentUser) {
+          console.warn("ProjectSummaryWidget: No user logged in");
+          loading.value = false;
+          error.value = "Authentication required";
+          return;
+        }
+        
+        // Fetch projects directly from Firestore
+        const snapshot = await db.collection('projects')
+          .where('userId', '==', currentUser.uid)
+          .orderBy('createdAt', 'desc')
+          .limit(10) // Only need a few for the summary
+          .get();
+        
+        const fetchedProjects = snapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            // Convert timestamps to JS Date objects
+            createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : 
+              (data.createdAt ? new Date(data.createdAt) : new Date()),
+            updatedAt: data.updatedAt?.toDate ? data.updatedAt.toDate() : 
+              (data.updatedAt ? new Date(data.updatedAt) : new Date())
+          };
+        });
+        
+        console.log(`ProjectSummaryWidget: Loaded ${fetchedProjects.length} projects`);
+        projects.value = fetchedProjects;
+      } catch (err) {
+        console.error("ProjectSummaryWidget: Error loading projects", err);
+        error.value = "Failed to load projects";
+      } finally {
+        loading.value = false;
+      }
+    };
+    
+    // Initialize data on component mount
+    onMounted(() => {
+      loadProjects();
+    });
+    
+    return {
+      projects,
+      loading,
+      error,
+      activeProjects,
+      completedProjects,
+      recentProjects,
+      formatDate,
+      formatStatus,
+      statusClass,
+      onImageError,
+      loadProjects
+    };
   }
-};
+}
 </script>
 
 <style scoped>
@@ -130,19 +236,20 @@ const statusClass = (project) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .widget-header h2 {
   margin: 0;
   font-size: 1.25rem;
   font-weight: 600;
+  color: #111827;
 }
 
 .view-all {
+  font-size: 0.875rem;
   color: #4f46e5;
   text-decoration: none;
-  font-size: 0.875rem;
 }
 
 .view-all:hover {
@@ -151,51 +258,33 @@ const statusClass = (project) => {
 
 .projects-content {
   flex: 1;
-}
-
-.projects-list-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  overflow: auto;
 }
 
 .project-stats {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  gap: 0.75rem;
 }
 
 .stat-box {
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background-color: #f3f4f6;
   border-radius: 8px;
-  padding: 1rem;
-  text-align: center;
   flex: 1;
-  margin-right: 0.5rem;
-}
-
-.stat-box:last-child {
-  margin-right: 0;
+  padding: 0.75rem;
+  text-align: center;
 }
 
 .stat-value {
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: bold;
   color: #111827;
-  margin-bottom: 0.25rem;
 }
 
 .stat-label {
   font-size: 0.75rem;
   color: #6b7280;
-}
-
-h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 1rem;
+  margin-top: 0.25rem;
 }
 
 .projects-list {
@@ -208,7 +297,7 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 0;
+  padding: 0.75rem;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -216,56 +305,50 @@ h3 {
   border-bottom: none;
 }
 
-.project-info {
-  flex: 1;
-}
-
 .project-name {
   font-weight: 500;
+  color: #111827;
   margin-bottom: 0.25rem;
 }
 
 .project-details {
   display: flex;
-  align-items: center;
+  gap: 1rem;
   font-size: 0.75rem;
+  color: #6b7280;
 }
 
 .project-status {
-  padding: 0.25rem 0.5rem;
-  border-radius: 16px;
-  margin-right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.status-active, .status-in-progress {
+  color: #2563eb;
 }
 
 .status-completed {
-  background-color: #d1fae5;
-  color: #065f46;
-}
-
-.status-active {
-  background-color: #eff6ff;
-  color: #1e40af;
+  color: #10b981;
 }
 
 .status-paused {
-  background-color: #fef3c7;
-  color: #92400e;
+  color: #f59e0b;
 }
 
-.status-planning {
-  background-color: #e5e7eb;
-  color: #374151;
-}
-
-.project-date {
+.status-archived {
   color: #6b7280;
 }
 
 .view-project {
-  color: #6b7280;
-  padding: 0.5rem;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
 }
 
 .view-project:hover {
@@ -273,94 +356,57 @@ h3 {
   color: #4f46e5;
 }
 
-.empty-state {
-  width: 100%;
-  height: 100%;
+.loading-state, .error-state, .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  height: 100%;
+  padding: 1.5rem;
   text-align: center;
-  padding: 2rem 1rem;
+  color: #6b7280;
 }
 
-.empty-icon {
-  font-size: 3rem;
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(99, 102, 241, 0.2);
+  border-radius: 50%;
+  border-top-color: #6366f1;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.error-icon, .empty-icon {
+  font-size: 2rem;
   margin-bottom: 1rem;
   color: #d1d5db;
 }
 
-.empty-state h3 {
-  margin: 0;
-  margin-bottom: 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 600;
+.error-state p {
+  margin-bottom: 1rem;
 }
 
-.empty-state p {
-  margin: 0;
-  margin-bottom: 1.5rem;
-  color: #6b7280;
-  max-width: 24rem;
-}
-
-.add-btn {
+.retry-btn, .add-btn {
   display: inline-flex;
   align-items: center;
+  gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: #4f46e5;
-  color: white;
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
   border-radius: 0.375rem;
-  text-decoration: none;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.add-btn i {
-  margin-right: 0.5rem;
-}
-
-.add-btn:hover {
-  background-color: #4338ca;
-}
-
-.loading-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #6b7280;
+  color: #4b5563;
   font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  text-decoration: none;
 }
 
-.spinner {
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top: 3px solid #4f46e5;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 0.5rem;
+.retry-btn:hover, .add-btn:hover {
+  background-color: #e5e7eb;
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@media (max-width: 640px) {
-  .project-stats {
-    flex-direction: column;
-  }
-  
-  .stat-box {
-    margin-right: 0;
-    margin-bottom: 0.5rem;
-  }
-  
-  .stat-box:last-child {
-    margin-bottom: 0;
-  }
+  to { transform: rotate(360deg); }
 }
 </style>

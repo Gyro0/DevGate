@@ -1,5 +1,5 @@
 // src/composables/useAuth.js
-import { ref, computed, onUnmounted } from 'vue';
+import { ref, computed, onUnmounted,onMounted } from 'vue';
 import firebase, { auth, db } from '@/firebase/firebaseInit'; // Import firebase namespace and initialized services
 import { useRouter } from 'vue-router';
 
@@ -12,10 +12,43 @@ export default function useAuth() {
   const error = ref(null);
   const loading = ref(false);
   const router = useRouter();
-
-  // Check if user is authenticated
-  const isAuthenticated = computed(() => !!user.value);
-
+  const authInitialized = ref(false);
+ // Add an isAuthenticated computed property
+ const isAuthenticated = computed(() => !!user.value);
+  
+ // Initialize auth state
+ const initAuth = () => {
+   return new Promise((resolve) => {
+     // Unsubscribe function to clean up listener
+     const unsubscribe = firebase.auth().onAuthStateChanged((authUser) => {
+       loading.value = false;
+       authInitialized.value = true; // Mark auth as initialized
+       
+       if (authUser) {
+         console.log('Auth: User is signed in', authUser.uid);
+         user.value = authUser;
+       } else {
+         console.log('Auth: No user signed in');
+         user.value = null;
+       }
+       resolve(user.value);
+     });
+     
+     // Return unsubscribe for component cleanup if needed
+     return unsubscribe;
+   });
+ };
+ 
+ // Call initAuth immediately when composable is used
+ // This ensures auth initialization starts right away
+ const authPromise = initAuth();
+ 
+ // Helper method to wait for auth to be ready
+ const waitForAuth = async () => {
+   if (authInitialized.value) return user.value;
+   return await authPromise;
+ };
+  
   // Login with email/password
   const login = async (email, password) => {
     loading.value = true;
@@ -147,5 +180,5 @@ export default function useAuth() {
   });
   onUnmounted(unsubscribe); // Clean up listener
 
-  return { user, error, loading, isAuthenticated, login, register, loginWithGoogle, loginWithGithub, logout };
+  return { user,initAuth,waitForAuth,authInitialized, error, loading, isAuthenticated, login, register, loginWithGoogle, loginWithGithub, logout };
 }

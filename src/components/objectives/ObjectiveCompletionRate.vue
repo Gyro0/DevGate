@@ -10,30 +10,37 @@
 </template>
 
 <script>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue'; 
 import useObjectives from '@/composables/useObjectives';
-import ProgressChart from '@/components/visualizations/ProgressChart.vue'; // Keep import
+import ProgressChart from '@/components/visualizations/ProgressChart.vue';
 
 export default {
   name: 'ObjectiveCompletionRate',
   components: {
-    ProgressChart // Register component
+    ProgressChart
   },
   setup() {
-    const { objectives, loading } = useObjectives();
+    const { objectives, loading, fetchUserObjectives } = useObjectives();
+    
+    // Add onMounted to ensure data is loaded
+    onMounted(async () => {
+      if (!objectives.value || objectives.value.length === 0) {
+        await fetchUserObjectives();
+      }
+    });
 
     const completionRate = computed(() => {
-      if (objectives.value.length === 0) return 0;
+      if (!objectives.value || objectives.value.length === 0) return 0;
       const completed = objectives.value.filter(o => o.status === 'completed').length;
       return Math.round((completed / objectives.value.length) * 100);
     });
 
     const completedCount = computed(() => {
-      return objectives.value.filter(o => o.status === 'completed').length;
+      return objectives.value ? objectives.value.filter(o => o.status === 'completed').length : 0;
     });
 
     const totalCount = computed(() => {
-      return objectives.value.length;
+      return objectives.value ? objectives.value.length : 0;
     });
 
     return {
@@ -48,7 +55,8 @@ export default {
 
 <style scoped>
 .completion-rate-chart {
-  height: 250px; /* Adjust height as needed */
+  height: 250px; /* Ensure height is defined */
   position: relative;
+  width: 100%; /* Make sure it takes full width */
 }
 </style>

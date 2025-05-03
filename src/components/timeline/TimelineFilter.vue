@@ -30,7 +30,7 @@ export default {
   props: {
     modelValue: {
       type: Array,
-      default: () => []
+      default: () => ['skill', 'project', 'objective']
     }
   },
   emits: ['update:modelValue'],

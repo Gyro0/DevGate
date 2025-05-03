@@ -3,252 +3,142 @@
     <AppHeader />
     <div class="main-layout">
       <AppSidebar :active-page="'dashboard'" />
-      
-      <div class="content-area">
-        <div class="welcome-section">
-          <UserSummary />
-          <!-- Add Buttons Here -->
-          <div class="dashboard-actions">
-            <button class="action-btn" @click="openAddSkillModal">Add Skill</button>
-            <button class="action-btn" @click="openAddProjectModal">Add Project</button>
-            <button class="action-btn" @click="openNewObjectiveModal">New Objective</button>
+
+      <div class="content-area feed-layout">
+
+        <!-- Button to Open Modal -->
+        <CreatePostButton @open-modal="openPostModal()" />
+
+        <!-- Feed Area -->
+        <div class="feed-container">
+          <h2>Feed</h2>
+          <!-- Loading State -->
+          <div v-if="loading" class="loading-state"> <!-- Use loading from usePosts -->
+            <div class="spinner"></div>
+            <span>Loading feed...</span>
+          </div>
+          <!-- Error State -->
+          <div v-else-if="error" class="error-state"> <!-- Use error from usePosts -->
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Error loading feed: {{ error }}</p>
+            <button @click="fetchPosts" class="retry-btn">Retry</button>
+          </div>
+          <!-- Empty State -->
+          <div v-else-if="posts.length === 0" class="empty-state">
+            <i class="fas fa-stream"></i>
+            <h3>No posts yet</h3>
+            <p>Be the first to share an update!</p>
+          </div>
+          <!-- Feed Items (Use PostItem component) -->
+          <div v-else class="post-list">
+            <PostItem
+              v-for="post in posts"
+              :key="post.id"
+              :post="post"
+            />
           </div>
         </div>
-        
-        <div class="dashboard-grid">
-          <div class="dashboard-widget skills-widget">
-            <SkillSummaryWidget />
-          </div>
-          
-          <div class="dashboard-widget projects-widget">
-            <ProjectSummaryWidget />
-          </div>
-          
-          <div class="dashboard-widget activity-widget">
-            <ActivityFeedWidget />
-          </div>
-          
-          <div class="dashboard-widget objectives-widget">
-            <ObjectivesProgressWidget />
-          </div>
-        </div>
+
       </div>
     </div>
 
-    <!-- Modals -->
-    <SkillFormModal
-      v-if="showSkillModal"
-      :skill="null"
-      @save="saveSkill"
-      @close="closeSkillModal"
+    <!-- Post Form Modal -->
+    <PostFormModal
+      v-if="showPostModal"
+      :post-to-edit="postToEdit"
+      @close="closePostModal"
+      @save="handleSavePost"
     />
-    <ProjectFormModal
-      v-if="showProjectModal"
-      :project="null"
-      @save="saveProject"
-      @close="closeProjectModal"
-    />
-    <ObjectiveFormModal
-      v-if="showObjectiveModal"
-      :objective="null"
-      @save="saveObjective"
-      @close="closeObjectiveModal"
-    />
+
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import AppHeader from '@/components/common/AppHeader.vue';
 import AppSidebar from '@/components/common/AppSidebar.vue';
-import UserSummary from '@/components/dashboard/UserSummary.vue';
-import SkillSummaryWidget from '@/components/dashboard/SkillSummaryWidget.vue';
-import ProjectSummaryWidget from '@/components/dashboard/ProjectSummaryWidget.vue';
-import ActivityFeedWidget from '@/components/dashboard/ActivityFeedWidget.vue';
-import ObjectivesProgressWidget from '@/components/dashboard/ObjectivesProgressWidget.vue';
-import SkillFormModal from '@/components/skills/SkillFormModal.vue';
-import ProjectFormModal from '@/components/projects/ProjectFormModal.vue';
-import ObjectiveFormModal from '@/components/objectives/ObjectiveFormModal.vue';
+import CreatePostButton from '@/components/dashboard/CreatePostButton.vue'; // Import button
+import PostFormModal from '@/components/modals/PostFormModal.vue'; // Import modal
+import PostItem from '@/components/posts/PostItem.vue'; // Import PostItem
 import useAuth from '@/composables/useAuth';
-import useSkills from '@/composables/useSkills';
-import useProjects from '@/composables/useProjects';
-import useObjectives from '@/composables/useObjectives';
-import useTimeline from '@/composables/useTimeline';
-import { onMounted } from 'vue';
+import usePosts from '@/composables/usePosts'; // Import the actual composable
 
 export default {
   name: 'DashboardView',
   components: {
     AppHeader,
     AppSidebar,
-    UserSummary,
-    SkillSummaryWidget,
-    ProjectSummaryWidget,
-    ActivityFeedWidget,
-    ObjectivesProgressWidget,
-    SkillFormModal,
-    ProjectFormModal,
-    ObjectiveFormModal
+    CreatePostButton, // Register button
+    PostFormModal,    // Register modal
+    PostItem          // Register PostItem
   },
   setup() {
-    const { user } = useAuth();
-    const { fetchUserSkills, addSkill } = useSkills();
-    const { fetchUserProjects, addProject } = useProjects();
-    const { fetchUserObjectives, addObjective } = useObjectives();
-    const { fetchUserTimeline, recordEvent } = useTimeline();
+    const { user } = useAuth(); // Only need user info if used directly, otherwise usePosts handles it
+    const { posts, loading, error, fetchPosts, addPost } = usePosts(); // Use the composable
 
-    // Modal visibility states
-    const showSkillModal = ref(false);
-    const showProjectModal = ref(false);
-    const showObjectiveModal = ref(false);
+    const showPostModal = ref(false);
+    const postToEdit = ref(null); // For editing later
 
-    // Fetch data on mount
-    onMounted(async () => {
-      await Promise.all([
-        fetchUserSkills(),
-        fetchUserProjects(),
-        fetchUserObjectives(),
-        fetchUserTimeline(10) // Just recent activities
-      ]);
+    onMounted(() => {
+      fetchPosts(); // Fetch posts when component loads using the composable
     });
 
-    // Open modals
-    const openAddSkillModal = () => {
-      showSkillModal.value = true;
+    const openPostModal = (post = null) => {
+      postToEdit.value = post; // Set if editing
+      showPostModal.value = true;
     };
 
-    const openAddProjectModal = () => {
-      showProjectModal.value = true;
+    const closePostModal = () => {
+      showPostModal.value = false;
+      postToEdit.value = null;
     };
 
-    const openNewObjectiveModal = () => {
-      showObjectiveModal.value = true;
-    };
-
-    // Close modals
-    const closeSkillModal = () => {
-      showSkillModal.value = false;
-    };
-
-    const closeProjectModal = () => {
-      showProjectModal.value = false;
-    };
-
-    const closeObjectiveModal = () => {
-      showObjectiveModal.value = false;
-    };
-
-    // Save handlers
-    const saveSkill = async (formData) => {
+    const handleSavePost = async (postDetails, imageFile) => {
       try {
-        const savedSkill = await addSkill(formData);
-        await recordEvent('skill', 'added', savedSkill.id, { name: savedSkill.name });
-        closeSkillModal();
-      } catch (error) {
-        console.error('Error adding skill:', error);
+        // Call the addPost function from the composable
+        await addPost(postDetails, imageFile);
+        closePostModal(); // Close modal on success
+      } catch (err) {
+        console.error('Dashboard: Failed to save post:', err);
+        // Error is already handled and logged in usePosts,
+        // but you could show a specific UI error here if needed.
+        // The modal itself might show the error from usePosts.
+        alert(`Error saving post: ${err.message}`); // Simple alert for now
       }
-    };
-
-    const saveProject = async (projectData, imageFile) => {
-      try {
-        const savedProject = await addProject(projectData, imageFile);
-        await recordEvent('project', 'added', savedProject.id, { title: savedProject.title });
-        closeProjectModal();
-      } catch (error) {
-        console.error('Error adding project:', error);
-      }
-    };
-
-    const saveObjective = async (objectiveData) => {
-      try {
-        const savedObjective = await addObjective(objectiveData);
-        await recordEvent('objective', 'added', savedObjective.id, { title: savedObjective.title });
-        closeObjectiveModal();
-      } catch (error) {
-        console.error('Error adding objective:', error);
-      }
+      // Note: The modal's isSaving state needs to be managed.
+      // We might need to pass a callback or use the loading state from usePosts.
+      // For simplicity now, the modal handles its own saving state visually.
     };
 
     return {
-      showSkillModal,
-      showProjectModal,
-      showObjectiveModal,
-      openAddSkillModal,
-      openAddProjectModal,
-      openNewObjectiveModal,
-      closeSkillModal,
-      closeProjectModal,
-      closeObjectiveModal,
-      saveSkill,
-      saveProject,
-      saveObjective
+      posts, // From usePosts
+      loading, // From usePosts
+      error,   // From usePosts
+      fetchPosts, // From usePosts (for retry)
+      showPostModal,
+      postToEdit,
+      openPostModal,
+      closePostModal,
+      handleSavePost
     };
   }
 }
 </script>
 
 <style scoped>
-.dashboard-view {
-  min-height: 100vh;
-  background-color: #f8f9fa;
-}
+/* Keep existing styles for dashboard-view, main-layout, feed-layout */
+.dashboard-view { min-height: 100vh; background-color: #f8f9fa; }
+.main-layout { display: flex; min-height: calc(100vh - 64px); }
+.content-area.feed-layout { flex: 1; padding: 1.5rem; overflow-y: auto; max-width: 700px; margin: 0 auto; }
 
-.main-layout {
-  display: flex;
-  min-height: calc(100vh - 64px); /* Account for header height */
-}
+/* Styles for feed container */
+.feed-container h2 { font-size: 1.25rem; margin-bottom: 1rem; color: #374151; font-weight: 600; }
+.post-list { display: flex; flex-direction: column; gap: 1.5rem; }
 
-.content-area {
-  flex: 1;
-  padding: 1.5rem;
-  overflow-y: auto;
-}
-
-.welcome-section {
-  margin-bottom: 1.5rem;
-}
-
-.dashboard-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.action-btn {
-  padding: 0.6rem 1.2rem;
-  background-color: #4f46e5;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.action-btn:hover {
-  background-color: #4338ca;
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 1.5rem;
-}
-
-.dashboard-widget {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-}
-
-@media (max-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-actions {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-}
+/* Loading/Error/Empty States (mostly unchanged) */
+.loading-state, .error-state, .empty-state { text-align: center; padding: 3rem 1rem; color: #6b7280; background-color: #fff; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
+.loading-state .spinner { width: 24px; height: 24px; border: 3px solid rgba(79, 70, 229, 0.2); border-radius: 50%; border-top-color: #4f46e5; animation: spin 1s linear infinite; }
+.error-state i, .empty-state i { font-size: 2rem; color: #d1d5db; }
+.retry-btn { background-color: #e5e7eb; color: #374151; border: none; border-radius: 6px; padding: 0.5rem 1rem; font-size: 0.85rem; cursor: pointer; }
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
