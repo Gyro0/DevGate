@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
     <div class="progress-chart">
       <div v-if="loading" class="chart-loading">
         <div class="spinner"></div>
@@ -21,11 +22,30 @@
             {{ completedCount }} of {{ totalCount }} objectives
           </div>
         </div>
+=======
+    <div class="progress-chart card shadow-sm border-0">
+      <!-- Card Header -->
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">Progress Chart</h5>
+      </div>
+  
+      <!-- Card Body -->
+      <div class="card-body d-flex justify-content-center align-items-center">
+        <div v-if="loading" class="text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <div v-else>
+          <canvas ref="chartCanvas"></canvas>
+        </div>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
       </div>
     </div>
   </template>
   
   <script>
+<<<<<<< HEAD
   import { ref, onMounted, watch } from 'vue';
   import Chart from 'chart.js/auto';
   
@@ -114,10 +134,22 @@
       };
     }
   }
+=======
+  export default {
+    name: 'ProgressChart',
+    props: {
+      loading: {
+        type: Boolean,
+        default: false,
+      },
+    },
+  };
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
   </script>
   
   <style scoped>
   .progress-chart {
+<<<<<<< HEAD
     position: relative;
     width: 100%;
     height: 100%;
@@ -203,5 +235,13 @@
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+=======
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .card-body {
+    height: 300px;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
   }
   </style>

@@ -8,6 +8,10 @@
   },
   "dependencies": {
     "bootstrap": "^5.3.5",
+<<<<<<< HEAD
+=======
+    "bootstrap-icons": "^1.12.1",
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     "chart.js": "^4.4.9",
     "chartjs": "^0.3.24",
     "chartjs-adapter-date-fns": "^3.0.0",

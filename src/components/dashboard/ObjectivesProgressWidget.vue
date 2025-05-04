@@ -1,9 +1,13 @@
 <template>
-  <div class="objectives-widget">
-    <div class="widget-header">
-      <h2>Objectives</h2>
-      <router-link to="/objectives" class="view-all">View All</router-link>
+  <div class="card objectives-widget shadow-sm">
+    <!-- Header -->
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2 class="h5 mb-0 text-primary">Objectives</h2>
+      <router-link to="/objectives" class="btn btn-link p-0 text-decoration-none text-secondary">
+        View All
+      </router-link>
     </div>
+<<<<<<< HEAD
     
     <div class="objectives-content">
       <!-- Loading state -->
@@ -80,6 +84,98 @@
         <router-link to="/objectives" class="add-btn">
           <i class="fas fa-plus"></i> Add Objective
         </router-link>
+=======
+
+    <!-- Content -->
+    <div class="card-body">
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading objectives...</p>
+      </div>
+
+      <!-- Objectives Content -->
+      <div v-else>
+        <div v-if="objectives.length > 0">
+          <!-- Progress Overview -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between small text-muted mb-1">
+              <span>{{ completionPercentage }}% Complete</span>
+            </div>
+            <div class="progress">
+              <div
+                class="progress-bar bg-primary"
+                role="progressbar"
+                :style="{ width: `${completionPercentage}%` }"
+                :aria-valuenow="completionPercentage"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              ></div>
+            </div>
+          </div>
+
+          <!-- Objectives Stats -->
+          <div class="row text-center mb-4">
+            <div class="col">
+              <div class="h5 text-primary">{{ objectives.length }}</div>
+              <div class="small text-muted">Total</div>
+            </div>
+            <div class="col">
+              <div class="h5 text-success">{{ completedObjectives.length }}</div>
+              <div class="small text-muted">Complete</div>
+            </div>
+            <div class="col">
+              <div class="h5 text-info">{{ inProgressObjectives.length }}</div>
+              <div class="small text-muted">In Progress</div>
+            </div>
+          </div>
+
+          <!-- Current Goals -->
+          <h3 class="h6 text-dark mb-3">Current Goals</h3>
+          <ul class="list-group">
+            <li
+              v-for="objective in activeObjectives"
+              :key="objective.id"
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <div class="fw-bold">{{ objective.title }}</div>
+                <div class="small text-muted">
+                  <span v-if="objective.deadline">
+                    <i class="fas fa-calendar-alt me-1"></i>
+                    Due {{ formatDate(objective.deadline) }}
+                  </span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <div class="progress me-2" style="width: 100px;">
+                  <div
+                    class="progress-bar bg-info"
+                    role="progressbar"
+                    :style="{ width: `${objective.progress}%` }"
+                    :aria-valuenow="objective.progress"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+                <span class="small text-muted">{{ objective.progress }}%</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="text-center py-5">
+          <i class="fas fa-bullseye fa-3x text-muted mb-3"></i>
+          <h3 class="h6 text-dark">No objectives yet</h3>
+          <p class="text-muted">Set clear objectives to guide your development journey.</p>
+          <router-link to="/objectives" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i> Add Objective
+          </router-link>
+        </div>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
       </div>
     </div>
   </div>
@@ -100,6 +196,7 @@ export default {
     const { waitForAuth } = useAuth();
     
     // Computed properties
+<<<<<<< HEAD
     const plannedCount = computed(() => 
       objectives.value.filter(o => o.status === 'planned').length
     );
@@ -112,6 +209,31 @@ export default {
       objectives.value.filter(o => o.status === 'completed').length
     );
     
+=======
+    const completedObjectives = computed(() => {
+      return objectives.value.filter((o) => o.status === 'completed');
+    });
+
+    const inProgressObjectives = computed(() => {
+      return objectives.value.filter((o) => o.status === 'in-progress');
+    });
+
+    const activeObjectives = computed(() => {
+      // Sort in-progress first, then planned, limit to 4
+      return [...inProgressObjectives.value, ...objectives.value.filter((o) => o.status === 'planned')]
+        .sort((a, b) => {
+          // Sort by deadline if available
+          if (a.deadline && b.deadline) {
+            const dateA = a.deadline?.seconds ? new Date(a.deadline.seconds * 1000) : new Date(a.deadline);
+            const dateB = b.deadline?.seconds ? new Date(b.deadline.seconds * 1000) : new Date(b.deadline);
+            return dateA - dateB;
+          }
+          return 0;
+        })
+        .slice(0, 4);
+    });
+
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     const completionPercentage = computed(() => {
       if (objectives.value.length === 0) return 0;
       return Math.round((completedCount.value / objectives.value.length) * 100);
@@ -130,6 +252,7 @@ export default {
     
     // Format date for display
     const formatDate = (timestamp) => {
+<<<<<<< HEAD
       if (!timestamp) return 'N/A';
       
       let date;
@@ -151,6 +274,16 @@ export default {
         console.error("Error formatting date:", err, timestamp);
         return 'N/A';
       }
+=======
+      if (!timestamp) return 'No deadline';
+
+      const date = timestamp?.seconds ? new Date(timestamp.seconds * 1000) : new Date(timestamp);
+
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     };
     
     // Format status
@@ -229,16 +362,21 @@ export default {
       inProgressCount,
       completedCount,
       completionPercentage,
+<<<<<<< HEAD
       recentObjectives,
       formatDate,
       formatStatus,
       loadObjectives
+=======
+      formatDate,
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 .objectives-widget {
   height: 100%; /* Ensure widget fills grid cell */
   display: flex;
@@ -549,4 +687,7 @@ h3 { /* Style for "Recent Objectives" */
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+=======
+/* No additional custom styles needed as Bootstrap is used */
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 </style>

@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div class="project-filter-bar">
     <!-- Search Group -->
     <div class="filter-group search-group">
@@ -38,33 +39,99 @@
         </div>
         <div v-else class="no-techs-info">
           No technologies used in projects yet.
+=======
+  <div class="project-filter-bar row g-3">
+    <!-- Search Filter -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="project-search" class="form-label">Search</label>
+        <div class="input-group">
+          <input
+            id="project-search"
+            v-model="filters.search"
+            @input="emitUpdate"
+            type="text"
+            class="form-control"
+            placeholder="Search projects..."
+          />
+          <button
+            v-if="filters.search"
+            class="btn btn-outline-secondary"
+            @click="clearSearch"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
         </div>
       </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Date Range Group -->
     <div class="filter-group date-group">
       <label>Date Range</label>
       <div class="date-inputs">
         <div class="date-input-wrapper">
           <label for="start-date">From</label>
+=======
+    <!-- Technologies Filter -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label class="form-label">Technologies</label>
+        <div class="d-flex flex-wrap gap-2">
+          <button
+            v-for="tech in availableTechnologies"
+            :key="tech"
+            @click="toggleTechFilter(tech)"
+            :class="['btn btn-sm', filters.tech.includes(tech) ? 'btn-primary' : 'btn-outline-primary']"
+          >
+            {{ tech }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Date Range Filter -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label class="form-label">Date Range</label>
+        <div class="d-flex align-items-center gap-2">
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
           <input
             id="start-date"
             type="date"
             :value="startDateValue"
             @input="updateStartDate"
+            class="form-control"
+            placeholder="From"
           />
+<<<<<<< HEAD
         </div>
         <div class="date-input-wrapper">
           <label for="end-date">To</label>
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
           <input
             id="end-date"
             type="date"
             :value="endDateValue"
             @input="updateEndDate"
+<<<<<<< HEAD
             :min="startDateValue"
+=======
+            class="form-control"
+            placeholder="To"
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
           />
+          <button
+            v-if="hasDateFilter"
+            class="btn btn-outline-secondary"
+            @click="clearDateFilter"
+          >
+            Clear
+          </button>
         </div>
+<<<<<<< HEAD
         <button
           v-if="hasDateFilter"
           class="clear-btn clear-dates"
@@ -73,6 +140,8 @@
         >
           <i class="fas fa-times"></i> Clear
         </button>
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
       </div>
     </div>
 
@@ -80,13 +149,18 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import { computed, reactive, watch, toRefs } from 'vue';
+=======
+import { computed, reactive, watch } from 'vue';
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 
 export default {
   name: 'ProjectFilterBar',
   props: {
     modelValue: {
       type: Object,
+<<<<<<< HEAD
       required: true,
       default: () => ({ search: '', tech: [], dateRange: null })
     },
@@ -122,12 +196,79 @@ export default {
       if (index === -1) {
         localFilters.tech.push(tech);
         console.log(`Added tech. Current localFilters.tech:`, JSON.stringify(localFilters.tech));
+=======
+      default: () => ({ tech: [], dateRange: null, search: '' }),
+    },
+  },
+  emits: ['update:modelValue'],
+  setup(props, { emit }) {
+    const availableTechnologies = [
+      'JavaScript', 'React', 'Vue', 'Angular',
+      'Node.js', 'Python', 'Django', 'Flask',
+      'Ruby', 'Rails', 'PHP', 'Laravel',
+      'Java', 'Spring', '.NET', 'C#',
+      'Docker', 'Kubernetes', 'AWS', 'Firebase',
+    ];
+
+    const filters = reactive({ ...props.modelValue });
+
+    watch(
+      () => props.modelValue,
+      (newVal) => {
+        Object.assign(filters, newVal);
+      },
+      { deep: true }
+    );
+
+    const formatDateForInput = (date) => {
+      if (!date) return '';
+      const dateObj = date instanceof Date ? date : new Date(date);
+      if (isNaN(dateObj.getTime())) return '';
+      return dateObj.toISOString().split('T')[0];
+    };
+
+    const startDateValue = computed(() => {
+      return filters.dateRange?.start ? formatDateForInput(filters.dateRange.start) : '';
+    });
+
+    const endDateValue = computed(() => {
+      return filters.dateRange?.end ? formatDateForInput(filters.dateRange.end) : '';
+    });
+
+    const hasDateFilter = computed(() => {
+      return !!(filters.dateRange?.start || filters.dateRange?.end);
+    });
+
+    const emitUpdate = () => {
+      const dataToEmit = {
+        ...filters,
+        dateRange: filters.dateRange
+          ? {
+              start: filters.dateRange.start || null,
+              end: filters.dateRange.end || null,
+            }
+          : null,
+      };
+      if (dataToEmit.dateRange && !dataToEmit.dateRange.start && !dataToEmit.dateRange.end) {
+        dataToEmit.dateRange = null;
+      }
+      emit('update:modelValue', dataToEmit);
+    };
+
+    const toggleTechFilter = (tech) => {
+      if (!Array.isArray(filters.tech)) {
+        filters.tech = [];
+      }
+      if (filters.tech.includes(tech)) {
+        filters.tech = filters.tech.filter((t) => t !== tech);
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
       } else {
         localFilters.tech.splice(index, 1);
         console.log(`Removed tech. Current localFilters.tech:`, JSON.stringify(localFilters.tech));
       }
       emitUpdate();
     };
+<<<<<<< HEAD
 
     const techIsSelected = (tech) => {
       return Array.isArray(localFilters.tech) && localFilters.tech.includes(tech);
@@ -165,6 +306,33 @@ export default {
     const endDateValue = computed(() => localFilters.dateRange?.end || '');
     const hasDateFilter = computed(() => !!(localFilters.dateRange?.start || localFilters.dateRange?.end));
 
+=======
+
+    const updateStartDate = (event) => {
+      const start = event.target.value ? new Date(event.target.value) : null;
+      filters.dateRange = filters.dateRange || { start: null, end: null };
+      filters.dateRange.start = start;
+      emitUpdate();
+    };
+
+    const updateEndDate = (event) => {
+      const end = event.target.value ? new Date(event.target.value) : null;
+      filters.dateRange = filters.dateRange || { start: null, end: null };
+      filters.dateRange.end = end;
+      emitUpdate();
+    };
+
+    const clearDateFilter = () => {
+      filters.dateRange = null;
+      emitUpdate();
+    };
+
+    const clearSearch = () => {
+      filters.search = '';
+      emitUpdate();
+    };
+
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     return {
       filters: localFilters,
       startDateValue,
@@ -176,10 +344,14 @@ export default {
       updateEndDate,
       clearDateFilter,
       clearSearch,
+<<<<<<< HEAD
       emitUpdate
+=======
+      emitUpdate,
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
@@ -196,13 +368,18 @@ export default {
   margin-bottom: 2rem; /* Ensure space below */
 }
 
+<<<<<<< HEAD
 /* General Filter Group Styling */
 .filter-group {
+=======
+.form-group {
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
   display: flex;
   flex-direction: column;
   gap: 0.6rem; /* Space between label and control */
 }
 
+<<<<<<< HEAD
 .filter-group > label { /* Label above the group */
   font-size: 0.8rem;
   font-weight: 600;
@@ -370,6 +547,31 @@ input[type="text"] {
   .tech-group {
     grid-column: 1 / -1; /* Span full width */
   }
+=======
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #4b5563;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+}
+
+.input-group .form-control {
+  flex: 1;
+}
+
+.btn-outline-secondary {
+  font-size: 0.875rem;
+}
+
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 
 @media (max-width: 768px) {

@@ -1,83 +1,105 @@
 <template>
-  <div class="modal-backdrop" @click.self="$emit('close')">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>{{ isEditing ? 'Edit Skill' : 'Add New Skill' }}</h3>
-        <button @click="$emit('close')" class="modal-close">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <form @submit.prevent="submitForm">
-          <div class="form-group">
-            <label for="skill-name">Skill Name *</label>
-            <input 
-              id="skill-name" 
-              type="text" 
-              v-model="formData.name" 
-              required
-              placeholder="e.g. JavaScript, React, Docker"
-            />
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="skill-category">Category *</label>
-              <select id="skill-category" v-model="formData.category" required>
-                <option v-for="category in skillCategories" :key="category.id" :value="category.id">
-                  {{ category.name }}
-                </option>
-              </select>
+  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="skillFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="skillFormModalLabel">
+            {{ isEditing ? 'Edit Skill' : 'Add New Skill' }}
+          </h5>
+          <button type="button" class="btn-close" aria-label="Close" @click="$emit('close')"></button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <form @submit.prevent="submitForm">
+            <!-- Skill Name -->
+            <div class="mb-3">
+              <label for="skill-name" class="form-label">Skill Name *</label>
+              <input
+                id="skill-name"
+                type="text"
+                v-model="formData.name"
+                class="form-control"
+                required
+                placeholder="e.g. JavaScript, React, Docker"
+              />
             </div>
-            
-            <div class="form-group">
-              <label for="skill-level">Proficiency Level *</label>
-              <select id="skill-level" v-model="formData.level" required>
-                <option v-for="level in skillLevels" :key="level.value" :value="level.value">
-                  {{ level.value }} - {{ level.label }}
-                </option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="skill-notes">Notes</label>
-            <textarea 
-              id="skill-notes" 
-              v-model="formData.notes" 
-              rows="3" 
-              placeholder="Add any details about your experience with this skill"
-            ></textarea>
-          </div>
-          
-          <div v-if="isEditing" class="progress-history">
-            <h4>Progress History</h4>
-            <div v-if="skill?.progressHistory?.length" class="history-list">
-              <div v-for="(entry, index) in skill.progressHistory" :key="index" class="history-item">
-                <span>Level {{ entry.level }}</span>
-                <span>{{ formatDate(entry.date) }}</span>
+
+            <!-- Category and Level -->
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="skill-category" class="form-label">Category *</label>
+                <select
+                  id="skill-category"
+                  v-model="formData.category"
+                  class="form-select"
+                  required
+                >
+                  <option v-for="category in skillCategories" :key="category.id" :value="category.id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="skill-level" class="form-label">Proficiency Level *</label>
+                <select
+                  id="skill-level"
+                  v-model="formData.level"
+                  class="form-select"
+                  required
+                >
+                  <option v-for="level in skillLevels" :key="level.value" :value="level.value">
+                    {{ level.value }} - {{ level.label }}
+                  </option>
+                </select>
               </div>
             </div>
-            <p v-else class="no-history">No progress history available</p>
-          </div>
-          
-          <div class="form-actions">
-            <button type="submit" class="btn-primary">
-              {{ isEditing ? 'Update Skill' : 'Add Skill' }}
-            </button>
-            <button type="button" class="btn-secondary" @click="$emit('close')">
-              Cancel
-            </button>
-          </div>
-        </form>
+
+            <!-- Notes -->
+            <div class="mb-3">
+              <label for="skill-notes" class="form-label">Notes</label>
+              <textarea
+                id="skill-notes"
+                v-model="formData.notes"
+                class="form-control"
+                rows="3"
+                placeholder="Add any details about your experience with this skill"
+              ></textarea>
+            </div>
+
+            <!-- Progress History -->
+            <div v-if="isEditing" class="mb-3">
+              <h6 class="text-muted">Progress History</h6>
+              <div v-if="skill?.progressHistory?.length" class="list-group">
+                <div
+                  v-for="(entry, index) in skill.progressHistory"
+                  :key="index"
+                  class="list-group-item d-flex justify-content-between align-items-center"
+                >
+                  <span>Level {{ entry.level }}</span>
+                  <span class="text-muted small">{{ formatDate(entry.date) }}</span>
+                </div>
+              </div>
+              <p v-else class="text-muted fst-italic">No progress history available</p>
+            </div>
+          </form>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="$emit('close')">Cancel</button>
+          <button type="submit" class="btn btn-primary" :disabled="!isFormValid">
+            {{ isEditing ? 'Update Skill' : 'Add Skill' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, computed } from 'vue'; // Removed defineProps, defineEmits
+import { reactive, computed } from 'vue';
 import useSkills from '@/composables/useSkills';
 
 export default {
@@ -85,78 +107,58 @@ export default {
   props: {
     skill: {
       type: Object,
-      default: null
-    }
+      default: null,
+    },
   },
   emits: ['save', 'close'],
   setup(props, { emit }) {
     const { skillCategories, skillLevels } = useSkills();
 
-    // Determine if we're editing an existing skill
     const isEditing = computed(() => !!props.skill);
 
-    // Initialize form data
     const formData = reactive({
       name: props.skill?.name || '',
-      // Ensure skillCategories has loaded before accessing [0]
-      category: props.skill?.category || (skillCategories.length > 0 ? skillCategories[0].id : ''), 
+      category: props.skill?.category || (skillCategories.length > 0 ? skillCategories[0].id : ''),
       level: props.skill?.level || 1,
-      notes: props.skill?.notes || ''
+      notes: props.skill?.notes || '',
     });
 
-    // Format date for display
     const formatDate = (timestamp) => {
       if (!timestamp) return 'N/A';
-      
-      let date;
-      if (timestamp.toDate) {
-        // Firestore Timestamp object
-        date = timestamp.toDate();
-      } else if (timestamp.seconds) {
-        // Firestore Timestamp as plain object
-        date = new Date(timestamp.seconds * 1000);
-      } else {
-        // JavaScript Date or string
-        date = new Date(timestamp);
-      }
-      
-      // Check if date is valid
-      if (isNaN(date.getTime())) {
-         return 'Invalid Date';
-      }
-      
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
+      const date = timestamp.seconds
+        ? new Date(timestamp.seconds * 1000)
+        : new Date(timestamp);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
         day: 'numeric',
-        year: 'numeric'
+        year: 'numeric',
       });
     };
 
-    // Submit form data to parent
+    const isFormValid = computed(() => {
+      return formData.name.trim() !== '' && formData.category !== '' && formData.level !== '';
+    });
+
     const submitForm = () => {
-      // Basic validation
-      if (!formData.name || !formData.category || !formData.level) {
-         console.error("Form validation failed: Name, Category, and Level are required.");
-         return; 
-      }
+      if (!isFormValid.value) return;
       emit('save', { ...formData });
     };
 
-    // Return everything needed by the template
     return {
       isEditing,
       formData,
-      skillCategories, // Expose for the template v-for
-      skillLevels,     // Expose for the template v-for
+      skillCategories,
+      skillLevels,
       formatDate,
-      submitForm
-      // props.skill is automatically available in the template
+      isFormValid,
+      submitForm,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
+<<<<<<< HEAD
   /* --- Start: Consistent Modal Styles --- */
   .modal-backdrop {
     position: fixed;
@@ -425,4 +427,29 @@ export default {
         padding-top: 1rem;
     }
   }
+=======
+.modal-content {
+  border-radius: 8px;
+}
+
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.list-group-item {
+  font-size: 0.875rem;
+}
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 </style>

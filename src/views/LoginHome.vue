@@ -1,28 +1,42 @@
 <template>
+<<<<<<< HEAD
   <div class="login-view">
     <div class="login-container">
       <div class="logo-container">
         <h1>DevGate</h1>
         <p>Track your developer journey</p>
+=======
+  <div class="login-view d-flex align-items-center justify-content-center bg-light vh-100">
+    <div class="card login-container shadow-sm p-4">
+      <!-- Logo Section -->
+      <div class="text-center mb-4">
+        <img src="@/assets/logo.png" alt="DevGate Logo" class="logo mb-3" />
+        <h1 class="h4 fw-bold text-primary">DevGate</h1>
+        <p class="text-muted">Track your developer journey</p>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
       </div>
-      
-      <div class="auth-card">
-        <div class="auth-tabs">
-          <button 
-            :class="{ 'active': activeTab === 'login' }" 
+
+      <!-- Tabs for Login/Register -->
+      <div>
+        <div class="nav nav-tabs mb-3">
+          <button
+            class="nav-link w-50 text-center"
+            :class="{ active: activeTab === 'login' }"
             @click="activeTab = 'login'"
           >
             Login
           </button>
-          <button 
-            :class="{ 'active': activeTab === 'signup' }" 
+          <button
+            class="nav-link w-50 text-center"
+            :class="{ active: activeTab === 'signup' }"
             @click="activeTab = 'signup'"
           >
             Register
           </button>
         </div>
-        
-        <div class="auth-form">
+
+        <!-- Login/Register Form -->
+        <div>
           <Login v-if="activeTab === 'login'" @login-success="onLoginSuccess" />
           <Signin v-else @signup-success="onSignupSuccess" />
         </div>
@@ -50,21 +64,28 @@ const onSignupSuccess = () => {
 </script>
 
 <style scoped>
+/* General layout */
 .login-view {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+<<<<<<< HEAD
   background: var(--background);
   padding: 1rem;
+=======
+  background-color: #f3f4f6; /* Light gray background */
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 
+/* Login container */
 .login-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
+<<<<<<< HEAD
   max-width: 520px;
   margin: 0 auto;
   background-color: var(--bg-main);
@@ -80,9 +101,16 @@ const onSignupSuccess = () => {
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.12);
   border: 1px solid var(--border-color);
+=======
+  max-width: 420px;
+  padding: 1.5rem;
+  border-radius: 10px;
+  background-color: #ffffff; /* White background for the card */
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 
-.logo-container {
+/* Logo container */
+.text-center {
   text-align: center;
   margin-bottom: 2.5rem;
 }
@@ -109,6 +137,7 @@ const onSignupSuccess = () => {
   filter: drop-shadow(0 0 8px var(--highlight));
 }
 
+<<<<<<< HEAD
 .auth-card {
   background: var(--surface);
   border-radius: 1rem;
@@ -122,9 +151,16 @@ const onSignupSuccess = () => {
   display: flex;
   margin-bottom: 2rem;
   border-bottom: 1.5px solid var(--highlight);
+=======
+/* Tabs for Login/Register */
+.nav-tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #d1d5db; /* Light gray border */
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 
-.auth-tabs button {
+.nav-link {
   flex: 1;
   background: none;
   border: none;
@@ -134,6 +170,7 @@ const onSignupSuccess = () => {
   font-size: 1rem;
   font-weight: 500;
   cursor: pointer;
+<<<<<<< HEAD
   color: var(--text);
   transition: color 0.2s, border-color 0.2s;
   text-align: center;
@@ -151,8 +188,19 @@ const onSignupSuccess = () => {
   font-weight: 700;
   background: rgba(255, 153, 0, 0.08);
   box-shadow: 0 2px 8px 0 var(--highlight);
+=======
+  color: #6b7280; /* Neutral gray */
+  transition: color 0.3s, border-bottom 0.3s;
 }
 
+.nav-link.active {
+  color: #1e3a8a; /* Darker blue for active tab */
+  border-bottom: 2px solid #1e3a8a; /* Underline for active tab */
+  font-weight: 600;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
+}
+
+/* Form container */
 .auth-form {
   /* No change needed here, handled by child components */
 }

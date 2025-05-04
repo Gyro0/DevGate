@@ -1,16 +1,13 @@
 <template>
-  <div class="skill-tracker-view">
+  <div class="skill-tracker-view bg-light min-vh-100">
     <AppHeader />
-    <div class="main-layout">
-      <AppSidebar :active-page="'skills'" />
-      
-      <div class="content-area">
-        <div class="page-header">
-          <h1>My Skills</h1>
-          <button class="btn-primary" @click="openSkillModal">
-            <span class="icon">+</span> Add Skill
-          </button>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 bg-white p-0">
+          <AppSidebar :active-page="'skills'" />
         </div>
+<<<<<<< HEAD
         
         <div class="filter-bar">
           <SkillFilterBar v-model="filters" />
@@ -41,17 +38,67 @@
             @edit="openSkillModal"
             @delete="confirmDeleteSkill"
           />
+=======
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 py-4">
+          <!-- Page Header -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h4 fw-bold">My Skills</h1>
+            <button class="btn btn-primary" @click="openSkillModal">
+              <i class="fas fa-plus me-2"></i> Add Skill
+            </button>
+          </div>
+
+          <!-- Filter Bar -->
+          <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+              <SkillFilterBar v-model="filters" />
+            </div>
+          </div>
+
+          <!-- Charts Section -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <div class="card shadow-sm border-0">
+                <div class="card-body">
+                  <h5 class="card-title fw-bold">Skill Categories</h5>
+                  <SkillRadarChart :skills="filteredSkills" />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card shadow-sm border-0">
+                <div class="card-body">
+                  <h5 class="card-title fw-bold">Skill Progression</h5>
+                  <SkillProgressChart :skills="filteredSkills" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills Grid -->
+          <div class="row g-4">
+            <div class="col-md-4" v-for="skill in filteredSkills" :key="skill.id">
+              <SkillCard
+                :skill="skill"
+                @edit="openSkillModal"
+                @delete="confirmDeleteSkill"
+              />
+            </div>
+          </div>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
         </div>
       </div>
     </div>
-    
+
+    <!-- Modals -->
     <SkillFormModal
       v-if="showAddSkillModal"
       :skill="selectedSkill"
       @save="saveSkill"
       @close="closeSkillModal"
     />
-    
     <ConfirmDialog
       v-if="showDeleteConfirm"
       :message="`Delete skill '${skillToDelete?.name}'?`"
@@ -84,18 +131,10 @@ export default {
     SkillRadarChart,
     SkillProgressChart,
     SkillFormModal,
-    ConfirmDialog
+    ConfirmDialog,
   },
   setup() {
-    const { 
-      skills, 
-      loading: skillsLoading, 
-      error: skillsError, 
-      fetchUserSkills, 
-      addSkill, 
-      updateSkill, 
-      deleteSkill: removeSkill 
-    } = useSkills();
+    const { skills, fetchUserSkills, addSkill, updateSkill, deleteSkill: removeSkill } = useSkills();
     const { recordEvent } = useTimeline();
 
     const filters = ref({ category: 'all', level: 'all', search: '' });
@@ -104,48 +143,44 @@ export default {
     const selectedSkill = ref(null);
     const skillToDelete = ref(null);
 
+<<<<<<< HEAD
     // Filter skills based on user filters
     const filteredSkills = computed(() => {
       if (!filters.value) return skills.value; 
 
       return skills.value.filter(skill => {
         // Filter by category
+=======
+    const filteredSkills = computed(() => {
+      return skills.value.filter((skill) => {
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
         if (filters.value.category !== 'all' && skill.category !== filters.value.category) {
           return false;
         }
-        
-        // Filter by level
         if (filters.value.level !== 'all' && skill.level !== parseInt(filters.value.level)) {
           return false;
         }
-        
-        // Filter by search term
         if (filters.value.search && !skill.name.toLowerCase().includes(filters.value.search.toLowerCase())) {
           return false;
         }
-        
         return true;
       });
     });
 
-    // Fetch skills on component mount
     onMounted(async () => {
       await fetchUserSkills();
     });
 
-    // Open add/edit modal for a skill
     const openSkillModal = (skill = null) => {
       selectedSkill.value = skill ? { ...skill } : null;
       showAddSkillModal.value = true;
     };
 
-    // Initialize deletion process for a skill
     const confirmDeleteSkill = (skill) => {
       skillToDelete.value = skill;
       showDeleteConfirm.value = true;
     };
 
-    // Delete the skill after confirmation
     const deleteSkill = async () => {
       if (!skillToDelete.value?.id) return;
       try {
@@ -158,16 +193,13 @@ export default {
       }
     };
 
-    // Save new or updated skill
     const saveSkill = async (skillData) => {
       try {
         let savedSkill;
         if (selectedSkill.value?.id) {
-          // Update existing skill
           savedSkill = await updateSkill(selectedSkill.value.id, skillData);
           await recordEvent('skill', 'updated', savedSkill.id, { name: savedSkill.name });
         } else {
-          // Add new skill
           savedSkill = await addSkill(skillData);
           await recordEvent('skill', 'added', savedSkill.id, { name: savedSkill.name });
         }
@@ -177,7 +209,6 @@ export default {
       }
     };
 
-    // Close skill modal and reset selection
     const closeSkillModal = () => {
       selectedSkill.value = null;
       showAddSkillModal.value = false;
@@ -196,15 +227,19 @@ export default {
       deleteSkill,
       saveSkill,
       closeSkillModal,
+<<<<<<< HEAD
       skillsLoading,
       skillsError
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
 .skill-tracker-view {
+<<<<<<< HEAD
   min-height: 100vh;
   background-color: var(--bg-main);
 }
@@ -296,6 +331,24 @@ export default {
 .icon {
   font-size: 1.2rem;
   font-weight: bold;
+=======
+  background-color: #f8f9fa;
+}
+
+.card {
+  border-radius: 8px;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 
 .loading-state {

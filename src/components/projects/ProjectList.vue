@@ -1,150 +1,180 @@
 <template>
   <div class="project-list">
-    <div v-if="projects.length === 0" class="empty-state">
-      <div class="empty-icon">
-        <i class="fas fa-folder-open"></i>
+    <!-- Empty State -->
+    <div v-if="projects.length === 0" class="text-center py-5">
+      <div class="mb-3">
+        <i class="fas fa-folder-open fa-3x text-muted"></i>
       </div>
-      <h3>No Projects Found</h3>
-      <p>Create your first project to get started or adjust your filters.</p>
+      <h3 class="text-secondary">No Projects Found</h3>
+      <p class="text-muted">Create your first project to get started or adjust your filters.</p>
     </div>
-    
-    <table v-else class="projects-table">
-      <thead>
-        <tr>
-          <th>Project</th>
-          <th>Technologies</th>
-          <th>Date Created</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="project in projects" :key="project.id">
-          <td class="project-cell">
-            <div class="project-thumb" v-if="project.imageUrl">
-              <img :src="project.imageUrl" alt="" @error="onImageError" />
-            </div>
-            <div class="project-info">
-              <div class="project-title">{{ project.title }}</div>
-              <div v-if="project.description" class="project-description">
-                {{ truncateDescription(project.description) }}
+
+    <!-- Projects Table -->
+    <div v-else class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Project</th>
+            <th scope="col">Technologies</th>
+            <th scope="col">Date Created</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="project in projects" :key="project.id">
+            <!-- Project Info -->
+            <td>
+              <div class="d-flex align-items-center">
+                <img
+                  v-if="project.imageUrl"
+                  :src="project.imageUrl"
+                  alt="Project Thumbnail"
+                  class="rounded me-3"
+                  style="width: 48px; height: 48px; object-fit: cover;"
+                  @error="onImageError"
+                />
+                <div>
+                  <div class="fw-bold text-truncate" style="max-width: 200px;">
+                    {{ project.title }}
+                  </div>
+                  <small v-if="project.description" class="text-muted">
+                    {{ truncateDescription(project.description) }}
+                  </small>
+                </div>
               </div>
-            </div>
-          </td>
-          <td class="tech-cell">
-            <div class="tech-stack">
-              <div v-for="tech in project.techStack.slice(0, 2)" :key="tech" class="tech-tag">
-                {{ tech }}
+            </td>
+
+            <!-- Technologies -->
+            <td>
+              <div class="d-flex flex-wrap gap-2">
+                <span
+                  v-for="tech in project.techStack.slice(0, 2)"
+                  :key="tech"
+                  class="badge bg-primary"
+                >
+                  {{ tech }}
+                </span>
+                <span
+                  v-if="project.techStack.length > 2"
+                  class="badge bg-secondary"
+                >
+                  +{{ project.techStack.length - 2 }}
+                </span>
               </div>
-              <div v-if="project.techStack.length > 2" class="tech-more">
-                +{{ project.techStack.length - 2 }}
-              </div>
-            </div>
-          </td>
-          <td class="date-cell">
-            {{ formatDate(project.createdAt) }}
-          </td>
-          <td class="status-cell">
-            <span 
-              v-if="project.status" 
-              :class="['status-badge', `status-${project.status}`]"
-            >
-              {{ formatStatus(project.status) }}
-            </span>
-            <span v-else class="status-badge">—</span>
-          </td>
-          <td class="actions-cell">
-            <button @click="$emit('edit', project)" class="action-btn edit-btn" title="Edit">
-              <i class="fas fa-pen"></i>
-            </button>
-            <button @click="$emit('delete', project)" class="action-btn delete-btn" title="Delete">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+
+            <!-- Date Created -->
+            <td>
+              <small class="text-muted">{{ formatDate(project.createdAt) }}</small>
+            </td>
+
+            <!-- Status -->
+            <td>
+              <span
+                v-if="project.status"
+                :class="['badge', getStatusClass(project.status)]"
+              >
+                {{ formatStatus(project.status) }}
+              </span>
+              <span v-else class="badge bg-light text-muted">—</span>
+            </td>
+
+            <!-- Actions -->
+            <td class="text-end">
+              <button
+                @click="$emit('edit', project)"
+                class="btn btn-sm btn-outline-primary me-2"
+                title="Edit"
+              >
+                <i class="fas fa-pen"></i>
+              </button>
+              <button
+                @click="$emit('delete', project)"
+                class="btn btn-sm btn-outline-danger"
+                title="Delete"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'; // Removed defineProps, defineEmits
+import { ref } from 'vue';
 
 export default {
   name: 'ProjectList',
   props: {
     projects: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: ['edit', 'delete'],
-  setup(props) { // props is automatically available here
+  setup() {
     const defaultImage = ref('/path/to/default-project.jpg');
 
-    // Format date for display
     const formatDate = (timestamp) => {
       if (!timestamp) return 'N/A';
-      
-      let date;
-      if (timestamp.seconds) {
-        date = new Date(timestamp.seconds * 1000);
-      } else {
-        date = new Date(timestamp);
-      }
-      
-      // Check if date is valid
-      if (isNaN(date.getTime())) {
-         return 'Invalid Date';
-      }
-      
+      const date = timestamp.seconds
+        ? new Date(timestamp.seconds * 1000)
+        : new Date(timestamp);
+      if (isNaN(date.getTime())) return 'Invalid Date';
       return date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
-        year: 'numeric'
+        year: 'numeric',
       });
     };
 
-    // Format project status
     const formatStatus = (status) => {
       const statusMap = {
-        'active': 'Active',
-        'completed': 'Completed',
-        'paused': 'Paused',
-        'archived': 'Archived',
-        'in-progress': 'In Progress', // Added for consistency
-        'planning': 'Planning' // Added for consistency
+        active: 'Active',
+        completed: 'Completed',
+        paused: 'Paused',
+        archived: 'Archived',
       };
-      
       return statusMap[status] || status;
     };
 
-    // Truncate description text
-    const truncateDescription = (text) => {
-      if (!text || typeof text !== 'string') return ''; // Added check
-      if (text.length <= 50) return text;
-      return text.substring(0, 50) + '...';
+    const getStatusClass = (status) => {
+      const statusClassMap = {
+        active: 'bg-success text-white',
+        completed: 'bg-primary text-white',
+        paused: 'bg-warning text-dark',
+        archived: 'bg-secondary text-white',
+      };
+      return statusClassMap[status] || 'bg-light text-dark';
     };
 
-    // Handle image loading errors
+    const truncateDescription = (text) => {
+      if (!text || typeof text !== 'string') return '';
+      return text.length > 50 ? `${text.substring(0, 50)}...` : text;
+    };
+
     const onImageError = (e) => {
       e.target.src = defaultImage.value;
     };
 
-    // Return everything needed by the template
     return {
       defaultImage,
       formatDate,
       formatStatus,
+      getStatusClass,
       truncateDescription,
-      onImageError
-      // props.projects is automatically available in the template
+      onImageError,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 .project-list {
   width: 100%;
 }
@@ -196,11 +226,17 @@ export default {
   border-collapse: collapse;
   background-color: var(--card-bg);
   border-radius: 12px;
+=======
+.table-responsive {
+  background-color: #ffffff;
+  border-radius: 8px;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border: 1px solid var(--border-color);
 }
 
+<<<<<<< HEAD
 .projects-table th, 
 .projects-table td {
   padding: 1.25rem;
@@ -260,11 +296,23 @@ export default {
 .project-title {
   font-weight: 600;
   color: var(--text-color);
+=======
+.table {
+  margin-bottom: 0;
+}
+
+.badge {
+  font-size: 0.75rem;
+}
+
+.text-truncate {
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   margin-bottom: 0.25rem;
 }
+<<<<<<< HEAD
 
 .project-description {
   color: var(--text-secondary);
@@ -396,4 +444,6 @@ export default {
     min-width: 200px;
   }
 }
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 </style>

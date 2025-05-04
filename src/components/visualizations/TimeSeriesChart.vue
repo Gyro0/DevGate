@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div class="time-series-chart">
     <div v-if="!chartData || chartData.labels.length === 0" class="chart-empty">
       <div class="empty-icon">
@@ -8,11 +9,30 @@
     </div>
     <div v-else class="chart-container">
       <canvas ref="chartCanvas"></canvas>
+=======
+  <div class="time-series-chart card shadow-sm border-0">
+    <!-- Card Header -->
+    <div class="card-header bg-light">
+      <h5 class="card-title mb-0">Time Series Chart</h5>
+    </div>
+
+    <!-- Card Body -->
+    <div class="card-body d-flex justify-content-center align-items-center">
+      <div v-if="loading" class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+      <div v-else>
+        <canvas ref="chartCanvas"></canvas>
+      </div>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     </div>
   </div>
 </template>
 
 <script>
+<<<<<<< HEAD
 import { ref, onMounted, watch } from 'vue';
 import Chart from 'chart.js/auto';
 
@@ -88,10 +108,22 @@ export default {
     };
   }
 }
+=======
+export default {
+  name: 'TimeSeriesChart',
+  props: {
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  },
+};
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 </script>
 
 <style scoped>
 .time-series-chart {
+<<<<<<< HEAD
   position: relative;
   width: 100%;
   height: 100%;
@@ -122,5 +154,13 @@ export default {
   font-size: 2.5rem;
   color: var(--text-secondary);
   margin-bottom: 1rem;
+=======
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-body {
+  height: 300px;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 </style>

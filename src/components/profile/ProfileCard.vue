@@ -1,54 +1,31 @@
 <template>
+<<<<<<< HEAD
   <div class="profile-card">
     <div class="profile-banner">
       <div class="profile-avatar-container">
         <!-- Use root-relative path for the default avatar -->
         <img :src="userProfile.photoURL || '/default.jpg'" alt="Profile" class="profile-avatar" />
         <button v-if="editMode" class="change-photo-btn" @click="triggerPhotoUpload">
+=======
+  <div class="card shadow-sm border-0">
+    <div class="card-body text-center">
+      <div class="profile-avatar-container mx-auto mb-3">
+        <img :src="userProfile.photoURL || '/default-avatar.png'" alt="Profile" class="profile-avatar" />
+        <button v-if="editMode" class="btn btn-sm btn-primary change-photo-btn" @click="triggerPhotoUpload">
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
           <i class="fas fa-camera"></i>
         </button>
-        <input
-          type="file"
-          ref="photoInput"
-          @change="handlePhotoChange"
-          accept="image/*"
-          class="hidden-input"
-        />
+        <input type="file" ref="photoInput" @change="handlePhotoChange" accept="image/*" class="d-none" />
       </div>
-    </div>
-    
-    <div class="profile-info">
-      <h2 class="profile-name">{{ userProfile.displayName }}</h2>
-      <p class="profile-title">{{ userProfile.title || 'Developer' }}</p>
-      <div class="profile-bio">
-        {{ userProfile.bio || 'No bio added yet.' }}
-      </div>
-      
-      <div class="profile-meta">
-        <div class="meta-item">
-          <i class="fas fa-envelope"></i>
-          <span>{{ userProfile.email }}</span>
-        </div>
-        <div v-if="userProfile.location" class="meta-item">
-          <i class="fas fa-map-marker-alt"></i>
-          <span>{{ userProfile.location }}</span>
-        </div>
-        <div v-if="userProfile.website" class="meta-item">
-          <i class="fas fa-globe"></i>
-          <a :href="userProfile.website" target="_blank" rel="noopener noreferrer">{{ formatWebsiteUrl(userProfile.website) }}</a>
-        </div>
-        <div v-if="userProfile.github" class="meta-item">
-          <i class="fab fa-github"></i>
-          <a :href="'https://github.com/' + userProfile.github" target="_blank" rel="noopener noreferrer">{{ userProfile.github }}</a>
-        </div>
-      </div>
+      <h2 class="h5 fw-bold">{{ userProfile.displayName }}</h2>
+      <p class="text-muted">{{ userProfile.title || 'Developer' }}</p>
+      <p class="text-muted">{{ userProfile.bio || 'No bio added yet.' }}</p>
     </div>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue';
-import useProfile  from '@/composables/useProfile';
 
 export default {
   name: 'ProfileCard',
@@ -56,43 +33,39 @@ export default {
     userProfile: {
       type: Object,
       required: true,
-      default: () => ({}) 
     },
     editMode: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   emits: ['triggerPhotoUpload', 'handlePhotoChange'],
-  setup(props, { emit }) { // Pass props and context { emit }
-    const { formatWebsiteUrl } = useProfile(); // userProfile comes from props now
+  setup(props, { emit }) {
     const photoInput = ref(null);
 
     const triggerPhotoUpload = () => {
       photoInput.value.click();
-      emit('triggerPhotoUpload'); // Emit event if parent needs to know
+      emit('triggerPhotoUpload');
     };
 
     const handlePhotoChange = (event) => {
       const file = event.target.files[0];
       if (file) {
-        console.log("Selected file:", file);
-        emit('handlePhotoChange', file); // Emit event with file
+        emit('handlePhotoChange', file);
       }
     };
 
-    // Return reactive state and methods
     return {
       photoInput,
       triggerPhotoUpload,
       handlePhotoChange,
-      formatWebsiteUrl // Expose if used in template
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 .profile-card {
   background: var(--surface-card);
   border-radius: 1.2rem;
@@ -108,16 +81,21 @@ export default {
   position: relative;
 }
 
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 .profile-avatar-container {
-  display: flex;
-  align-items: center;
   position: relative;
+<<<<<<< HEAD
   width: 110px;
   height: 110px;
   margin-bottom: 1.2rem;
+=======
+  width: 100px;
+  height: 100px;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
-
 .profile-avatar {
+<<<<<<< HEAD
   width: 110px;
   height: 110px;
   border-radius: 50%;
@@ -125,12 +103,18 @@ export default {
   border: 3px solid var(--primary-glow);
   box-shadow: 0 0 16px var(--primary-glow), 0 0 0 2px var(--circuit-accent);
   background: var(--background);
+=======
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
-
 .change-photo-btn {
   position: absolute;
   bottom: 0;
   right: 0;
+<<<<<<< HEAD
   background: var(--primary);
   color: #fff;
   width: 36px;
@@ -212,5 +196,7 @@ export default {
 .meta-item a:hover {
   color: var(--primary-glow);
   text-decoration: underline;
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 </style>

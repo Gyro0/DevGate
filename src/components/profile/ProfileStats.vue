@@ -1,37 +1,14 @@
 <template>
-    <div class="profile-stats">
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.skillCount }}</div>
-        <div class="stat-label">Skills</div>
-        <div class="stat-icon skill-icon">
-          <i class="fas fa-chart-line"></i>
-        </div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.projectCount }}</div>
-        <div class="stat-label">Projects</div>
-        <div class="stat-icon project-icon">
-          <i class="fas fa-code"></i>
-        </div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.completedObjectives }}</div>
-        <div class="stat-label">Completed Goals</div>
-        <div class="stat-icon objective-icon">
-          <i class="fas fa-bullseye"></i>
-        </div>
-      </div>
-      
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.daysActive }}</div>
-        <div class="stat-label">Days Active</div>
-        <div class="stat-icon activity-icon">
-          <i class="fas fa-calendar-check"></i>
+  <div class="row g-4">
+    <div class="col-md-3" v-for="(value, label, index) in stats" :key="index">
+      <div class="card text-center shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title text-primary">{{ value }}</h5>
+          <p class="card-text text-muted">{{ label }}</p>
         </div>
       </div>
     </div>
+<<<<<<< HEAD
   </template>
   
   <script setup>
@@ -107,3 +84,30 @@
     }
   }
   </style>
+=======
+  </div>
+</template>
+
+<script setup>
+defineProps({
+  stats: {
+    type: Object,
+    required: true,
+  },
+});
+</script>
+
+<style scoped>
+.card {
+  border-radius: 8px;
+}
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+.card-text {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+</style>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8

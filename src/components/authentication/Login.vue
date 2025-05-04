@@ -1,4 +1,5 @@
 <template>
+<<<<<<< HEAD
   <div class="container d-flex justify-content-center align-items-center min-vh-100">
     <div class="card p-4 shadow-lg login-form-wrapper w-100" style="max-width: 28rem;">
       <div class="form-header mb-4">
@@ -57,22 +58,68 @@
           </div>
         </div>
       </form>
+=======
+  <div class="container login-container card shadow-sm p-4">
+    <h2 class="text-center mb-4">Login to Your Account</h2>
+    <form @submit.prevent="handleSubmit">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email Address</label>
+        <input
+          id="email"
+          v-model="email"
+          type="email"
+          class="form-control"
+          placeholder="Enter your email"
+          required
+        />
+      </div>
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          id="password"
+          v-model="password"
+          type="password"
+          class="form-control"
+          placeholder="Enter your password"
+          required
+        />
+      </div>
+      <button
+        type="submit"
+        class="btn btn-primary w-100"
+        :disabled="loading"
+      >
+        <span v-if="loading">Logging in...</span>
+        <span v-else>Login</span>
+      </button>
+      <div v-if="error" class="text-danger text-center mt-3">
+        {{ error }}
+      </div>
+    </form>
+    <div class="mt-4 text-center">
+      <p class="text-muted">Or login with</p>
+      <div class="d-flex justify-content-center gap-2">
+        <SocialLoginButton provider="google" @success="handleSocialSuccess" />
+        <SocialLoginButton provider="github" @success="handleSocialSuccess" />
+      </div>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     </div>
   </div>
 </template>
 
 <script>
-import useAuth from '@/composables/useAuth'
-import { ref } from 'vue'
-import SocialLoginButton from './SocialLoginButton.vue'
+import { ref } from 'vue';
+import SocialLoginButton from './SocialLoginButton.vue';
+import useAuth from '@/composables/useAuth';
 
 export default {
   name: 'Login',
   components: {
-    SocialLoginButton
+    SocialLoginButton,
   },
   emits: ['login-success'],
   setup(props, { emit }) {
+<<<<<<< HEAD
     const { login, error: authError, loading } = useAuth()
     const email = ref('')
     const password = ref('')
@@ -86,23 +133,49 @@ export default {
       } catch (err) {
         error.value = err.message || 'Failed to login. Please check your credentials.'
         console.error('Login error:', err)
+=======
+    const { login } = useAuth();
+    const email = ref('');
+    const password = ref('');
+    const loading = ref(false);
+    const error = ref('');
+
+    const handleSubmit = async () => {
+      error.value = '';
+      loading.value = true;
+      try {
+        await login(email.value, password.value);
+        emit('login-success');
+      } catch (err) {
+        error.value = err.message || 'Login failed';
+      } finally {
+        loading.value = false;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
       }
-    }
+    };
 
     const handleSocialSuccess = () => {
-      emit('login-success')
-    }
+      emit('login-success');
+    };
 
     return {
       email,
       password,
-      error,
       loading,
+      error,
       handleSubmit,
-      handleSocialSuccess
-    }
-  }
+      handleSocialSuccess,
+    };
+  },
+};
+</script>
+
+<style scoped>
+.login-container {
+  max-width: 400px;
+  margin: 0 auto;
 }
+<<<<<<< HEAD
 </script>
 
 <style scoped>
@@ -150,4 +223,6 @@ export default {
   border: none;
   box-shadow: 0 0 8px var(--highlight);
 }
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 </style>

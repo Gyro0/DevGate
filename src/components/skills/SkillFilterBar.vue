@@ -1,65 +1,77 @@
 <template>
-  <div class="skill-filter-bar">
-    <div class="filter-group">
-      <label for="category-filter">Category</label>
-      <select 
-        id="category-filter" 
-        v-model="filters.category" 
-        @change="emitUpdate"
-      >
-        <option value="all">All Categories</option>
-        <option 
-          v-for="category in skillCategories" 
-          :key="category.id" 
-          :value="category.id"
+  <div class="skill-filter-bar row g-3">
+    <!-- Category Filter -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="category-filter" class="form-label">Category</label>
+        <select
+          id="category-filter"
+          v-model="filters.category"
+          @change="emitUpdate"
+          class="form-select"
         >
-          {{ category.name }}
-        </option>
-      </select>
+          <option value="all">All Categories</option>
+          <option
+            v-for="category in skillCategories"
+            :key="category.id"
+            :value="category.id"
+          >
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
     </div>
-    
-    <div class="filter-group">
-      <label for="level-filter">Level</label>
-      <select 
-        id="level-filter" 
-        v-model="filters.level" 
-        @change="emitUpdate"
-      >
-        <option value="all">All Levels</option>
-        <option 
-          v-for="level in skillLevels" 
-          :key="level.value" 
-          :value="level.value"
+
+    <!-- Level Filter -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="level-filter" class="form-label">Level</label>
+        <select
+          id="level-filter"
+          v-model="filters.level"
+          @change="emitUpdate"
+          class="form-select"
         >
-          {{ level.label }}
-        </option>
-      </select>
+          <option value="all">All Levels</option>
+          <option
+            v-for="level in skillLevels"
+            :key="level.value"
+            :value="level.value"
+          >
+            {{ level.label }}
+          </option>
+        </select>
+      </div>
     </div>
-    
-    <div class="filter-group search-group">
-      <label for="skill-search">Search</label>
-      <div class="search-input-wrapper">
-        <input 
-          id="skill-search" 
-          type="text" 
-          v-model="filters.search" 
-          placeholder="Search skills..."
-          @input="emitUpdate"
-        />
-        <button 
-          v-if="filters.search" 
-          class="clear-search" 
-          @click="clearSearch"
-        >
-          <i class="fas fa-times"></i>
-        </button>
+
+    <!-- Search Filter -->
+    <div class="col-md-4">
+      <div class="form-group">
+        <label for="skill-search" class="form-label">Search</label>
+        <div class="input-group">
+          <input
+            id="skill-search"
+            type="text"
+            v-model="filters.search"
+            placeholder="Search skills..."
+            @input="emitUpdate"
+            class="form-control"
+          />
+          <button
+            v-if="filters.search"
+            class="btn btn-outline-secondary"
+            @click="clearSearch"
+          >
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { reactive, watch } from 'vue'; // Removed defineProps, defineEmits, toRef
+import { reactive, watch } from 'vue';
 import useSkills from '@/composables/useSkills';
 
 export default {
@@ -67,8 +79,8 @@ export default {
   props: {
     modelValue: {
       type: Object,
-      default: () => ({ category: 'all', level: 'all', search: '' })
-    }
+      default: () => ({ category: 'all', level: 'all', search: '' }),
+    },
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -78,9 +90,13 @@ export default {
     const filters = reactive({ ...props.modelValue });
 
     // Update component state when props change
-    watch(() => props.modelValue, (newValue) => {
-      Object.assign(filters, newValue);
-    }, { deep: true });
+    watch(
+      () => props.modelValue,
+      (newValue) => {
+        Object.assign(filters, newValue);
+      },
+      { deep: true }
+    );
 
     // Emit changes to parent component
     const emitUpdate = () => {
@@ -93,16 +109,15 @@ export default {
       emitUpdate();
     };
 
-    // Return everything needed by the template
     return {
       filters,
       skillCategories,
       skillLevels,
       emitUpdate,
-      clearSearch
+      clearSearch,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
@@ -117,6 +132,7 @@ export default {
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+<<<<<<< HEAD
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -199,6 +215,20 @@ input[type="text"] {
   color: white;
   border-color: var(--primary-color);
   transform: translateY(-50%) scale(1.1);
+=======
+.form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.input-group .form-control {
+  flex: 1;
+}
+
+.btn-outline-secondary {
+  font-size: 0.875rem;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 
 @media (max-width: 768px) {
@@ -207,8 +237,11 @@ input[type="text"] {
     padding: 1rem;
     gap: 1rem;
   }
+<<<<<<< HEAD
   .filter-group {
     width: 100%;
   }
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 </style>

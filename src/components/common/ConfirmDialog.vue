@@ -1,24 +1,23 @@
 <template>
-  <div class="modal-backdrop" @click.self="$emit('cancel')">
-    <div class="modal-content confirm-dialog">
-      <div class="modal-header">
-        <h3>Confirmation</h3>
-        <button @click="$emit('cancel')" class="modal-close">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <p class="confirm-message">{{ message }}</p>
-      </div>
-      
-      <div class="modal-footer">
-        <button @click="$emit('cancel')" class="btn-secondary">
-          Cancel
-        </button>
-        <button @click="$emit('confirm')" class="btn-danger">
-          Confirm
-        </button>
+  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="confirmDialogLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <!-- Header -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="confirmDialogLabel">Confirmation</h5>
+          <button type="button" class="btn-close" aria-label="Close" @click="$emit('cancel')"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="modal-body">
+          <p class="mb-0">{{ message }}</p>
+        </div>
+
+        <!-- Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="$emit('cancel')">Cancel</button>
+          <button type="button" class="btn btn-danger" @click="$emit('confirm')">Confirm</button>
+        </div>
       </div>
     </div>
   </div>
@@ -30,18 +29,15 @@ export default {
   props: {
     message: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: ['confirm', 'cancel'],
-  setup() {
-    // No additional reactive state or methods needed
-    return {};
-  }
-}
+};
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -142,4 +138,7 @@ export default {
   color: var(--background);
   box-shadow: 0 0 12px var(--primary);
 }
+=======
+/* No additional custom styles needed as Bootstrap is used */
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 </style>

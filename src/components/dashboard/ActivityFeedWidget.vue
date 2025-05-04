@@ -1,9 +1,13 @@
 <template>
-  <div class="activity-feed-widget">
-    <div class="widget-header">
-      <h2>Recent Activity</h2>
-      <router-link to="/timeline" class="view-all">View All</router-link>
+  <div class="card activity-feed-widget shadow-sm">
+    <!-- Header -->
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h2 class="h5 mb-0 text-primary">Recent Activity</h2>
+      <router-link to="/timeline" class="btn btn-link p-0 text-decoration-none text-secondary">
+        View All
+      </router-link>
     </div>
+<<<<<<< HEAD
     
     <div class="feed-content" v-if="!loading">
       <div v-if="events && events.length > 0" class="feed-list-container">
@@ -27,15 +31,51 @@
       <div v-else class="empty-state">
         <div class="empty-icon">
           <i class="fas fa-clock"></i>
+=======
+
+    <!-- Content -->
+    <div class="card-body">
+      <!-- Loading State -->
+      <div v-if="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
-        <h3>No activity yet</h3>
-        <p>Your recent activities will appear here as you use the platform.</p>
+        <p class="mt-3 text-muted">Loading activities...</p>
       </div>
-    </div>
-    
-    <div v-else class="loading-state">
-      <div class="spinner"></div>
-      <span>Loading activities...</span>
+
+      <!-- Activities Content -->
+      <div v-else>
+        <!-- Activity List -->
+        <div v-if="events.length > 0" class="activity-list-container">
+          <ul class="list-group">
+            <li
+              v-for="event in recentEvents"
+              :key="event.id"
+              class="list-group-item d-flex align-items-center"
+            >
+              <div class="activity-icon me-3 d-flex justify-content-center align-items-center rounded-circle bg-light">
+                <i :class="eventTypeIcon(event)" class="text-primary"></i>
+              </div>
+              <div class="activity-details flex-grow-1">
+                <div class="fw-bold text-dark">
+                  {{ formatEventDescription(event) }}
+                </div>
+                <div class="small text-muted">
+                  {{ formatEventTime(event.timestamp) }}
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="text-center py-5">
+          <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+          <h3 class="h6 text-dark">No activity yet</h3>
+          <p class="text-muted">Your recent activities will appear here as you use the platform.</p>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -58,48 +98,32 @@ export default {
 
     // Get only recent events, with nullchecking
     const recentEvents = computed(() => {
-      // Ensure events.value is an array before slicing
       return Array.isArray(events.value) ? events.value.slice(0, 6) : [];
     });
 
     // Format event time to relative time
     const formatEventTime = (timestamp) => {
       if (!timestamp) return '';
-      
       const now = new Date();
-      // Handle both Firebase Timestamp and standard Date objects
-      const eventTime = timestamp instanceof Date 
-        ? timestamp 
+      const eventTime = timestamp instanceof Date
+        ? timestamp
         : new Date(timestamp?.seconds ? timestamp.seconds * 1000 : timestamp);
-      
-      // Check if eventTime is a valid date
-      if (isNaN(eventTime.getTime())) {
-        return 'Invalid date';
-      }
-
-      // Get time difference in minutes
+      if (isNaN(eventTime.getTime())) return 'Invalid date';
       const diffMinutes = Math.floor((now - eventTime) / (1000 * 60));
-      
       if (diffMinutes < 1) return 'Just now';
       if (diffMinutes < 60) return `${diffMinutes}m ago`;
-      
       const diffHours = Math.floor(diffMinutes / 60);
       if (diffHours < 24) return `${diffHours}h ago`;
-      
       const diffDays = Math.floor(diffHours / 24);
       if (diffDays < 7) return `${diffDays}d ago`;
-      
-      // For older dates, return the actual date
       return eventTime.toLocaleDateString();
     };
 
     // Format event description
     const formatEventDescription = (event) => {
       if (!event) return '';
-      
       const { type, action, entityData } = event;
       const name = entityData?.name || entityData?.title || 'item';
-      
       switch (action) {
         case 'added':
           return `Added new ${type}: ${name}`;
@@ -114,6 +138,7 @@ export default {
       }
     };
 
+<<<<<<< HEAD
     // Get CSS class for event type
     const eventTypeClass = (event) => {
       switch (event?.type) {
@@ -128,6 +153,8 @@ export default {
       }
     };
 
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     // Get icon for event type
     const eventTypeIcon = (event) => {
       switch (event?.type) {
@@ -148,14 +175,14 @@ export default {
       recentEvents,
       formatEventTime,
       formatEventDescription,
-      eventTypeClass,
-      eventTypeIcon
+      eventTypeIcon,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 .activity-feed-widget {
   height: 100%; /* Ensure widget fills grid cell */
   display: flex;
@@ -329,5 +356,11 @@ export default {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+=======
+.activity-icon {
+  width: 40px;
+  height: 40px;
+  font-size: 1.25rem;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 </style>

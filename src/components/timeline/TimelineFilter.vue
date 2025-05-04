@@ -1,22 +1,30 @@
 <template>
-  <div class="timeline-filter">
-    <span class="filter-label">Filter by:</span>
-    <div class="filter-options">
-      <label 
-        v-for="type in eventTypes" 
-        :key="type.id" 
-        class="filter-option"
-        :class="{ active: selectedFilters.includes(type.id) }"
+  <div class="timeline-filter d-flex align-items-center gap-3">
+    <!-- Filter Label -->
+    <span class="filter-label text-muted fw-semibold">Filter by:</span>
+
+    <!-- Filter Options -->
+    <div class="filter-options d-flex flex-wrap gap-2">
+      <div
+        v-for="type in eventTypes"
+        :key="type.id"
+        class="form-check form-check-inline"
       >
-        <input 
-          type="checkbox" 
-          :value="type.id" 
+        <input
+          class="form-check-input"
+          type="checkbox"
+          :id="`filter-${type.id}`"
+          :value="type.id"
           v-model="selectedFilters"
           @change="emitUpdate"
         />
-        <span class="checkbox-custom"></span>
-        {{ type.label }}
-      </label>
+        <label
+          class="form-check-label"
+          :for="`filter-${type.id}`"
+        >
+          {{ type.label }}
+        </label>
+      </div>
     </div>
   </div>
 </template>
@@ -30,8 +38,13 @@ export default {
   props: {
     modelValue: {
       type: Array,
+<<<<<<< HEAD
       default: () => ['skill', 'project', 'objective']
     }
+=======
+      default: () => [],
+    },
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
@@ -39,48 +52,49 @@ export default {
     const selectedFilters = ref([...props.modelValue]);
 
     // Watch for external changes to modelValue
-    watch(() => props.modelValue, (newValue) => {
-      selectedFilters.value = [...newValue];
-    }, { deep: true });
+    watch(
+      () => props.modelValue,
+      (newValue) => {
+        selectedFilters.value = [...newValue];
+      },
+      { deep: true }
+    );
 
     // Emit changes to parent
     const emitUpdate = () => {
       emit('update:modelValue', [...selectedFilters.value]);
     };
 
-    // Return reactive state and methods
     return {
       eventTypes,
       selectedFilters,
-      emitUpdate
+      emitUpdate,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
 .timeline-filter {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .filter-label {
   font-size: 0.875rem;
+<<<<<<< HEAD
   font-weight: 500;
   color: var(--text-secondary);
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 
-.filter-options {
-  display: flex;
-  gap: 1rem;
-}
-
-.filter-option {
-  display: flex;
-  align-items: center;
+.form-check-input {
   cursor: pointer;
+}
+
+.form-check-label {
   font-size: 0.875rem;
+<<<<<<< HEAD
   position: relative;
   padding-left: 1.5rem;
   color: var(--text-color);
@@ -138,6 +152,9 @@ export default {
 .filter-option.active {
   color: var(--primary-color);
   font-weight: 500;
+=======
+  cursor: pointer;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 
 .filter-option:hover .checkbox-custom {

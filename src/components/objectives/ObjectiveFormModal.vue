@@ -1,86 +1,95 @@
 <template>
-  <div class="modal-backdrop" @click.self="$emit('close')">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>{{ isEditing ? 'Edit Objective' : 'Add New Objective' }}</h3>
-        <button @click="$emit('close')" class="modal-close">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      
-      <div class="modal-body">
-        <form @submit.prevent="submitForm">
-          <div class="form-group">
-            <label for="objective-title">Title *</label>
-            <input 
-              id="objective-title" 
-              type="text" 
-              v-model="formData.title" 
-              required
-              placeholder="e.g. Learn Vue 3 Composition API"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="objective-description">Description</label>
-            <textarea 
-              id="objective-description" 
-              v-model="formData.description" 
-              rows="3" 
-              placeholder="Describe the objective and its goals"
-            ></textarea>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="objective-status">Status *</label>
-              <select id="objective-status" v-model="formData.status" required>
-                <option value="planned">Planned</option>
-                <option value="in-progress">In Progress</option>
-                <option value="completed">Completed</option>
-                <option value="on-hold">On Hold</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="objective-priority">Priority</label>
-              <select id="objective-priority" v-model="formData.priority">
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="objective-start-date">Start Date</label>
-              <input 
-                id="objective-start-date" 
-                type="date" 
-                v-model="formData.startDate" 
+  <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="objectiveFormModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="objectiveFormModalLabel">
+            {{ isEditing ? 'Edit Objective' : 'Add New Objective' }}
+          </h5>
+          <button type="button" class="btn-close" aria-label="Close" @click="$emit('close')"></button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <form @submit.prevent="submitForm">
+            <!-- Title -->
+            <div class="mb-3">
+              <label for="objective-title" class="form-label">Title *</label>
+              <input
+                id="objective-title"
+                type="text"
+                v-model="formData.title"
+                class="form-control"
+                required
+                placeholder="e.g. Learn Vue 3 Composition API"
               />
             </div>
-            
-            <div class="form-group">
-              <label for="objective-deadline">Deadline</label>
-              <input 
-                id="objective-deadline" 
-                type="date" 
-                v-model="formData.deadline" 
-              />
+
+            <!-- Description -->
+            <div class="mb-3">
+              <label for="objective-description" class="form-label">Description</label>
+              <textarea
+                id="objective-description"
+                v-model="formData.description"
+                class="form-control"
+                rows="3"
+                placeholder="Describe the objective and its goals"
+              ></textarea>
             </div>
-          </div>
-          
-          <div class="form-actions">
-            <button type="submit" class="btn-primary" :disabled="!isFormValid">
-              {{ isEditing ? 'Update Objective' : 'Add Objective' }}
-            </button>
-            <button type="button" class="btn-secondary" @click="$emit('close')">
-              Cancel
-            </button>
-          </div>
-        </form>
+
+            <!-- Status and Priority -->
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="objective-status" class="form-label">Status *</label>
+                <select id="objective-status" v-model="formData.status" class="form-select" required>
+                  <option value="planned">Planned</option>
+                  <option value="in-progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                  <option value="on-hold">On Hold</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label for="objective-priority" class="form-label">Priority</label>
+                <select id="objective-priority" v-model="formData.priority" class="form-select">
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Start Date and Deadline -->
+            <div class="row g-3 mt-3">
+              <div class="col-md-6">
+                <label for="objective-start-date" class="form-label">Start Date</label>
+                <input
+                  id="objective-start-date"
+                  type="date"
+                  v-model="formData.startDate"
+                  class="form-control"
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="objective-deadline" class="form-label">Deadline</label>
+                <input
+                  id="objective-deadline"
+                  type="date"
+                  v-model="formData.deadline"
+                  class="form-control"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" @click="$emit('close')">Cancel</button>
+          <button type="submit" class="btn btn-primary" :disabled="!isFormValid">
+            {{ isEditing ? 'Update Objective' : 'Add Objective' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -88,66 +97,37 @@
 
 <script>
 import { reactive, computed, watch } from 'vue';
-import firebase from '@/firebase/firebaseInit'; // Import firebase namespace for Timestamp
 
 export default {
   name: 'ObjectiveFormModal',
   props: {
     objective: {
       type: Object,
-      default: null
-    }
+      default: null,
+    },
   },
   emits: ['save', 'close'],
   setup(props, { emit }) {
     const isEditing = computed(() => !!props.objective?.id);
 
-    // Helper to format Firestore Timestamp or Date to YYYY-MM-DD for input[type=date]
-    const formatDateForInput = (dateValue) => {
-      if (!dateValue) return '';
-      let date;
-      // Check if it's a Firestore v8 Timestamp
-      if (dateValue && typeof dateValue.toDate === 'function') {
-        date = dateValue.toDate();
-      } else if (dateValue instanceof Date) {
-         date = dateValue;
-      } else {
-        try {
-          date = new Date(dateValue); // Attempt to parse string/number
-        } catch {
-          return ''; // Invalid date format
-        }
-      }
-      
-      if (isNaN(date.getTime())) return ''; // Check if date is valid
-      
-      const year = date.getFullYear();
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const day = date.getDate().toString().padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    };
-
-    // Initialize form data
     const formData = reactive({
       title: '',
       description: '',
       status: 'planned',
       priority: 'medium',
       startDate: '',
-      deadline: ''
+      deadline: '',
     });
 
-    // Populate form when objective prop changes (for editing)
     const populateForm = (objective) => {
       if (objective) {
         formData.title = objective.title || '';
         formData.description = objective.description || '';
         formData.status = objective.status || 'planned';
         formData.priority = objective.priority || 'medium';
-        formData.startDate = formatDateForInput(objective.startDate);
-        formData.deadline = formatDateForInput(objective.deadline);
+        formData.startDate = objective.startDate || '';
+        formData.deadline = objective.deadline || '';
       } else {
-        // Reset form if objective is null (for adding)
         formData.title = '';
         formData.description = '';
         formData.status = 'planned';
@@ -157,42 +137,35 @@ export default {
       }
     };
 
-    // Watch for changes in the objective prop
-    watch(() => props.objective, (newObjective) => {
-      populateForm(newObjective);
-    }, { immediate: true }); // immediate: true to run on initial mount
+    watch(
+      () => props.objective,
+      (newObjective) => {
+        populateForm(newObjective);
+      },
+      { immediate: true }
+    );
 
-    // Basic form validation
     const isFormValid = computed(() => {
       return formData.title.trim() !== '' && formData.status !== '';
     });
 
-    // Submit form data to parent
     const submitForm = () => {
       if (!isFormValid.value) return;
-      
-      // Convert date strings back to Firestore v8 Timestamps
-      const dataToSave = {
-        ...formData,
-        // Use v8 firebase.firestore.Timestamp
-        startDate: formData.startDate ? firebase.firestore.Timestamp.fromDate(new Date(formData.startDate)) : null,
-        deadline: formData.deadline ? firebase.firestore.Timestamp.fromDate(new Date(formData.deadline)) : null,
-      };
-      emit('save', dataToSave);
+      emit('save', { ...formData });
     };
 
-    // Return reactive state and methods
     return {
       isEditing,
       formData,
       isFormValid,
-      submitForm
+      submitForm,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
+<<<<<<< HEAD
   .modal-backdrop {
     position: fixed;
     top: 0;
@@ -405,4 +378,25 @@ export default {
         padding-top: 1rem;
     }
   }
+=======
+.modal-content {
+  border-radius: 8px;
+}
+
+.modal-header {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+}
+
+.form-label {
+  font-weight: 500;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 </style>

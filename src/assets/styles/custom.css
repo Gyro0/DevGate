@@ -1,0 +1,15 @@
+/* filepath: src/assets/styles/custom.css */
+body {
+    background-color: #f5f7fa; /* Light gray background */
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #4f46e5; /* Primary color */
+  }
+  
+  p {
+    color: #6b7280; /* Neutral gray */
+  }

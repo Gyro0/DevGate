@@ -1,16 +1,13 @@
 <template>
-  <div class="objectives-view">
+  <div class="objectives-view bg-light min-vh-100">
     <AppHeader />
-    <div class="main-layout">
-      <AppSidebar :active-page="'objectives'" />
-      
-      <div class="content-area">
-        <div class="page-header">
-          <h1>My Objectives</h1>
-          <button class="btn-primary" @click="showAddObjectiveModal = true">
-            <span class="icon">+</span> Add Objective
-          </button>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 bg-white p-0">
+          <AppSidebar :active-page="'objectives'" />
         </div>
+<<<<<<< HEAD
         
         <div class="charts-section">
           <div class="chart-card">
@@ -49,18 +46,84 @@
               @delete="confirmDeleteObjective"
               @update-progress="handleUpdateProgress"
             />
+=======
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 py-4">
+          <!-- Page Header -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h4 fw-bold">My Objectives</h1>
+            <button class="btn btn-primary" @click="showAddObjectiveModal = true">
+              <i class="fas fa-plus me-2"></i> Add Objective
+            </button>
+          </div>
+
+          <!-- Charts Section -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <div class="card shadow-sm border-0">
+                <div class="card-body">
+                  <h5 class="card-title fw-bold">Completion Rate</h5>
+                  <ObjectiveCompletionRate :objectives="objectives" />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card shadow-sm border-0">
+                <div class="card-body">
+                  <h5 class="card-title fw-bold">Objective Timeline</h5>
+                  <ObjectiveTimeline :objectives="objectives" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Objectives Board -->
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <div class="row g-4">
+                <div class="col-md-4">
+                  <ObjectiveColumn
+                    title="Planned"
+                    :objectives="plannedObjectives"
+                    @edit="editObjective"
+                    @delete="confirmDeleteObjective"
+                    @update-progress="updateObjectiveProgress"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <ObjectiveColumn
+                    title="In Progress"
+                    :objectives="inProgressObjectives"
+                    @edit="editObjective"
+                    @delete="confirmDeleteObjective"
+                    @update-progress="updateObjectiveProgress"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <ObjectiveColumn
+                    title="Completed"
+                    :objectives="completedObjectives"
+                    @edit="editObjective"
+                    @delete="confirmDeleteObjective"
+                    @update-progress="updateObjectiveProgress"
+                  />
+                </div>
+              </div>
+            </div>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
           </div>
         </div>
       </div>
     </div>
-    
+
+    <!-- Modals -->
     <ObjectiveFormModal
       v-if="showAddObjectiveModal"
       :objective="selectedObjective"
       @save="saveObjective"
       @close="closeObjectiveModal"
     />
-    
     <ConfirmDialog
       v-if="showDeleteConfirm"
       :message="`Delete objective '${objectiveToDelete?.title}'?`"
@@ -91,21 +154,27 @@ export default {
     ObjectiveCompletionRate,
     ObjectiveTimeline,
     ObjectiveFormModal,
-    ConfirmDialog
+    ConfirmDialog,
   },
   setup() {
-    const { 
-      objectives, 
+    const {
+      objectives,
       plannedObjectives,
-      inProgressObjectives, 
+      inProgressObjectives,
       completedObjectives,
+<<<<<<< HEAD
       loading,
       error,
       fetchUserObjectives, 
       addObjective, 
       updateObjective, 
+=======
+      fetchUserObjectives,
+      addObjective,
+      updateObjective,
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
       deleteObjective: removeObjective,
-      updateProgress
+      updateProgress,
     } = useObjectives();
 
     const { recordEvent } = useTimeline();
@@ -125,6 +194,7 @@ export default {
       console.log("ObjectivesView: Computed Completed:", completedObjectives.value.length);
     });
 
+<<<<<<< HEAD
     // Watch the main objectives array for changes
     watch(objectives, (newObjectives, oldObjectives) => {
         if (newObjectives !== oldObjectives) {
@@ -136,18 +206,18 @@ export default {
     }, { deep: false });
 
     // Open edit modal for an objective
+=======
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     const editObjective = (objective) => {
       selectedObjective.value = { ...objective };
       showAddObjectiveModal.value = true;
     };
 
-    // Initialize deletion process for an objective
     const confirmDeleteObjective = (objective) => {
       objectiveToDelete.value = objective;
       showDeleteConfirm.value = true;
     };
 
-    // Delete the objective after confirmation
     const deleteObjective = async () => {
       try {
         await removeObjective(objectiveToDelete.value.id);
@@ -159,7 +229,6 @@ export default {
       }
     };
 
-    // Save new or updated objective
     const saveObjective = async (objectiveData) => {
       try {
         if (selectedObjective.value?.id) {
@@ -175,6 +244,7 @@ export default {
       }
     };
 
+<<<<<<< HEAD
     // Handler for the update-progress event from ObjectiveColumn
     const handleUpdateProgress = async (objectiveId, progress) => {
       console.log(`ObjectivesView: handleUpdateProgress called for ${objectiveId} with ${progress}%`);
@@ -186,6 +256,18 @@ export default {
            await recordEvent('objective', 'completed', objectiveId, { title: updatedObjective.title });
         } else {
              await recordEvent('objective', 'progress_updated', objectiveId, { title: updatedObjective?.title, progress: updatedObjective?.progress });
+=======
+    const updateObjectiveProgress = async (objectiveId, progress) => {
+      try {
+        const updatedObjective = await updateProgress(objectiveId, progress);
+        if (updatedObjective?.status === 'completed' || progress >= 100) {
+          const objective = objectives.value.find((o) => o.id === objectiveId) || updatedObjective;
+          if (objective) {
+            if (objective.status !== 'completed' || progress >= 100) {
+              await recordEvent('objective', 'completed', objectiveId, objective);
+            }
+          }
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
         }
 
       } catch (error) {
@@ -193,13 +275,11 @@ export default {
       }
     };
 
-    // Close objective modal and reset selection
     const closeObjectiveModal = () => {
       selectedObjective.value = null;
       showAddObjectiveModal.value = false;
     };
 
-    // Return reactive state and methods
     return {
       objectives,
       plannedObjectives,
@@ -215,15 +295,21 @@ export default {
       confirmDeleteObjective,
       deleteObjective,
       saveObjective,
+<<<<<<< HEAD
       handleUpdateProgress,
       closeObjectiveModal
+=======
+      updateObjectiveProgress,
+      closeObjectiveModal,
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
 .objectives-view {
+<<<<<<< HEAD
   min-height: 100vh;
   background-color: var(--bg-main);
 }
@@ -326,5 +412,23 @@ export default {
   .charts-section {
     grid-template-columns: 1fr;
   }
+=======
+  background-color: #f8f9fa;
+}
+
+.card {
+  border-radius: 8px;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 </style>

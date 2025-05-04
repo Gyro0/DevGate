@@ -1,52 +1,81 @@
 <template>
-  <div class="objective-column">
-    <h2 class="column-title">{{ title }} ({{ objectives.length }})</h2>
-    <div class="column-content">
-      <div 
-        v-for="objective in objectives" 
-        :key="objective.id" 
-        class="objective-card"
-      >
-        <div class="card-header">
-          <h3 class="objective-title">{{ objective.title }}</h3>
-          <div class="card-actions">
-            <button @click="$emit('edit', objective)" class="action-btn edit-btn">
-              <i class="fas fa-pen"></i>
-            </button>
-            <button @click="$emit('delete', objective)" class="action-btn delete-btn">
-              <i class="fas fa-trash"></i>
-            </button>
+  <div class="objective-column card shadow-sm border-0">
+    <!-- Column Title -->
+    <div class="card-header bg-light">
+      <h5 class="card-title mb-0">{{ title }} ({{ objectives.length }})</h5>
+    </div>
+
+    <!-- Column Content -->
+    <div class="card-body p-3">
+      <div v-if="objectives.length > 0">
+        <div
+          v-for="objective in objectives"
+          :key="objective.id"
+          class="objective-card card mb-3 shadow-sm border-0"
+        >
+          <!-- Card Header -->
+          <div class="card-header d-flex justify-content-between align-items-start">
+            <h6 class="objective-title mb-0 text-truncate">{{ objective.title }}</h6>
+            <div class="card-actions">
+              <button
+                @click="$emit('edit', objective)"
+                class="btn btn-sm btn-outline-primary me-2"
+                title="Edit"
+              >
+                <i class="fas fa-pen"></i>
+              </button>
+              <button
+                @click="$emit('delete', objective)"
+                class="btn btn-sm btn-outline-danger"
+                title="Delete"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
           </div>
-        </div>
-        
-        <p class="objective-description">{{ objective.description }}</p>
-        
-        <div class="objective-meta">
-          <div v-if="objective.deadline" class="meta-item deadline">
-            <i class="fas fa-calendar"></i> Due {{ formatDate(objective.deadline) }}
+
+          <!-- Card Body -->
+          <div class="card-body">
+            <p class="objective-description text-muted mb-2">
+              {{ objective.description || 'No description provided.' }}
+            </p>
+            <div class="objective-meta d-flex flex-wrap gap-3 small text-muted">
+              <div v-if="objective.deadline" class="meta-item">
+                <i class="fas fa-calendar me-1"></i> Due {{ formatDate(objective.deadline) }}
+              </div>
+              <div
+                v-if="objective.priority"
+                class="meta-item"
+                :class="getPriorityClass(objective.priority)"
+              >
+                <i class="fas fa-flag me-1"></i> {{ capitalize(objective.priority) }}
+              </div>
+            </div>
           </div>
-          <div v-if="objective.priority" class="meta-item priority" :class="`priority-${objective.priority}`">
-            <i class="fas fa-flag"></i> {{ objective.priority }}
+
+          <!-- Progress Section -->
+          <div v-if="objective.status !== 'completed'" class="card-footer bg-light">
+            <label :for="`progress-${objective.id}`" class="form-label small">
+              Progress: {{ objective.progress || 0 }}%
+            </label>
+            <input
+              type="range"
+              :id="`progress-${objective.id}`"
+              :value="objective.progress || 0"
+              @input="updateProgress($event, objective.id)"
+              min="0"
+              max="100"
+              step="10"
+              class="form-range"
+            />
           </div>
-        </div>
-        
-        <div v-if="objective.status !== 'completed'" class="progress-section">
-          <label :for="`progress-${objective.id}`">Progress: {{ objective.progress || 0 }}%</label>
-          <input 
-            type="range" 
-            :id="`progress-${objective.id}`" 
-            :value="objective.progress || 0" 
-            @input="updateProgress($event, objective.id)"
-            min="0" 
-            max="100" 
-            step="10"
-            class="progress-slider"
-          />
         </div>
       </div>
-      
-      <div v-if="objectives.length === 0" class="empty-column">
-        No objectives in this stage.
+
+      <!-- Empty State -->
+      <div v-else class="text-center text-muted py-4">
+        <i class="fas fa-inbox fa-2x mb-3"></i>
+        <p>No objectives in this stage.</p>
       </div>
     </div>
   </div>
@@ -58,28 +87,42 @@ export default {
   props: {
     title: {
       type: String,
-      required: true
+      required: true,
     },
     objectives: {
       type: Array,
       required: true,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   emits: ['edit', 'delete', 'update-progress'],
   setup(props, { emit }) {
     // Format date for display
     const formatDate = (timestamp) => {
       if (!timestamp) return 'N/A';
-      
-      const date = timestamp?.seconds 
-        ? new Date(timestamp.seconds * 1000) 
+      const date = timestamp?.seconds
+        ? new Date(timestamp.seconds * 1000)
         : new Date(timestamp);
-        
       return date.toLocaleDateString('en-US', {
         month: 'short',
-        day: 'numeric'
+        day: 'numeric',
       });
+    };
+
+    // Capitalize text
+    const capitalize = (text) => {
+      if (!text) return '';
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    };
+
+    // Get priority class
+    const getPriorityClass = (priority) => {
+      const priorityClasses = {
+        high: 'text-danger',
+        medium: 'text-warning',
+        low: 'text-success',
+      };
+      return priorityClasses[priority] || 'text-muted';
     };
 
     // Emit progress update event
@@ -87,17 +130,19 @@ export default {
       emit('update-progress', objectiveId, parseInt(event.target.value));
     };
 
-    // Return methods
     return {
       formatDate,
-      updateProgress
+      capitalize,
+      getPriorityClass,
+      updateProgress,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
 .objective-column {
+<<<<<<< HEAD
   background: var(--surface);
   border-radius: 1.1rem;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.18), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
@@ -195,6 +240,31 @@ export default {
   margin-bottom: 1rem;
 }
 
+=======
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.objective-card {
+  border-radius: 8px;
+}
+
+.objective-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.objective-description {
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 .meta-item {
   display: flex;
   align-items: center;
@@ -204,6 +274,7 @@ export default {
   margin-right: 0.3rem;
 }
 
+<<<<<<< HEAD
 .priority-high { color: #ff4d4f; }
 .priority-medium { color: #f59e0b; }
 .priority-low { color: #10b981; }
@@ -221,6 +292,9 @@ export default {
 
 .progress-slider {
   width: 100%;
+=======
+.form-range {
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
   cursor: pointer;
   accent-color: var(--primary);
   background: var(--surface-card);
@@ -229,6 +303,7 @@ export default {
   margin-top: 0.2rem;
 }
 
+<<<<<<< HEAD
 .empty-column {
   text-align: center;
   color: var(--text-secondary);
@@ -236,5 +311,11 @@ export default {
   padding: 2rem 0;
   background: transparent;
   border-radius: 0.8rem;
+=======
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 </style>

@@ -1,14 +1,18 @@
 <template>
+<<<<<<< HEAD
   <div class="timeline-view">
     <!-- Header and sidebar remain the same -->
+=======
+  <div class="timeline-view bg-light min-vh-100">
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     <AppHeader />
-    <div class="main-layout">
-      <AppSidebar :active-page="'timeline'" />
-      
-      <div class="content-area">
-        <div class="page-header">
-          <h1>My Activity Timeline</h1>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 bg-white p-0">
+          <AppSidebar :active-page="'timeline'" />
         </div>
+<<<<<<< HEAD
         
         <div class="filter-bar">
           <TimelineFilter v-model="activeFilters" />
@@ -43,6 +47,43 @@
           >
             <h2 class="month-title">{{ month.name }}</h2>
             <TimelineMonth :month="month" />
+=======
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 py-4">
+          <!-- Page Header -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h4 fw-bold">My Activity Timeline</h1>
+          </div>
+
+          <!-- Filter Bar -->
+          <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+              <TimelineFilter v-model="activeFilters" />
+            </div>
+          </div>
+
+          <!-- Loading State -->
+          <div v-if="loading" class="d-flex justify-content-center py-5">
+            <LoadingSpinner />
+          </div>
+
+          <!-- Empty State -->
+          <div v-else-if="filteredMonths.length === 0" class="text-center py-5">
+            <p class="text-muted">No activity found. Start adding skills or projects to see your timeline!</p>
+          </div>
+
+          <!-- Timeline Content -->
+          <div v-else class="timeline-content">
+            <div
+              v-for="month in filteredMonths"
+              :key="month.id"
+              class="timeline-month mb-4"
+            >
+              <h2 class="month-title fw-bold text-primary">{{ month.name }}</h2>
+              <TimelineMonth :month="month" />
+            </div>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
           </div>
         </div>
       </div>
@@ -68,6 +109,7 @@ export default {
     TimelineFilter,
     TimelineMonth,
     LoadingSpinner,
+<<<<<<< HEAD
     ActivityTimelineChart
   },
   setup() {
@@ -83,9 +125,15 @@ export default {
     
     // Initialize with all filter types selected
     const activeFilters = ref(['skill', 'project', 'objective']);
+=======
+  },
+  setup() {
+    const { events, loading, eventsByMonth, fetchUserTimeline } = useTimeline();
+    const activeFilters = ref([]);
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 
-    // Filter timeline months based on selected filters
     const filteredMonths = computed(() => {
+<<<<<<< HEAD
       if (!eventsByMonth.value || eventsByMonth.value.length === 0) {
         console.log("No timeline months available");
         return [];
@@ -167,13 +215,39 @@ export default {
       eventTypes,
       backfillEvents,
       generateSampleData
+=======
+      if (!activeFilters.value.length) return eventsByMonth.value;
+
+      return eventsByMonth.value
+        .map((month) => {
+          const filteredEvents = month.events.filter((event) =>
+            activeFilters.value.includes(event.type)
+          );
+          return {
+            ...month,
+            events: filteredEvents,
+          };
+        })
+        .filter((month) => month.events.length > 0);
+    });
+
+    onMounted(async () => {
+      await fetchUserTimeline(100);
+    });
+
+    return {
+      loading,
+      filteredMonths,
+      activeFilters,
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
 .timeline-view {
+<<<<<<< HEAD
   min-height: 100vh;
   background-color: var(--bg-main);
 }
@@ -227,6 +301,13 @@ export default {
   font-weight: 600;
   margin: 0 0 1rem 0;
   color: var(--text-color);
+=======
+  background-color: #f8f9fa;
+}
+
+.card {
+  border-radius: 8px;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 
 .timeline-content {
@@ -240,6 +321,7 @@ export default {
 .month-title {
   margin-bottom: 1rem;
   font-size: 1.25rem;
+<<<<<<< HEAD
   color: var(--text-color);
   border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
@@ -282,5 +364,13 @@ export default {
   background-color: var(--primary-color-dark);
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(79, 70, 229, 0.18);
+=======
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.text-muted {
+  color: #6c757d !important;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 </style>

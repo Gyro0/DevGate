@@ -1,23 +1,37 @@
 <template>
+<<<<<<< HEAD
   <header class="app-header">
     <div class="header-container">
       <div class="logo-section">
         <router-link to="/dashboard" class="logo-link">
           <span class="logo-text">DevGate</span>
+=======
+  <header class="app-header bg-white shadow-sm sticky-top">
+    <div class="container-fluid d-flex align-items-center justify-content-between py-2">
+      <!-- Logo Section -->
+      <div class="d-flex align-items-center">
+        <router-link to="/dashboard" class="d-flex align-items-center text-decoration-none text-dark">
+          <img src="@/assets/logo.png" alt="DevGate" class="logo me-2" />
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
         </router-link>
       </div>
-      
-      <div class="search-section">
-        <div class="search-box">
-          <i class="fas fa-search search-icon"></i>
-          <input 
-            type="text" 
-            placeholder="Search..." 
+
+      <!-- Search Section -->
+      <div class="d-none d-md-flex flex-grow-1 mx-3">
+        <div class="input-group">
+          <span class="input-group-text bg-light border-0">
+            <i class="fas fa-search text-muted"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control border-0 bg-light"
+            placeholder="Search..."
             v-model="searchQuery"
             @keyup.enter="performSearch"
           />
         </div>
       </div>
+<<<<<<< HEAD
       
       <div class="user-section">
         
@@ -50,13 +64,56 @@
           </button>
         </div>
         
+=======
+
+      <!-- User Section -->
+      <div class="dropdown">
+        <button
+          class="btn btn-light d-flex align-items-center"
+          type="button"
+          id="userMenuButton"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <img
+            :src="user?.photoURL || '/default-avatar.png'"
+            alt="Profile"
+            class="rounded-circle me-2"
+            style="width: 32px; height: 32px; object-fit: cover;"
+          />
+          <span class="d-none d-md-inline">{{ user?.displayName || 'User' }}</span>
+          <i class="fas fa-chevron-down ms-2"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+          <li class="dropdown-header text-muted">
+            Signed in as <strong>{{ user?.displayName }}</strong>
+          </li>
+          <li><hr class="dropdown-divider" /></li>
+          <li>
+            <router-link to="/profile" class="dropdown-item">
+              <i class="fas fa-user me-2"></i> Your Profile
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/settings" class="dropdown-item">
+              <i class="fas fa-cog me-2"></i> Settings
+            </router-link>
+          </li>
+          <li><hr class="dropdown-divider" /></li>
+          <li>
+            <button @click="logout" class="dropdown-item">
+              <i class="fas fa-sign-out-alt me-2"></i> Sign Out
+            </button>
+          </li>
+        </ul>
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
       </div>
     </div>
   </header>
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import useAuth from '@/composables/useAuth';
 
@@ -66,59 +123,34 @@ export default {
     const router = useRouter();
     const { user, logout: authLogout } = useAuth();
 
-    // UI state
-    const showUserMenu = ref(false);
     const searchQuery = ref('');
 
-    // Close dropdowns when clicking outside
-    const handleClickOutside = (event) => {
-      const userMenu = document.querySelector('.user-menu');
-      const userDropdown = document.querySelector('.user-dropdown');
-      
-      if (userMenu && !userMenu.contains(event.target) && 
-          userDropdown && !userDropdown.contains(event.target)) {
-        showUserMenu.value = false;
-      }
-    };
-
-    onMounted(() => {
-      document.addEventListener('click', handleClickOutside);
-    });
-
-    onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside);
-    });
-
-    // Search functionality
     const performSearch = () => {
       if (searchQuery.value.trim()) {
         router.push({
           path: '/search',
-          query: { q: searchQuery.value.trim() }
+          query: { q: searchQuery.value.trim() },
         });
         searchQuery.value = '';
       }
     };
 
-    // Logout function
     const logout = async () => {
       await authLogout();
-      // router.push('/login'); // useAuth already handles redirect
     };
 
-    // Return reactive state and methods
     return {
       user,
-      showUserMenu,
       searchQuery,
       performSearch,
-      logout
+      logout,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
+<<<<<<< HEAD
 .app-header {
   height: 64px;
   background: var(--surface);
@@ -280,16 +312,23 @@ export default {
 .dropdown-item:hover {
   background: var(--highlight);
   color: var(--background);
+=======
+.logo {
+  height: 32px;
+}
+
+.input-group-text {
+  border-radius: 20px 0 0 20px;
+}
+
+.form-control {
+  border-radius: 0 20px 20px 0;
+>>>>>>> 20c0385a9dfd9d8223f4cc853fc798ebf0956bc8
 }
 
 @media (max-width: 768px) {
-  .user-name,
   .logo-text {
     display: none;
-  }
-  
-  .search-section {
-    margin: 0 1rem;
   }
 }
 </style>
