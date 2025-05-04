@@ -1,122 +1,178 @@
 <template>
-  <div class="vote-buttons">
+  <div class="reaction-buttons">
     <button
-      @click="handleVote('up')"
-      :class="{ 'active': userVote === 'up', 'disabled': loading }"
-      :disabled="loading || !isLoggedIn"
-      class="vote-btn upvote"
-      title="Upvote"
+      @click="react('like')"
+      :class="['reaction-btn', 'like-btn', { 'active': userReaction === 'like' }]"
+      :disabled="loading"
+      title="Like"
     >
-      <i class="fas fa-arrow-up"></i>
-      <span class="count">{{ upvotesCount }}</span>
+      <i :class="userReaction === 'like' ? 'fas fa-thumbs-up' : 'far fa-thumbs-up'"></i>
     </button>
     <button
-      @click="handleVote('down')"
-      :class="{ 'active': userVote === 'down', 'disabled': loading }"
-      :disabled="loading || !isLoggedIn"
-      class="vote-btn downvote"
-      title="Downvote"
+      @click="react('dislike')"
+      :class="['reaction-btn', 'dislike-btn', { 'active': userReaction === 'dislike' }]"
+      :disabled="loading"
+      title="Dislike"
     >
-      <i class="fas fa-arrow-down"></i>
-      <span class="count">{{ downvotesCount }}</span>
+      <i :class="userReaction === 'dislike' ? 'fas fa-thumbs-down' : 'far fa-thumbs-down'"></i>
     </button>
-    <p v-if="error" class="vote-error">{{ error }}</p>
   </div>
 </template>
 
 <script>
-import { computed } from 'vue';
-import useVotes from '@/composables/useVotes';
+import { ref, computed, watch } from 'vue';
+import usePosts from '@/composables/usePosts';
 import useAuth from '@/composables/useAuth';
 
 export default {
-  name: 'VoteButtons',
+  name: 'ReactionButtons',
   props: {
     postId: {
       type: String,
       required: true
+    },
+    initialLikes: {
+      type: Number,
+      default: 0
+    },
+    initialDislikes: {
+      type: Number,
+      default: 0
+    },
+    initialUserReaction: {
+      type: String, // 'like', 'dislike', or null
+      default: null
     }
   },
   setup(props) {
     const { user } = useAuth();
-    const {
-      userVote,
-      upvotesCount,
-      downvotesCount,
-      loading,
-      error,
-      castVote
-    } = useVotes(props.postId);
+    const { likeDislikePost, loading: postsLoading } = usePosts();
 
-    const isLoggedIn = computed(() => !!user.value);
+    const likeCount = ref(props.initialLikes);
+    const dislikeCount = ref(props.initialDislikes);
+    const userReaction = ref(props.initialUserReaction);
+    const loading = ref(false);
 
-    const handleVote = (type) => {
-      if (!isLoggedIn.value) {
-         alert('Please log in to vote.');
-         return;
+    watch(() => props.initialLikes, (newLikes) => likeCount.value = newLikes);
+    watch(() => props.initialDislikes, (newDislikes) => dislikeCount.value = newDislikes);
+    watch(() => props.initialUserReaction, (newReaction) => userReaction.value = newReaction);
+
+    const react = async (reactionType) => {
+      if (!user.value || loading.value || postsLoading.value) return;
+
+      loading.value = true;
+      const previousReaction = userReaction.value;
+      let newReaction = reactionType;
+
+      if (previousReaction === reactionType) {
+        if (reactionType === 'like') likeCount.value--;
+        if (reactionType === 'dislike') dislikeCount.value--;
+        userReaction.value = null;
+        newReaction = null;
+      } else {
+        if (previousReaction === 'like') likeCount.value--;
+        if (previousReaction === 'dislike') dislikeCount.value--;
+
+        if (reactionType === 'like') likeCount.value++;
+        if (reactionType === 'dislike') dislikeCount.value++;
+        userReaction.value = reactionType;
       }
-      castVote(type);
+
+      try {
+        const updatedPostData = await likeDislikePost(props.postId, newReaction);
+
+        if (updatedPostData) {
+          if (typeof updatedPostData.likes === 'number') {
+            likeCount.value = updatedPostData.likes;
+          }
+          if (typeof updatedPostData.dislikes === 'number') {
+            dislikeCount.value = updatedPostData.dislikes;
+          }
+          if (typeof updatedPostData.userReaction !== 'undefined') {
+            userReaction.value = updatedPostData.userReaction;
+          }
+        }
+      } catch (error) {
+        console.error("Reaction failed:", error);
+        if (previousReaction === reactionType) {
+          if (reactionType === 'like') likeCount.value++;
+          if (reactionType === 'dislike') dislikeCount.value++;
+          userReaction.value = previousReaction;
+        } else {
+          if (reactionType === 'like') likeCount.value--;
+          if (reactionType === 'dislike') dislikeCount.value--;
+
+          if (previousReaction === 'like') likeCount.value++;
+          if (previousReaction === 'dislike') dislikeCount.value++;
+          userReaction.value = previousReaction;
+        }
+      } finally {
+        loading.value = false;
+      }
     };
 
     return {
-      userVote,
-      upvotesCount,
-      downvotesCount,
-      loading,
-      error,
-      handleVote,
-      isLoggedIn
+      likeCount,
+      dislikeCount,
+      userReaction,
+      loading: computed(() => loading.value || postsLoading.value),
+      react
     };
   }
 }
 </script>
 
 <style scoped>
-.vote-buttons {
+.reaction-buttons {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #6b7280;
 }
-.vote-btn {
+
+.reaction-btn {
+  background: none;
+  border: 1px solid #d1d5db;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.3rem 0.7rem;
+  border-radius: 16px;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  justify-content: center;
+  gap: 0.4rem;
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s;
+  font-size: 0.85rem;
+}
+
+.reaction-btn:hover:not(:disabled) {
   background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 1rem; /* Pill shape */
-  padding: 0.25rem 0.75rem;
-  font-size: 0.8rem;
-  color: #4b5563;
-  cursor: pointer;
-  transition: all 0.2s ease;
 }
-.vote-btn:hover:not(.disabled) {
-  background-color: #e5e7eb;
-  border-color: #d1d5db;
-}
-.vote-btn.disabled {
-  opacity: 0.7;
+
+.reaction-btn:disabled {
   cursor: not-allowed;
+  opacity: 0.6;
 }
-.vote-btn .count {
-  font-weight: 500;
-  min-width: 10px; /* Ensure space for number */
-  text-align: center;
+
+.reaction-btn i {
+  font-size: 0.9rem;
+  line-height: 1;
 }
-.vote-btn.upvote.active {
-  background-color: #dbeafe; /* Light blue */
+
+.like-btn.active {
+  color: #3b82f6;
+  border-color: #bfdbfe;
+  background-color: #eff6ff;
+}
+.like-btn:hover:not(.active):not(:disabled) {
   border-color: #93c5fd;
-  color: #2563eb;
 }
-.vote-btn.downvote.active {
-  background-color: #fee2e2; /* Light red */
-  border-color: #fca5a5;
-  color: #dc2626;
-}
-.vote-error {
+
+.dislike-btn.active {
   color: #ef4444;
-  font-size: 0.75rem;
-  margin-left: 0.5rem;
+  border-color: #fecaca;
+  background-color: #fef2f2;
+}
+.dislike-btn:hover:not(.active):not(:disabled) {
+  border-color: #fca5a5;
 }
 </style>

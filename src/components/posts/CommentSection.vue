@@ -1,7 +1,11 @@
 <template>
   <div class="comment-section">
     <h4>Comments ({{ comments.length }})</h4>
-
+    <CommentForm
+      :adding-comment="addingComment"
+      :add-error="addError"
+      @submit-comment="handleCommentSubmit"
+    />
     <div v-if="loading" class="loading-state small">
       <div class="spinner"></div> Loading comments...
     </div>
@@ -15,11 +19,7 @@
       <CommentItem v-for="comment in comments" :key="comment.id" :comment="comment" />
     </div>
 
-    <CommentForm
-      :adding-comment="addingComment"
-      :add-error="addError"
-      @submit-comment="handleCommentSubmit"
-    />
+    
   </div>
 </template>
 

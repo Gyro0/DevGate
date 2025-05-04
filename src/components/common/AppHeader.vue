@@ -8,17 +8,7 @@
         </router-link>
       </div>
       
-      <div class="search-section">
-        <div class="search-box">
-          <i class="fas fa-search search-icon"></i>
-          <input 
-            type="text" 
-            placeholder="Search..." 
-            v-model="searchQuery"
-            @keyup.enter="performSearch"
-          />
-        </div>
-      </div>
+      
       
       <div class="user-section">
         

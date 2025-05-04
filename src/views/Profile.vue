@@ -7,28 +7,25 @@
       <div class="content-area" v-if="userProfile">
         <div class="profile-header">
           <h1>User Profile</h1>
-          <button @click="editMode = !editMode" class="edit-button">
-            <i :class="editMode ? 'fas fa-times' : 'fas fa-pen'"></i>
-            {{ editMode ? 'Cancel' : 'Edit Profile' }}
+          <button @click="goToSettings" class="edit-button">
+            <i class="fas fa-cog"></i>
+            Settings
           </button>
         </div>
 
         <!-- Profile Info -->
-        <ProfileCard :userProfile="userProfile" :editMode="editMode" @triggerPhotoUpload="triggerPhotoUpload" @handlePhotoChange="handlePhotoChange" />
-        <ProfileStats :stats="userStats" />
+        <ProfileCard :userProfile="userProfile" @triggerPhotoUpload="triggerPhotoUpload" @handlePhotoChange="handlePhotoChange" />
 
-        <!-- Profile Edit Form (only shows in edit mode) -->
-        <ProfileForm
-          v-if="editMode"
-          :editedProfile="editedProfile"
-          @saveProfile="saveProfile"
-          @cancel="cancelEditing"
-        />
-
-        <!-- Dashboard Components Section (shows when not editing) -->
-        <div v-if="!editMode" class="profile-dashboard-section">
+        <!-- Dashboard Components Section -->
+        <div class="profile-dashboard-section">
           <div class="profile-widget">
              <UserSummary />
+          </div>
+          <div class="profile-widget">
+            <SkillSummaryWidget /> <!-- Added Skill Summary -->
+          </div>
+          <div class="profile-widget">
+            <ProjectSummaryWidget /> <!-- Added Project Summary -->
           </div>
           <div class="profile-widget">
             <ActivityFeedWidget />
@@ -55,11 +52,11 @@ import { ref, onMounted, watch, computed } from 'vue';
 import AppHeader from '@/components/common/AppHeader.vue';
 import AppSidebar from '@/components/common/AppSidebar.vue';
 import ProfileCard from '@/components/profile/ProfileCard.vue';
-import ProfileStats from '@/components/profile/ProfileStats.vue';
-import ProfileForm from '@/components/profile/ProfileForm.vue';
 import UserSummary from '@/components/dashboard/UserSummary.vue';
 import ActivityFeedWidget from '@/components/dashboard/ActivityFeedWidget.vue';
 import ObjectivesProgressWidget from '@/components/dashboard/ObjectivesProgressWidget.vue';
+import SkillSummaryWidget from '@/components/dashboard/SkillSummaryWidget.vue'; // Import Skill Summary
+import ProjectSummaryWidget from '@/components/dashboard/ProjectSummaryWidget.vue'; // Import Project Summary
 
 import useProfile from '@/composables/useProfile';
 import useFileUpload from '@/composables/useFileUpload';
@@ -71,26 +68,22 @@ export default {
     AppHeader,
     AppSidebar,
     ProfileCard,
-    ProfileStats,
-    ProfileForm,
     UserSummary,
     ActivityFeedWidget,
     ObjectivesProgressWidget,
+    SkillSummaryWidget, // Register Skill Summary
+    ProjectSummaryWidget, // Register Project Summary
   },
   setup() {
-    const router = useRouter();
+    const router = useRouter(); // Get router instance
     const {
       userProfile,
-      editedProfile,
       loading,
       error,
-      fetchUserProfile,
-      updateUserProfile
+      fetchUserProfile
     } = useProfile();
     const { user, isAuthenticated } = useAuth();
-    const { uploadFile } = useFileUpload();
-
-    const editMode = ref(false);
+    const { uploadFile } = useFileUpload(); // Keep for photo change
 
     const userStats = computed(() => {
       if (!userProfile.value) return { skills: 0, objectives: 0, completedProjects: 0 };
@@ -115,24 +108,23 @@ export default {
       }
     });
 
+    // Function to navigate to settings
+    const goToSettings = () => {
+      router.push('/settings');
+    };
+
     const triggerPhotoUpload = () => { /* ... */ };
     const handlePhotoChange = async (file) => { /* ... */ };
 
-    const saveProfile = async (formData) => { /* ... */ };
-
-    const cancelEditing = () => { /* ... */ };
-
     return {
       userProfile,
-      editedProfile,
       loading,
       error,
       userStats,
-      editMode,
-      triggerPhotoUpload,
-      handlePhotoChange,
-      saveProfile,
-      cancelEditing,
+      triggerPhotoUpload, // Keep for now
+      handlePhotoChange, // Keep for now
+      fetchUserProfile,
+      goToSettings, // Expose navigation function
     };
   }
 };
@@ -182,7 +174,14 @@ export default {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  min-height: 300px;
+  min-height: 300px; /* Adjust as needed */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Ensure content stays within card */
+}
+/* Ensure widgets inside fill the space */
+.profile-widget > div {
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
@@ -193,5 +192,10 @@ export default {
   align-items: center;
   justify-content: center;
   height: calc(100vh - 64px);
+}
+.error-state button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
 }
 </style>

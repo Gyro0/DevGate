@@ -1,15 +1,15 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import { auth } from '@/firebase/firebaseInit'
+import { createRouter, createWebHistory } from 'vue-router';
+import { auth } from '@/firebase/firebaseInit';
 
-import LoginHome from '@/views/LoginHome.vue'
-import Dashboard from '@/views/Dashboard.vue'
-import Objectives from '@/views/Objectives.vue'
-import SkillTracker from '@/views/SkillTracker.vue'
-import Timeline from '@/views/Timeline.vue'
-import Profile from '@/views/Profile.vue'
-import Projects from '@/views/Projects.vue'
-import Settings from '../views/Settings.vue'; // Import the new view
-import PostDetail from '../views/PostDetail.vue'; // Import the new view
+import LoginHome from '@/views/LoginHome.vue';
+import Dashboard from '@/views/Dashboard.vue';
+import Objectives from '@/views/Objectives.vue';
+import SkillTracker from '@/views/SkillTracker.vue';
+import Timeline from '@/views/Timeline.vue';
+import Profile from '@/views/Profile.vue';
+import Projects from '@/views/Projects.vue';
+import Settings from '../views/Settings.vue';
+import PostDetail from '../views/PostDetail.vue';
 
 const routes = [
   {
@@ -58,39 +58,36 @@ const routes = [
     path: '/settings',
     name: 'Settings',
     component: Settings,
-    meta: { requiresAuth: true } // Assuming settings requires login
+    meta: { requiresAuth: true }
   },
   {
-    path: '/posts/:id', // Route for single post view
+    path: '/posts/:id',
     name: 'PostDetail',
     component: PostDetail,
-    meta: { requiresAuth: true } // Or false if public posts allowed
+    meta: { requiresAuth: true }
   },
   {
     path: '/',
     redirect: '/login'
   }
-]
+];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(process.env.BASE_URL),
   routes
-})
+});
 
 router.beforeEach(async (to, from, next) => {
   const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   const guestOnly = to.matched.some(record => record.meta.guestOnly);
-  
-  // Wait for auth state to initialize before routing
+
   const currentUser = auth.currentUser;
-  
-  // Guest only routes check
+
   if (guestOnly && currentUser) {
     next('/dashboard');
     return;
   }
-  
-  // Authentication check
+
   if (requiresAuth && !currentUser) {
     next({
       path: '/login',
@@ -98,8 +95,8 @@ router.beforeEach(async (to, from, next) => {
     });
     return;
   }
-  
+
   next();
 });
 
-export default router
+export default router;
