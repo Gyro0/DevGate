@@ -11,7 +11,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.7); /* Optional: semi-transparent background */
+  background-color: rgba(22, 27, 34, 0.85); /* Use dark background with some transparency */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -19,11 +19,14 @@
 }
 
 .spinner {
-  border: 4px solid rgba(0, 0, 0, 0.1);
+  border: 4px solid rgba(63, 208, 212, 0.15);
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border-left-color: #4f46e5; /* Use your primary color */
+  border-left-color: var(--primary);
+  border-top-color: var(--secondary);
+  background: transparent;
+  box-shadow: 0 0 16px var(--highlight);
   animation: spin 1s ease infinite;
 }
 

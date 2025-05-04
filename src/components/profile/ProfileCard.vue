@@ -93,12 +93,15 @@ export default {
 </script>
 
 <style scoped>
-/* ... existing styles ... */
 .profile-card {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  background: var(--surface-card);
+  border-radius: 1.2rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.35), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
+  border: 1.5px solid var(--border-color, #23272e);
+  padding: 2rem 1.5rem;
+  color: var(--text);
+  max-width: 480px;
+  margin: 2rem auto;
 }
 
 .profile-banner {
@@ -109,44 +112,45 @@ export default {
   display: flex;
   align-items: center;
   position: relative;
-  width: 100px;
-  height: 100px;
-  margin-bottom: 1rem;
+  width: 110px;
+  height: 110px;
+  margin-bottom: 1.2rem;
 }
 
 .profile-avatar {
-  width: 100px;
-  height: 100px;
+  width: 110px;
+  height: 110px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid white;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  border: 3px solid var(--primary-glow);
+  box-shadow: 0 0 16px var(--primary-glow), 0 0 0 2px var(--circuit-accent);
+  background: var(--background);
 }
 
 .change-photo-btn {
   position: absolute;
   bottom: 0;
   right: 0;
-  background: #4f46e5;
-  color: white;
-  width: 32px;
-  height: 32px;
+  background: var(--primary);
+  color: #fff;
+  width: 36px;
+  height: 36px;
   border: none;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-  transition: background-color 0.2s;
+  box-shadow: 0 0 8px var(--primary-glow);
+  transition: background 0.18s, box-shadow 0.18s;
+  font-size: 1.1rem;
 }
-
 .change-photo-btn:hover {
-  background-color: #4338CA;
+  background: var(--primary-glow);
+  box-shadow: 0 0 16px 2px var(--primary-glow);
 }
-
 .change-photo-btn i {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .hidden-input {
@@ -154,56 +158,59 @@ export default {
 }
 
 .profile-info {
-  /* Styles for profile info section */
+  margin-top: 0.5rem;
 }
 
 .profile-name {
   font-size: 1.5rem;
-  font-weight: 600;
-  color: #111827;
+  font-weight: 800;
+  color: var(--primary);
   margin: 0 0 0.25rem 0;
+  text-shadow: 0 0 8px var(--primary-glow);
 }
 
 .profile-title {
-  color: #6b7280;
-  font-size: 0.875rem;
+  color: var(--secondary);
+  font-size: 1rem;
   margin-bottom: 0.75rem;
+  font-weight: 600;
 }
 
 .profile-bio {
   margin: 0.75rem 0;
-  color: #374151;
-  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-size: 0.98rem;
   line-height: 1.5;
 }
 
 .profile-meta {
-  margin-top: 1rem;
-  font-size: 0.875rem;
+  margin-top: 1.2rem;
+  font-size: 0.95rem;
 }
 
 .meta-item {
   display: flex;
   align-items: center;
   margin-bottom: 0.5rem;
-  color: #4b5563;
+  color: var(--text-tertiary, #7a869a);
 }
 
 .meta-item i {
   margin-right: 0.75rem;
-  color: #9ca3af;
-  width: 16px;
+  color: var(--primary-glow);
+  width: 18px;
   text-align: center;
+  font-size: 1.1rem;
 }
 
 .meta-item a {
-  color: #4f46e5;
-  text-decoration: none;
-  transition: color 0.2s;
+  color: var(--primary);
+  text-decoration: underline;
+  font-weight: 600;
+  transition: color 0.18s;
 }
-
 .meta-item a:hover {
-  color: #4338CA;
+  color: var(--primary-glow);
   text-decoration: underline;
 }
 </style>

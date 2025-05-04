@@ -71,22 +71,24 @@ export default {
 .comment-section {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1.5px solid var(--highlight);
 }
 .comment-section h4 {
   margin-top: 0;
   margin-bottom: 1rem;
   font-size: 1rem;
-  font-weight: 600;
-  color: #374151;
+  font-weight: 700;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px var(--highlight);
 }
 .comment-list {
   margin-bottom: 1rem;
 }
 /* Small states for inline display */
 .loading-state.small, .error-state.small, .empty-state.small {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 0.95rem;
+  color: var(--highlight);
   padding: 1rem 0;
   text-align: center;
   background: none;
@@ -94,7 +96,7 @@ export default {
 }
 .loading-state.small .spinner {
    width: 16px; height: 16px; border-width: 2px; display: inline-block; margin-right: 0.5rem; vertical-align: middle;
-   border: 2px solid rgba(79, 70, 229, 0.2); border-radius: 50%; border-top-color: #4f46e5;
+   border: 2px solid rgba(63, 208, 212, 0.15); border-radius: 50%; border-top-color: var(--primary); border-left-color: var(--secondary);
    animation: spin 1s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }

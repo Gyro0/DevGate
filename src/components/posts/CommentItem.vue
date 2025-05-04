@@ -43,7 +43,7 @@ export default {
   display: flex;
   gap: 0.75rem;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1.5px solid var(--highlight);
 }
 .comment-item:last-child {
   border-bottom: none;
@@ -54,6 +54,9 @@ export default {
   height: 32px;
   border-radius: 50%;
   margin-top: 0.25rem;
+  border: 2px solid var(--highlight);
+  box-shadow: 0 0 8px var(--highlight);
+  background: var(--background);
 }
 .comment-content {
   flex: 1;
@@ -65,19 +68,19 @@ export default {
   margin-bottom: 0.25rem;
 }
 .comment-author {
-  font-weight: 600;
-  font-size: 0.875rem;
-  color: #1f2937;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--primary);
 }
 .comment-timestamp {
-  font-size: 0.75rem;
-  color: #9ca3af;
+  font-size: 0.8rem;
+  color: var(--highlight);
 }
 .comment-text {
-  font-size: 0.875rem;
-  color: #4b5563;
+  font-size: 0.95rem;
+  color: var(--text);
   line-height: 1.5;
   margin: 0;
-  white-space: pre-wrap; /* Preserve line breaks */
+  white-space: pre-wrap;
 }
 </style>

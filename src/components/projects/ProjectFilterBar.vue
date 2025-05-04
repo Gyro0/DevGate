@@ -213,18 +213,25 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 }
 
 .filter-group > label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  color: #4b5563;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .search-group {
@@ -239,31 +246,54 @@ export default {
 
 .search-input-wrapper input {
   width: 100%;
-  padding: 0.6rem;
+  padding: 0.75rem;
   padding-right: 2.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: var(--bg-darker);
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+.search-input-wrapper input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.search-input-wrapper input::placeholder {
+  color: var(--text-secondary);
 }
 
 .clear-search {
   position: absolute;
-  right: 0.5rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
-  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-darker);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   cursor: pointer;
-  color: #9ca3af;
+  transition: all 0.3s ease;
 }
 
 .clear-search:hover {
-  color: #4b5563;
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: translateY(-50%) scale(1.1);
 }
 
 .tech-filter {
-  flex: 2;
-  min-width: 300px;
+  flex: 1;
+  min-width: 200px;
 }
 
 .tech-chips {
@@ -273,73 +303,102 @@ export default {
 }
 
 .tech-chip {
-  padding: 0.25rem 0.75rem;
-  background-color: #f3f4f6;
-  border-radius: 1rem;
-  font-size: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background-color: var(--bg-darker);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s ease;
 }
 
 .tech-chip:hover {
-  background-color: #e5e7eb;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .tech-chip.selected {
-  background-color: #4f46e5;
+  background-color: var(--primary-color);
   color: white;
+  border-color: var(--primary-color);
 }
 
 .date-filter {
+  flex: 1;
   min-width: 200px;
 }
 
 .date-inputs {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 1rem;
 }
 
 .date-input {
   flex: 1;
-  min-width: 120px;
+  min-width: 150px;
 }
 
 .date-input label {
   display: block;
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
   margin-bottom: 0.25rem;
 }
 
 .date-input input {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 0.875rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: var(--bg-darker);
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+.date-input input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .clear-dates {
-  align-self: flex-end;
-  padding: 0.5rem 0.75rem;
-  background-color: #f3f4f6;
-  border: none;
+  padding: 0.5rem 1rem;
   border-radius: 6px;
-  font-size: 0.75rem;
-  color: #4b5563;
+  font-size: 0.85rem;
+  background-color: var(--bg-darker);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
   cursor: pointer;
-  margin-bottom: 1px;
+  transition: all 0.3s ease;
+  align-self: flex-end;
 }
 
 .clear-dates:hover {
-  background-color: #e5e7eb;
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {
   .project-filter-bar {
-    flex-direction: column;
+    padding: 1rem;
     gap: 1rem;
+  }
+  
+  .filter-group {
+    width: 100%;
+  }
+  
+  .date-inputs {
+    flex-direction: column;
+  }
+  
+  .clear-dates {
+    width: 100%;
   }
 }
 </style>

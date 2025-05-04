@@ -161,43 +161,158 @@ export default {
 </script>
 
 <style scoped>
-/* Basic layout styles */
-.main-layout { display: flex; min-height: calc(100vh - 64px); }
-.content-area { flex: 1; padding: 1.5rem; overflow-y: auto; max-width: 800px; margin: 0 auto; } /* Center content */
+.main-layout {
+  display: flex;
+  min-height: calc(100vh - 64px);
+}
+.content-area {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  max-width: 800px;
+  margin: 0 auto;
+}
 
 .post-container {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  border: 1px solid #e5e7eb;
-  overflow: hidden; /* Contain elements */
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  overflow: visible;
 }
 
-/* Use styles from PostItem, potentially adjust padding/margins */
 .post-card.detailed {
-   box-shadow: none; border: none; border-radius: 0;
-   padding-bottom: 0; /* Remove bottom padding as footer/comments follow */
+  background: var(--surface-card);
+  border-radius: 1.1rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.35), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
+  border: 1.5px solid var(--border-color, #23272e);
+  padding-bottom: 0;
+  margin-bottom: 2rem;
+  color: var(--text);
+  position: relative;
+  overflow: hidden;
 }
-.post-header { padding: 1.5rem 1.5rem 0.5rem; }
-.post-content { padding: 0.5rem 1.5rem 1rem; }
-.post-footer { padding: 0.75rem 1.5rem; border-top: 1px solid #f3f4f6; }
-.post-title { font-size: 1.5rem; margin-bottom: 1rem; } /* Larger title */
-.post-description { font-size: 1rem; line-height: 1.7; } /* Slightly larger text */
-
-/* Inherited styles from PostItem.vue */
-.post-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 0.75rem; object-fit: cover; border: 1px solid #eee; }
-.post-author { font-weight: 600; color: #111827; display: block; font-size: 0.9rem; }
-.post-timestamp { font-size: 0.75rem; color: #6b7280; }
-.post-image { max-width: 100%; border-radius: 6px; margin-top: 1rem; margin-bottom: 1rem; border: 1px solid #e5e7eb; }
-.linked-entity { font-size: 0.8rem; color: #4b5563; background-color: #f3f4f6; padding: 0.3rem 0.6rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; }
-.linked-entity a { color: #4f46e5; text-decoration: none; font-weight: 500; }
-.linked-entity a:hover { text-decoration: underline; }
-.linked-entity i { color: #9ca3af; }
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem 1.5rem 0.5rem;
+}
+.post-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-glow);
+  box-shadow: 0 0 8px var(--primary-glow);
+  object-fit: cover;
+  background: var(--background);
+}
+.post-author {
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+  font-size: 1.08rem;
+  letter-spacing: 0.5px;
+}
+.post-timestamp {
+  font-size: 0.95rem;
+  color: var(--highlight);
+  margin-left: 0.5rem;
+}
+.post-content {
+  padding: 0.5rem 1.5rem 1rem;
+}
+.post-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin-bottom: 0.7rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px var(--primary-glow);
+}
+.post-description {
+  font-size: 1.13rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  margin-bottom: 1.1rem;
+}
+.post-image {
+  max-width: 100%;
+  border-radius: 0.75rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  border: 1.5px solid var(--primary-glow);
+  box-shadow: 0 0 8px var(--primary-glow);
+}
+.linked-entity {
+  font-size: 0.97rem;
+  color: var(--highlight);
+  background: var(--surface-2);
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 0 0 1.5px var(--primary-glow), 0 0 8px 0 var(--circuit-accent-fade, #2e8b57cc);
+}
+.linked-entity a {
+  color: var(--primary);
+  text-decoration: underline;
+  font-weight: 600;
+}
+.linked-entity i {
+  color: var(--primary-glow);
+}
+.post-footer {
+  padding: 0.75rem 1.5rem;
+  border-top: 1px solid var(--border-color, #23272e);
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
 
 /* Loading/Error States */
-.loading-state, .error-state { text-align: center; padding: 3rem 1rem; color: #6b7280; }
-.loading-state .spinner { width: 24px; height: 24px; border: 3px solid rgba(79, 70, 229, 0.2); border-radius: 50%; border-top-color: #4f46e5; animation: spin 1s linear infinite; display: inline-block; margin-bottom: 0.5rem; }
-.error-state i { font-size: 2rem; color: #d1d5db; margin-bottom: 0.5rem; }
-.error-state a { color: #4f46e5; text-decoration: underline; }
+.loading-state, .error-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-tertiary, #7a869a);
+}
+.loading-state .spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(60, 65, 80, 0.18);
+  border-radius: 50%;
+  border-top-color: var(--primary-glow);
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+.error-state i {
+  font-size: 2rem;
+  color: var(--primary-glow);
+  margin-bottom: 0.5rem;
+}
+.error-state a {
+  color: var(--primary);
+  text-decoration: underline;
+}
 @keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+  .post-card.detailed {
+    padding: 0.5rem 0.2rem;
+  }
+  .post-title {
+    font-size: 1.1rem;
+  }
+  .post-content {
+    padding: 0.5rem 0.5rem 1rem;
+  }
+  .post-header, .post-footer {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
 </style>

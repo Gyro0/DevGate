@@ -160,6 +160,12 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--surface);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px 0 rgba(30, 203, 225, 0.10), 0 0 0 2px var(--highlight);
+  border: 1.5px solid var(--highlight);
+  padding: 2rem 1.5rem;
+  color: var(--text);
 }
 
 .widget-header {
@@ -172,27 +178,33 @@ export default {
 .widget-header h2 {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px var(--highlight);
 }
 
 .view-all {
-  color: #4f46e5;
+  color: var(--highlight);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: color 0.2s;
 }
 
 .view-all:hover {
   text-decoration: underline;
+  color: var(--secondary);
 }
 
 .activities-content {
   flex: 1;
-  overflow: hidden; /* Prevent content overflow */
+  overflow: hidden;
 }
 
 .activity-list-container {
   height: 100%;
-  overflow-y: auto; /* Allow scrolling if content exceeds height */
+  overflow-y: auto;
 }
 
 .activity-list {
@@ -204,7 +216,7 @@ export default {
 .activity-item {
   display: flex;
   padding: 0.75rem 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1.5px solid var(--border);
 }
 
 .activity-item:last-child {
@@ -220,43 +232,47 @@ export default {
   border-radius: 50%;
   margin-right: 1rem;
   flex-shrink: 0;
+  background: var(--background);
+  border: 1.5px solid var(--highlight);
+  box-shadow: 0 0 8px var(--highlight);
 }
 
 .activity-icon i {
-  font-size: 0.875rem;
+  font-size: 1rem;
 }
 
 .event-skill {
-  background-color: #dbeafe;
-  color: #3b82f6;
+  background: rgba(30, 203, 225, 0.10);
+  color: var(--primary);
 }
 
 .event-project {
-  background-color: #fef3c7;
-  color: #d97706;
+  background: rgba(255, 153, 0, 0.10);
+  color: var(--secondary);
 }
 
 .event-objective {
-  background-color: #dcfce7;
+  background: rgba(16, 185, 129, 0.10);
   color: #10b981;
 }
 
 .activity-details {
   flex: 1;
-  min-width: 0; /* Prevent text overflow issues */
+  min-width: 0;
 }
 
 .activity-description {
-  font-size: 0.875rem;
+  font-size: 1rem;
   margin-bottom: 0.25rem;
+  color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .activity-time {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 0.85rem;
+  color: var(--highlight);
 }
 
 .empty-state {
@@ -268,24 +284,26 @@ export default {
   justify-content: center;
   text-align: center;
   padding: 2rem 1rem;
+  color: var(--highlight);
 }
 
 .empty-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: #d1d5db;
+  color: var(--highlight);
 }
 
 .empty-state h3 {
   margin: 0;
   margin-bottom: 0.5rem;
   font-size: 1.125rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--primary);
 }
 
 .empty-state p {
   margin: 0;
-  color: #6b7280;
+  color: var(--text);
   max-width: 24rem;
 }
 
@@ -295,13 +313,13 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
-  font-size: 0.875rem;
+  color: var(--highlight);
+  font-size: 0.95rem;
 }
 
 .spinner {
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top: 3px solid #4f46e5;
+  border: 3px solid rgba(63, 208, 212, 0.15);
+  border-top: 3px solid var(--primary);
   border-radius: 50%;
   width: 24px;
   height: 24px;

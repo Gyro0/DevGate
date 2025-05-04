@@ -88,62 +88,137 @@ export default {
 </script>
 
 <style scoped>
-/* Styles copied & adapted from Dashboard.vue post-card */
 .post-card {
-  background-color: #ffffff; border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb;
-  display: flex; flex-direction: column; /* Needed for footer */
+  background: var(--surface-card);
+  border-radius: 1rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.35), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
+  border: 1.5px solid var(--border-color, #23272e);
+  padding: 1.5rem 1.25rem;
+  margin-bottom: 2rem;
+  color: var(--text);
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.post-card:hover {
+  box-shadow: 0 0 32px 2px var(--primary-glow), 0 0 0 2.5px var(--primary-glow);
+  border-color: var(--primary-glow);
+  background: var(--surface-2);
 }
 .post-header {
-  display: flex; align-items: center; padding: 1rem 1.5rem 0.5rem; /* Adjust padding */
-}
-.post-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 0.75rem; object-fit: cover; border: 1px solid #eee; }
-.post-author { font-weight: 600; color: #111827; display: block; font-size: 0.9rem; }
-.post-timestamp { font-size: 0.75rem; color: #6b7280; }
-
-.post-link-wrapper {
-  text-decoration: none; /* Remove underline from link */
-  color: inherit; /* Inherit text color */
-  display: block; /* Make link take up space */
-  padding: 0.5rem 1.5rem 1rem; /* Adjust padding */
-}
-
-.post-content { /* Styles for content area */ }
-.post-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem; color: #1f2937; margin-top: 0; }
-.post-description { margin-top: 0; margin-bottom: 1rem; line-height: 1.6; color: #374151; white-space: pre-wrap; font-size: 0.9rem; }
-.post-image { max-width: 100%; border-radius: 6px; margin-top: 1rem; margin-bottom: 1rem; border: 1px solid #e5e7eb; }
-.linked-entity { font-size: 0.8rem; color: #4b5563; background-color: #f3f4f6; padding: 0.3rem 0.6rem; border-radius: 4px; display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; }
-.linked-entity a { color: #4f46e5; text-decoration: none; font-weight: 500; }
-.linked-entity a:hover { text-decoration: underline; }
-.linked-entity i { color: #9ca3af; }
-
-.post-footer {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem 1.5rem;
-  border-top: 1px solid #f3f4f6;
+  margin-bottom: 1.1rem;
+}
+.post-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid var(--primary-glow);
+  box-shadow: 0 0 8px var(--primary-glow);
+  object-fit: cover;
+  background: var(--background);
+}
+.post-author {
+  font-weight: 700;
+  color: var(--primary);
+  display: inline-block;
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  margin-right: 0.7rem;
+}
+.post-timestamp {
+  font-size: 0.95rem;
+  color: var(--highlight);
+  margin-left: 0;
+}
+.post-link-wrapper {
+  text-decoration: none;
+  color: inherit;
+}
+.post-content {
+  margin-bottom: 1rem;
+}
+.post-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--secondary);
+  margin-bottom: 0.4rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px var(--primary-glow);
+}
+.post-description {
+  color: var(--text-secondary);
+  margin-bottom: 0.8rem;
+  font-size: 1.08rem;
+}
+.post-image {
+  width: 100%;
+  max-height: 350px;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1.5px solid var(--primary-glow);
+  box-shadow: 0 0 8px var(--primary-glow);
+}
+.linked-entity {
+  margin-top: 0.5rem;
+  font-size: 0.97rem;
+  color: var(--highlight);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.linked-entity i {
+  color: var(--primary-glow);
+  margin-right: 0.3rem;
+}
+.linked-entity a {
+  color: var(--primary);
+  text-decoration: underline;
+  font-weight: 600;
+}
+.post-footer {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--border-color, #23272e);
+  padding-top: 0.7rem;
 }
 .comment-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: none;
-  border: none;
-  color: #6b7280;
-  font-size: 0.8rem;
+  background: var(--surface-2);
+  color: var(--primary);
+  border: 1.5px solid var(--primary-glow);
+  border-radius: 1.2rem;
+  padding: 0.35rem 1.1rem;
+  font-weight: 700;
+  font-size: 1rem;
   cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  box-shadow: 0 0 8px var(--primary-glow);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: background 0.18s, color 0.18s, border-color 0.18s, box-shadow 0.18s;
 }
 .comment-btn:hover {
-  background-color: #f3f4f6;
+  background: var(--primary-glow);
+  color: #fff;
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 16px 2px var(--primary-glow);
 }
 .comment-btn .count {
-  font-weight: 500;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-left: 0.3rem;
 }
-.comment-btn i {
-  font-size: 0.9rem;
+@media (max-width: 600px) {
+  .post-card {
+    padding: 1rem 0.5rem;
+  }
+  .post-title {
+    font-size: 1.05rem;
+  }
 }
 </style>

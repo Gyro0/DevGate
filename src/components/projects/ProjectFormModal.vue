@@ -280,43 +280,66 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.7);
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     z-index: 1000;
+    backdrop-filter: blur(4px);
   }
   
   .modal-content {
-    background-color: white;
-    border-radius: 8px;
+    background-color: var(--card-bg);
+    border-radius: 12px;
     width: 90%;
     max-width: 600px;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    position: relative;
+  }
+  
+  .modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    opacity: 0.7;
   }
   
   .modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 1.5rem;
-    border-bottom: 1px solid #e5e7eb;
   }
   
   .modal-header h3 {
     margin: 0;
-    font-size: 1.25rem;
-    color: #111827;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    font-weight: 600;
   }
   
   .modal-close {
-    background: none;
+    background: transparent;
     border: none;
-    font-size: 1.25rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+  
+  .modal-close:hover {
+    background-color: var(--bg-darker);
+    color: var(--text-color);
+    transform: rotate(90deg);
   }
   
   .modal-body {
@@ -324,7 +347,14 @@ export default {
   }
   
   .form-group {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    font-weight: 500;
   }
   
   .form-row {
@@ -333,91 +363,90 @@ export default {
     gap: 1rem;
   }
   
-  label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
-  }
-  
-  input, select, textarea {
+  input, textarea, select {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-darker);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
   }
   
-  input:focus, select:focus, textarea:focus {
+  input:focus, textarea:focus, select:focus {
     outline: none;
-    border-color: #4f46e5;
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
   }
   
-  textarea {
-    resize: vertical;
+  input::placeholder, textarea::placeholder {
+    color: var(--text-secondary);
   }
   
   .tech-selection {
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    overflow: hidden;
+    background-color: var(--bg-darker);
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
   }
   
   .selected-techs {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    padding: 0.75rem;
-    background-color: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-    min-height: 56px;
+    margin-bottom: 1rem;
   }
   
   .tech-tag {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    border: 1px solid var(--border-color);
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    background-color: #4f46e5;
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
+    gap: 0.5rem;
   }
   
   .remove-tech {
-    background: none;
+    background: transparent;
     border: none;
-    color: white;
+    color: var(--text-secondary);
     cursor: pointer;
     padding: 0;
-    display: flex;
-    align-items: center;
+    font-size: 0.8rem;
+    transition: color 0.3s ease;
+  }
+  
+  .remove-tech:hover {
+    color: #ef4444;
   }
   
   .tech-input-wrapper {
     display: flex;
-    border-bottom: 1px solid #e5e7eb;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
   }
   
   .tech-input-wrapper input {
     flex: 1;
-    border: none;
-    border-radius: 0;
   }
   
   .add-tech-btn {
-    padding: 0.5rem 1rem;
-    background-color: #f3f4f6;
+    background-color: var(--primary-color);
+    color: white;
     border: none;
+    padding: 0 1rem;
+    border-radius: 6px;
     cursor: pointer;
-    color: #4b5563;
-    font-weight: 500;
+    transition: all 0.3s ease;
   }
   
   .add-tech-btn:hover:not(:disabled) {
-    background-color: #e5e7eb;
+    background-color: var(--primary-color-dark);
+    transform: translateY(-1px);
   }
   
   .add-tech-btn:disabled {
@@ -429,54 +458,39 @@ export default {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    padding: 0.75rem;
-    background-color: #f9fafb;
   }
   
   .suggestion-btn {
-    background-color: #e5e7eb;
-    border: none;
-    color: #4b5563;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
     cursor: pointer;
+    transition: all 0.3s ease;
   }
   
   .suggestion-btn:hover {
-    background-color: #d1d5db;
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
   }
   
   .image-upload {
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    overflow: hidden;
-  }
-  
-  .upload-area {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 2rem 1rem;
-    cursor: pointer;
-    background-color: #f9fafb;
-  }
-  
-  .upload-area i {
-    font-size: 2rem;
-    color: #9ca3af;
-    margin-bottom: 0.5rem;
-  }
-  
-  .upload-area span {
-    color: #6b7280;
-    font-size: 0.875rem;
+    background-color: var(--bg-darker);
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
   }
   
   .image-preview {
     position: relative;
+    width: 100%;
     height: 200px;
+    border-radius: 8px;
+    overflow: hidden;
   }
   
   .image-preview img {
@@ -489,16 +503,50 @@ export default {
     position: absolute;
     top: 0.5rem;
     right: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .clear-image:hover {
+    background-color: #ef4444;
+    transform: scale(1.1);
+  }
+  
+  .upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .upload-area:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(79, 70, 229, 0.05);
+  }
+  
+  .upload-area i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+  }
+  
+  .upload-area span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
   }
   
   .form-actions {
@@ -509,36 +557,36 @@ export default {
   }
   
   .btn-primary {
-    background-color: #4f46e5;
+    background-color: var(--primary-color);
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
-    border-radius: 6px;
+    border-radius: 8px;
     font-weight: 500;
     cursor: pointer;
+    transition: all 0.3s ease;
   }
   
   .btn-primary:hover {
-    background-color: #4338ca;
+    background-color: var(--primary-color-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
   }
   
   .btn-secondary {
-    border: 1px solid #d1d5db;
-    background-color: white;
-    color: #374151;
+    background-color: var(--bg-darker);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
     padding: 0.75rem 1.5rem;
-    border-radius: 6px;
+    border-radius: 8px;
     font-weight: 500;
     cursor: pointer;
+    transition: all 0.3s ease;
   }
   
   .btn-secondary:hover {
-    background-color: #f9fafb;
-  }
-  
-  @media (max-width: 640px) {
-    .form-row {
-      grid-template-columns: 1fr;
-    }
+    background-color: var(--card-bg);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
   </style>

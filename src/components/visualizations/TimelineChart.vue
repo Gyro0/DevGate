@@ -114,6 +114,11 @@
     width: 100%;
     height: 100%;
     min-height: 200px;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    border: 1px solid var(--border-color);
   }
   
   .chart-container {
@@ -128,12 +133,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #6b7280;
+    color: var(--text-secondary);
   }
   
   .empty-icon {
     font-size: 2.5rem;
-    color: #e5e7eb;
+    color: var(--text-secondary);
     margin-bottom: 1rem;
   }
   </style>

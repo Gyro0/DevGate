@@ -3,7 +3,6 @@
     <div class="header-container">
       <div class="logo-section">
         <router-link to="/dashboard" class="logo-link">
-          <img src="@/assets/logo.png" alt="DevGate" class="logo" />
           <span class="logo-text">DevGate</span>
         </router-link>
       </div>
@@ -122,8 +121,9 @@ export default {
 <style scoped>
 .app-header {
   height: 64px;
-  background-color: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background: var(--surface);
+  box-shadow: 0 2px 12px 0 rgba(30, 203, 225, 0.08), 0 0 0 2px var(--highlight);
+  border-bottom: 1.5px solid var(--highlight);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -146,17 +146,16 @@ export default {
   display: flex;
   align-items: center;
   text-decoration: none;
-  color: #333;
-}
-
-.logo {
-  height: 32px;
-  margin-right: 0.5rem;
+  color: var(--primary);
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .logo-text {
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--primary);
+  text-shadow: 0 0 8px var(--highlight);
 }
 
 .search-section {
@@ -177,24 +176,27 @@ export default {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #6b7280;
+  color: var(--highlight);
 }
 
 .search-box input {
   width: 100%;
   padding: 0.5rem 1rem 0.5rem 2.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1.5px solid var(--highlight);
   border-radius: 20px;
-  font-size: 0.875rem;
-  background-color: #f3f4f6;
+  font-size: 0.95rem;
+  background: var(--background);
+  color: var(--text);
   transition: all 0.2s;
+  box-shadow: 0 0 8px var(--highlight);
 }
 
 .search-box input:focus {
   outline: none;
-  background-color: white;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+  background: var(--surface);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--highlight);
+  color: var(--text);
 }
 
 .user-section {
@@ -206,93 +208,79 @@ export default {
 .user-menu {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
   cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  border-radius: 20px;
-  transition: background-color 0.2s;
+  background: var(--background);
+  border-radius: 2rem;
+  padding: 0.25rem 1.2rem 0.25rem 0.7rem;
+  box-shadow: 0 0 8px var(--highlight);
+  border: 1.5px solid var(--highlight);
+  color: var(--text);
+  transition: box-shadow 0.2s, border-color 0.2s;
+  min-width: 140px;
+  max-width: 220px;
+  overflow: hidden;
 }
-
 .user-menu:hover {
-  background-color: #f3f4f6;
+  border-color: var(--primary);
+  box-shadow: 0 0 12px var(--primary);
 }
-
 .user-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
+  border: 2px solid var(--highlight);
+  box-shadow: 0 0 8px var(--highlight);
+  margin: 0;
+  background: var(--surface);
   object-fit: cover;
-  margin-right: 0.5rem;
+  flex-shrink: 0;
 }
-
 .user-name {
-  margin-right: 0.5rem;
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  display: inline-block;
 }
-
-/* Dropdown styles */
 .user-dropdown {
   position: absolute;
-  top: calc(100% + 0.5rem);
   right: 0;
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-  width: 250px;
-  z-index: 101;
+  top: 110%;
+  background: var(--surface);
+  border: 1.5px solid var(--highlight);
+  border-radius: 1rem;
+  box-shadow: 0 4px 32px 0 rgba(30, 203, 225, 0.08), 0 0 0 2px var(--highlight);
+  min-width: 200px;
+  z-index: 200;
+  padding: 1rem 0.5rem;
 }
-
 .dropdown-header {
-  padding: 0.75rem 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: 0.5rem 1rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.5rem;
 }
-
-.dropdown-header span {
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-.dropdown-header strong {
-  color: #111827;
-  display: block;
-  font-size: 0.875rem;
-}
-
 .dropdown-divider {
   height: 1px;
-  background-color: #e5e7eb;
-  margin: 0.25rem 0;
+  background: var(--border);
+  margin: 0.5rem 0;
 }
-
 .dropdown-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1rem;
-  color: #374151;
+  padding: 0.5rem 1rem;
+  color: var(--text);
   text-decoration: none;
-  transition: background-color 0.2s;
-  font-size: 0.875rem;
-}
-
-.dropdown-item i {
-  margin-right: 0.75rem;
-  width: 20px;
-  text-align: center;
-  color: #6b7280;
-}
-
-.dropdown-item:hover {
-  background-color: #f3f4f6;
-}
-
-button.dropdown-item {
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s;
   cursor: pointer;
-  font-family: inherit;
+}
+.dropdown-item:hover {
+  background: var(--highlight);
+  color: var(--background);
 }
 
 @media (max-width: 768px) {

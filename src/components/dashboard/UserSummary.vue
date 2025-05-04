@@ -94,10 +94,12 @@ export default {
 
 <style scoped>
 .user-summary {
-  background-color: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
+  background: var(--surface);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px 0 rgba(30, 203, 225, 0.10), 0 0 0 2px var(--highlight);
+  border: 1.5px solid var(--highlight);
+  padding: 2rem 1.5rem;
+  color: var(--text);
 }
 
 .greeting-section {
@@ -115,18 +117,24 @@ export default {
   height: 64px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid var(--highlight);
+  box-shadow: 0 0 8px var(--highlight);
+  background: var(--background);
 }
 
 .greeting-text h1 {
   font-size: 1.5rem;
   margin: 0;
   margin-bottom: 0.5rem;
-  font-weight: 600;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px var(--highlight);
 }
 
 .greeting-text p {
   margin: 0;
-  color: #6b7280;
+  color: var(--highlight);
 }
 
 .summary-actions {
@@ -137,16 +145,17 @@ export default {
 
 .action-button {
   padding: 0.6rem 1.2rem;
-  background-color: #4f46e5;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
+  background: var(--highlight);
+  color: var(--background);
+  border: 1.5px solid var(--primary);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 8px var(--highlight);
 }
 
 .action-button i {
@@ -154,7 +163,10 @@ export default {
 }
 
 .action-button:hover {
-  background-color: #4338ca;
+  background: var(--primary);
+  color: var(--background);
+  border-color: var(--highlight);
+  box-shadow: 0 0 12px var(--primary);
 }
 
 @media (max-width: 768px) {

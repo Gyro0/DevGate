@@ -225,7 +225,7 @@ export default {
 <style scoped>
 .objectives-view {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: var(--bg-main);
 }
 
 .main-layout {
@@ -246,18 +246,63 @@ export default {
   margin-bottom: 1.5rem;
 }
 
+.page-header h1 {
+  color: var(--text-color);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.12);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-color-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.18);
+}
+
+.icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
 .charts-section {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .chart-card {
-  background: white;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  border: 1px solid var(--border-color);
   padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chart-card h3 {
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
 }
 
 .objectives-board {
@@ -275,36 +320,9 @@ export default {
   padding: 1rem;
 }
 
-.btn-primary {
-  background-color: #4f46e5;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.6rem 1.2rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  background-color: #4338ca;
-}
-
-.icon {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .charts-section {
     grid-template-columns: 1fr;
-  }
-  
-  .kanban-columns {
-    grid-template-columns: 1fr;
-    gap: 1rem;
   }
 }
 </style>

@@ -109,13 +109,19 @@ export default {
 .skill-filter-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
   min-width: 150px;
+  gap: 0.5rem;
 }
 
 .search-group {
@@ -123,24 +129,34 @@ export default {
 }
 
 label {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
   margin-bottom: 0.25rem;
-  color: #4B5563;
+  color: var(--text-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 select, input {
-  padding: 0.5rem;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  background-color: white;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: var(--bg-darker);
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
 }
 
 select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-  background-position: right 0.5rem center;
+  background-position: right 0.75rem center;
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;
   padding-right: 2.5rem;
@@ -157,28 +173,34 @@ input[type="text"] {
 
 .clear-search {
   position: absolute;
-  right: 0.5rem;
+  right: 0.75rem;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #9CA3AF;
+  background: var(--bg-darker);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 0.25rem;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
 }
 
 .clear-search:hover {
-  color: #4B5563;
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: translateY(-50%) scale(1.1);
 }
 
 @media (max-width: 768px) {
   .skill-filter-bar {
     flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
   }
-  
   .filter-group {
     width: 100%;
   }

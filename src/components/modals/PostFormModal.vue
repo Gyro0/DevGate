@@ -247,32 +247,99 @@ export default {
 </script>
 
 <style scoped>
-/* Basic Modal Styles (reuse from other modals or define here) */
 .modal-backdrop {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex; justify-content: center; align-items: center; z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(22, 27, 34, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
 }
 .modal-content {
-  background-color: white; border-radius: 8px; width: 90%; max-width: 650px;
-  max-height: 90vh; display: flex; flex-direction: column; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  background: var(--surface);
+  border-radius: 1rem;
+  max-width: 500px;
+  width: 95%;
+  box-shadow: 0 4px 32px 0 rgba(30, 203, 225, 0.08), 0 0 0 2px var(--highlight);
+  border: 1.5px solid var(--highlight);
+  padding: 2rem 1.5rem;
 }
 .modal-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
 }
-.modal-header h3 { margin: 0; font-size: 1.25rem; color: #111827; }
-.modal-close { background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; }
-.modal-body { padding: 1.5rem; overflow-y: auto; }
-
-/* Form Styles */
-.form-group { margin-bottom: 1.25rem; }
-label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 500; color: #374151; }
-input[type="text"], textarea, select {
-  width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px; font-size: 0.9rem;
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--primary);
+  font-weight: 700;
+  letter-spacing: 1px;
 }
-input:focus, textarea:focus, select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 1px #4f46e5; }
-textarea { resize: vertical; min-height: 100px; }
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--highlight);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.modal-close:hover {
+  color: var(--secondary);
+}
+.modal-body {
+  padding: 1.5rem 0;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--background);
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+}
+input, .form-control, textarea {
+  background: var(--background);
+  color: var(--text);
+  border: 1.5px solid var(--highlight);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  box-shadow: 0 0 8px var(--highlight);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+input:focus, .form-control:focus, textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--highlight);
+  outline: none;
+}
+.btn-secondary, .btn-primary {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--highlight);
+  background: var(--surface);
+  color: var(--text);
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 8px var(--highlight);
+}
+.btn-secondary:hover, .btn-primary:hover {
+  background: var(--highlight);
+  color: var(--background);
+  border-color: var(--primary);
+}
 
 /* Image Upload Styles (similar to ProjectFormModal) */
 .image-upload { border: 1px solid #d1d5db; border-radius: 6px; overflow: hidden; }

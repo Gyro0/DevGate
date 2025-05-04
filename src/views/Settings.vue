@@ -190,7 +190,7 @@ export default {
 <style scoped>
 .settings-view {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: var(--bg-main);
 }
 
 .main-layout {
@@ -205,38 +205,74 @@ export default {
 }
 
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e5e7eb;
+}
+
+.page-header h1 {
+  color: var(--text-color);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
 }
 
 .settings-section {
-  background-color: #ffffff;
-  border-radius: 8px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  border: 1px solid var(--border-color);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .settings-section h2 {
-  font-size: 1.25rem;
+  color: var(--text-color);
+  font-size: 1.5rem;
   font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid #eee;
+  margin: 0 0 1rem 0;
 }
 
-.loading-state, .error-state {
+.settings-section p {
+  color: var(--text-secondary);
+  margin: 0 0 1rem 0;
+  font-size: 0.95rem;
+}
+
+.error-message {
+  color: var(--error-color);
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: calc(100vh - 64px); /* Full height minus header */
+  min-height: 200px;
+  color: var(--text-secondary);
 }
 
-.error-message {
-  color: #ef4444;
-  margin-top: 1rem;
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--border-color);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 900px) {
+  .settings-section {
+    padding: 1rem;
+  }
 }
 </style>

@@ -141,7 +141,7 @@ export default {
 <style scoped>
 .profile-view {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background: var(--background);
 }
 
 .main-layout {
@@ -163,12 +163,23 @@ export default {
 }
 
 .edit-button {
-  background-color: #4f46e5;
-  color: white;
+  background: var(--primary);
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  padding: 0.6rem 1.2rem;
+  border-radius: 0.7rem;
+  padding: 0.6rem 1.3rem;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 0 8px var(--primary-glow);
   cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.edit-button:hover {
+  background: var(--primary-glow);
+  box-shadow: 0 0 16px 2px var(--primary-glow);
 }
 
 .profile-dashboard-section {
@@ -179,12 +190,14 @@ export default {
 }
 
 .profile-widget {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  background: var(--surface-card);
+  border-radius: 1.1rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.25), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
   min-height: 300px;
   display: flex;
   flex-direction: column;
+  padding: 1.5rem 1.2rem;
+  border: 1.5px solid var(--border-color, #23272e);
 }
 
 .loading-state, .error-state {
@@ -193,5 +206,6 @@ export default {
   align-items: center;
   justify-content: center;
   height: calc(100vh - 64px);
+  color: var(--text-tertiary, #7a869a);
 }
 </style>

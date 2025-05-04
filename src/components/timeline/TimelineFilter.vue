@@ -68,7 +68,7 @@ export default {
 .filter-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 .filter-options {
@@ -82,7 +82,8 @@ export default {
   cursor: pointer;
   font-size: 0.875rem;
   position: relative;
-  padding-left: 1.5rem; /* Space for custom checkbox */
+  padding-left: 1.5rem;
+  color: var(--text-color);
 }
 
 /* Hide default checkbox */
@@ -102,16 +103,16 @@ export default {
   transform: translateY(-50%);
   height: 16px;
   width: 16px;
-  background-color: #fff;
-  border: 1px solid #d1d5db;
+  background-color: var(--bg-darker);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  transition: background-color 0.15s, border-color 0.15s;
+  transition: all 0.15s ease;
 }
 
 /* Style when checked */
 .filter-option input:checked ~ .checkbox-custom {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 /* Checkmark style */
@@ -135,7 +136,11 @@ export default {
 
 /* Optional: Style for active label text */
 .filter-option.active {
-  color: #4f46e5;
+  color: var(--primary-color);
   font-weight: 500;
+}
+
+.filter-option:hover .checkbox-custom {
+  border-color: var(--primary-color);
 }
 </style>

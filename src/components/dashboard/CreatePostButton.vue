@@ -13,29 +13,31 @@ export default {
 
 <style scoped>
 .create-post-btn {
-  display: block; /* Make it block to take width */
-  width: 100%;   /* Full width */
-  background-color: #ffffff;
-  color: #4b5563;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 1rem;
-  font-size: 1rem;
-  font-weight: 500;
+  display: block;
+  width: 100%;
+  background: var(--surface);
+  color: var(--primary);
+  border: 1.5px solid var(--highlight);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
   cursor: pointer;
-  text-align: left; /* Align text left */
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: background-color 0.2s, box-shadow 0.2s;
+  text-align: left;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 2px 16px 0 rgba(30, 203, 225, 0.10);
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s, color 0.2s;
 }
 
 .create-post-btn:hover {
-  background-color: #f9fafb;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 0 24px var(--primary);
+  border-color: var(--primary);
+  background: var(--background);
+  color: var(--secondary);
 }
 
 .create-post-btn i {
   margin-right: 0.75rem;
-  color: #9ca3af;
+  color: var(--highlight);
 }
 </style>

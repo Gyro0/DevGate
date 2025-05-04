@@ -1,0 +1,105 @@
+:root {
+  --background: #161b22;
+  --surface: #21262d;
+  --text: #c9d1d9;
+  --primary: #1ecbe1;
+  --secondary: #ff9900;
+  --border: #30363d;
+  --highlight: #3fd0d4;
+}
+body {
+  background: var(--background);
+  color: var(--text);
+}
+.btn-primary {
+  background-color: var(--primary) !important;
+  border-color: var(--highlight) !important;
+  color: var(--background) !important;
+  box-shadow: 0 0 8px var(--highlight);
+}
+.btn-primary:hover {
+  background-color: var(--secondary) !important;
+  color: var(--background) !important;
+}
+.card {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+/* Navbar */
+.navbar, .navbar-light, .navbar-dark {
+  background: var(--surface) !important;
+  border-bottom: 1.5px solid var(--highlight);
+  box-shadow: 0 2px 12px 0 rgba(30, 203, 225, 0.08);
+}
+.navbar-brand, .navbar-nav .nav-link {
+  color: var(--primary) !important;
+}
+.navbar-nav .nav-link.active {
+  color: var(--secondary) !important;
+}
+
+/* Alerts */
+.alert-primary {
+  background: linear-gradient(90deg, var(--primary) 60%, var(--highlight) 100%);
+  color: var(--background);
+  border: none;
+  box-shadow: 0 0 8px var(--highlight);
+}
+.alert-warning {
+  background: linear-gradient(90deg, var(--secondary) 60%, var(--primary) 100%);
+  color: var(--background);
+  border: none;
+}
+
+/* Forms */
+.form-control {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--highlight);
+}
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--highlight);
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* Circuit-inspired accent for cards */
+.card {
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--secondary), var(--highlight));
+  opacity: 0.7;
+}
+
+/* Techy background effect (optional, for body or a wrapper) */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: repeating-linear-gradient(135deg, rgba(30,203,225,0.04) 0 2px, transparent 2px 40px), repeating-linear-gradient(45deg, rgba(255,153,0,0.03) 0 2px, transparent 2px 40px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* General accent for links */
+a {
+  color: var(--primary);
+  transition: color 0.2s;
+}
+a:hover {
+  color: var(--secondary);
+  text-shadow: 0 0 4px var(--highlight);
+}
+
+/* Add a subtle glow to buttons on focus */
+.btn:focus, .btn:active {
+  box-shadow: 0 0 0 3px var(--highlight), 0 0 8px var(--primary);
+}

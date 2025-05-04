@@ -125,6 +125,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    border: 1px solid var(--border-color);
   }
   
   .chart-container {
@@ -154,19 +159,19 @@
   .completion-percentage {
     font-size: 2rem;
     font-weight: 700;
-    color: #1f2937;
+    color: var(--text-color);
     line-height: 1;
   }
   
   .completion-label {
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 0.5rem;
   }
   
   .completion-counts {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
   }
   
   .chart-loading, .chart-empty {
@@ -176,12 +181,12 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #6b7280;
+    color: var(--text-secondary);
   }
   
   .spinner {
-    border: 3px solid rgba(0, 0, 0, 0.1);
-    border-top: 3px solid #4f46e5;
+    border: 3px solid var(--border-color);
+    border-top: 3px solid var(--primary-color);
     border-radius: 50%;
     width: 24px;
     height: 24px;
@@ -191,7 +196,7 @@
   
   .empty-icon {
     font-size: 2.5rem;
-    color: #e5e7eb;
+    color: var(--text-secondary);
     margin-bottom: 1rem;
   }
   

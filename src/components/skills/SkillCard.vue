@@ -92,16 +92,30 @@ export default {
 
 <style scoped>
 .skill-card {
-  background-color: white;
-  border-radius: 8px;
+  background-color: var(--card-bg);
+  border-radius: 12px;
   padding: 1.25rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  border: 1px solid var(--border-color);
   transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.skill-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  opacity: 0.7;
 }
 
 .skill-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18), 0 0 0 1px var(--primary-color), 0 0 20px rgba(79,70,229,0.15);
 }
 
 .skill-header {
@@ -115,6 +129,7 @@ export default {
   margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
+  color: var(--text-color);
 }
 
 .skill-actions {
@@ -123,32 +138,41 @@ export default {
 }
 
 .action-btn {
-  background: none;
-  border: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
+  background: var(--bg-darker);
+  border: 1px solid var(--border-color);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(79,70,229,0.3);
 }
 
 .edit-btn:hover {
-  background-color: #f3f4f6;
-  color: #4f46e5;
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
 }
 
 .delete-btn:hover {
-  background-color: #fee2e2;
-  color: #ef4444;
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
 }
 
 .skill-category {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
   margin-bottom: 0.75rem;
+  font-weight: 500;
 }
 
 .skill-rating {
@@ -165,19 +189,22 @@ export default {
 
 .stars i {
   margin-right: 0.125rem;
+  filter: drop-shadow(0 0 2px #eab30855);
 }
 
-.stars i.empty {
-  color: #e5e7eb;
+.stars i.fa-star-o {
+  color: var(--border-color);
+  filter: none;
 }
 
 .level-text {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .skill-meta {
-  font-size: 0.875rem;
+  font-size: 0.9rem;
 }
 
 .meta-item {
@@ -187,36 +214,39 @@ export default {
 }
 
 .meta-label {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
 .meta-value {
-  color: #374151;
+  color: var(--text-color);
 }
 
 .skill-notes {
   margin-top: 0.75rem;
+  background: var(--bg-darker);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
 }
 
 .notes-label {
-  color: #6b7280;
-  font-weight: 500;
+  color: var(--primary-color);
+  font-weight: 600;
   margin-bottom: 0.25rem;
   display: block;
 }
 
 .notes-text {
   margin: 0.25rem 0 0 0;
-  color: #374151;
-  line-height: 1.4;
+  color: var(--text-color);
+  line-height: 1.5;
 }
 
 @media (max-width: 640px) {
   .skill-header {
     flex-direction: column;
   }
-  
   .skill-actions {
     margin-top: 0.5rem;
   }

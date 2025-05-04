@@ -117,7 +117,7 @@ export default {
 .event-item {
   display: flex;
   position: relative;
-  padding-bottom: 1.5rem; /* Space between items */
+  padding-bottom: 1.5rem;
 }
 
 .event-item:last-child {
@@ -125,7 +125,7 @@ export default {
 }
 
 .event-item:last-child .marker-line {
-  display: none; /* Hide line for the last item */
+  display: none;
 }
 
 .event-marker {
@@ -143,30 +143,34 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1; /* Ensure icon is above the line */
+  z-index: 1;
+  background-color: var(--bg-darker);
+  border: 1px solid var(--border-color);
 }
 
 .marker-icon i {
   font-size: 0.875rem;
+  color: var(--primary-color);
 }
 
-.event-skill { background-color: #dbeafe; color: #3b82f6; }
-.event-project { background-color: #fef3c7; color: #d97706; }
-.event-objective { background-color: #dcfce7; color: #10b981; }
+.event-skill { background-color: var(--skill-bg); color: var(--skill-color); }
+.event-project { background-color: var(--project-bg); color: var(--project-color); }
+.event-objective { background-color: var(--objective-bg); color: var(--objective-color); }
 
 .marker-line {
   width: 2px;
-  background-color: #e5e7eb;
+  background-color: var(--border-color);
   flex-grow: 1;
-  margin-top: 4px; /* Start line below the icon */
+  margin-top: 4px;
 }
 
 .event-details {
   flex: 1;
-  background-color: white;
+  background-color: var(--card-bg);
   padding: 0.75rem 1rem;
-  border-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  border: 1px solid var(--border-color);
 }
 
 .event-header {
@@ -179,19 +183,19 @@ export default {
 .event-description {
   font-weight: 500;
   font-size: 0.875rem;
-  color: #111827;
+  color: var(--text-color);
 }
 
 .event-time {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-secondary);
   white-space: nowrap;
   margin-left: 1rem;
 }
 
 .event-body {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 </style>

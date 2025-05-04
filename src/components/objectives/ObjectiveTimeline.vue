@@ -78,9 +78,15 @@ export default {
 
 <style scoped>
 .objective-timeline {
-  height: 250px; /* Match the height of completion rate chart */
+  height: 250px;
   position: relative;
   width: 100%;
+  background: var(--surface-card);
+  border-radius: 1.1rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.25), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
+  border: 1.5px solid var(--border-color, #23272e);
+  padding: 1.2rem 1rem;
+  color: var(--text);
 }
 
 .timeline-chart-container {
@@ -94,12 +100,12 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
+  color: var(--text-tertiary, #7a869a);
 }
 
 .spinner {
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top: 3px solid #4f46e5;
+  border: 3px solid rgba(60, 65, 80, 0.18);
+  border-top: 3px solid var(--primary-glow);
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -109,8 +115,9 @@ export default {
 
 .empty-icon {
   font-size: 2rem;
-  color: #d1d5db;
+  color: var(--primary-glow);
   margin-bottom: 1rem;
+  filter: drop-shadow(0 0 6px var(--primary-glow));
 }
 
 @keyframes spin {

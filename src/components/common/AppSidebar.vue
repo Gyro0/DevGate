@@ -86,8 +86,9 @@ export default {
 <style scoped>
 .app-sidebar {
   width: 240px;
-  background-color: #ffffff;
-  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.05);
+  background: var(--surface);
+  box-shadow: 1px 0 8px var(--highlight);
+  border-right: 1.5px solid var(--highlight);
   transition: width 0.3s;
   position: relative;
   min-height: calc(100vh - 64px);
@@ -103,14 +104,21 @@ export default {
   right: -12px;
   width: 24px;
   height: 24px;
-  background-color: #ffffff;
+  background: var(--background);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 8px var(--highlight);
+  border: 1.5px solid var(--highlight);
   cursor: pointer;
   z-index: 1;
+  color: var(--primary);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.sidebar-toggle:hover {
+  border-color: var(--primary);
+  box-shadow: 0 0 12px var(--primary);
 }
 
 .sidebar-content {
@@ -130,10 +138,12 @@ export default {
   display: flex;
   align-items: center;
   padding: 0.75rem 1.5rem;
-  color: #4b5563;
+  color: var(--text);
   text-decoration: none;
   transition: all 0.2s;
   margin: 0.25rem 0;
+  border-radius: 0.75rem;
+  font-weight: 500;
 }
 
 .nav-item i {
@@ -141,6 +151,8 @@ export default {
   margin-right: 1rem;
   min-width: 20px;
   text-align: center;
+  color: var(--highlight);
+  transition: color 0.2s;
 }
 
 .collapsed .nav-item {
@@ -153,19 +165,21 @@ export default {
 }
 
 .nav-item:hover {
-  color: #111827;
-  background-color: #f3f4f6;
+  color: var(--primary);
+  background: rgba(30, 203, 225, 0.08);
+  box-shadow: 0 0 8px var(--highlight);
 }
 
 .nav-item.active {
-  color: #4f46e5;
-  background-color: #eff6ff;
-  font-weight: 500;
+  color: var(--secondary);
+  background: rgba(255, 153, 0, 0.12);
+  font-weight: 700;
+  box-shadow: 0 0 12px var(--secondary);
 }
 
 .sidebar-separator {
   height: 1px;
-  background-color: #e5e7eb;
+  background: var(--border);
   margin: 0.5rem 1rem;
 }
 
@@ -173,14 +187,12 @@ export default {
   .app-sidebar {
     width: 64px;
   }
-  
   .app-sidebar:not(.collapsed) {
     width: 240px;
     position: absolute;
     z-index: 50;
     height: 100vh;
   }
-  
   .sidebar-toggle {
     display: none;
   }

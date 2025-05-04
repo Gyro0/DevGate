@@ -48,19 +48,20 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(22, 27, 34, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1050; /* Ensure it's above other modals if needed */
+  z-index: 1050;
 }
 
 .modal-content {
-  background-color: white;
-  border-radius: 8px;
+  background: var(--surface);
+  border-radius: 1rem;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 32px 0 rgba(30, 203, 225, 0.08), 0 0 0 2px var(--highlight);
+  border: 1.5px solid var(--highlight);
 }
 
 .modal-header {
@@ -68,21 +69,27 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.1rem;
-  color: #111827;
+  color: var(--primary);
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .modal-close {
   background: none;
   border: none;
   font-size: 1.25rem;
-  color: #6b7280;
+  color: var(--highlight);
   cursor: pointer;
+  transition: color 0.2s;
+}
+.modal-close:hover {
+  color: var(--secondary);
 }
 
 .modal-body {
@@ -92,7 +99,7 @@ export default {
 .confirm-message {
   margin: 0;
   font-size: 1rem;
-  color: #374151;
+  color: var(--text);
   line-height: 1.6;
 }
 
@@ -101,37 +108,38 @@ export default {
   justify-content: flex-end;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  background-color: #f9fafb;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
+  border-top: 1px solid var(--border);
+  background: var(--background);
+  border-bottom-left-radius: 1rem;
+  border-bottom-right-radius: 1rem;
 }
 
 .btn-secondary, .btn-danger {
   padding: 0.6rem 1.2rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
+  border: 1.5px solid var(--highlight);
+  background: var(--surface);
+  color: var(--text);
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 8px var(--highlight);
 }
-
-.btn-secondary {
-  background-color: white;
-  color: #4b5563;
-  border: 1px solid #d1d5db;
-}
-
 .btn-secondary:hover {
-  background-color: #f9fafb;
+  background: var(--highlight);
+  color: var(--background);
+  border-color: var(--primary);
 }
-
 .btn-danger {
-  background-color: #ef4444;
-  color: white;
+  background: linear-gradient(90deg, var(--secondary) 60%, var(--primary) 100%);
+  color: var(--background);
   border: none;
+  box-shadow: 0 0 8px var(--secondary);
 }
-
 .btn-danger:hover {
-  background-color: #dc2626;
+  background: var(--primary);
+  color: var(--background);
+  box-shadow: 0 0 12px var(--primary);
 }
 </style>

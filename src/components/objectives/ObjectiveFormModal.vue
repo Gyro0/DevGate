@@ -193,7 +193,6 @@ export default {
 </script>
 
 <style scoped>
-/* Reuse styles from SkillFormModal or create specific ones */
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -208,14 +207,16 @@ export default {
 }
 
 .modal-content {
-  background-color: white;
-  border-radius: 8px;
+  background: var(--surface);
+  border-radius: 1.1rem;
   width: 90%;
-  max-width: 600px; /* Slightly wider for objectives */
+  max-width: 600px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.25), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-color);
 }
 
 .modal-header {
@@ -223,21 +224,26 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1.5px solid var(--border-color);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 1.25rem;
-  color: #111827;
+  color: var(--primary);
+  text-shadow: 0 0 8px var(--primary-glow);
 }
 
 .modal-close {
   background: none;
   border: none;
-  color: #6B7280;
+  color: var(--highlight);
   font-size: 1.25rem;
   cursor: pointer;
+  transition: color 0.18s;
+}
+.modal-close:hover {
+  color: var(--primary-glow);
 }
 
 .modal-body {
@@ -258,27 +264,28 @@ export default {
 
 label {
   display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 1rem;
+  font-weight: 700;
   margin-bottom: 0.5rem;
-  color: #4B5563;
+  color: var(--secondary);
 }
 
 input, select, textarea {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #D1D5DB;
-  border-radius: 6px;
+  border: 1.5px solid var(--border-color);
+  border-radius: 0.7rem;
   font-size: 1rem;
-  background-color: white;
+  background: var(--surface-2);
+  color: var(--text);
+  transition: border-color 0.18s, box-shadow 0.18s;
+  box-shadow: 0 0 8px var(--primary-glow, transparent);
 }
-
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: #4F46E5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 0 2px var(--primary-glow);
 }
-
 select {
   appearance: none;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
@@ -287,7 +294,6 @@ select {
   background-size: 1em 1em;
   padding-right: 2.5rem;
 }
-
 textarea {
   resize: vertical;
   min-height: 80px;
@@ -299,41 +305,46 @@ textarea {
   gap: 1rem;
   margin-top: 1.5rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1.5px solid var(--border-color);
 }
 
 .btn-primary, .btn-secondary {
   padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
 }
 
 .btn-primary {
-  background-color: #4F46E5;
-  color: white;
+  background: var(--primary);
+  color: #fff;
   border: none;
+  box-shadow: 0 0 8px var(--primary-glow);
 }
-
 .btn-primary:hover:not(:disabled) {
-  background-color: #4338CA;
+  background: var(--primary-glow);
+  box-shadow: 0 0 16px 2px var(--primary-glow);
 }
-
 .btn-primary:disabled {
-  background-color: #A5B4FC;
+  background: var(--surface-2);
+  color: var(--highlight);
   cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .btn-secondary {
-  background-color: white;
-  color: #4B5563;
-  border: 1px solid #D1D5DB;
+  background: var(--surface-2);
+  color: var(--primary);
+  border: 1.5px solid var(--primary-glow);
+  box-shadow: 0 0 8px var(--primary-glow);
 }
-
 .btn-secondary:hover {
-  background-color: #F9FAFB;
+  background: var(--primary-glow);
+  color: #fff;
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 16px 2px var(--primary-glow);
 }
 
 @media (max-width: 640px) {

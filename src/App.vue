@@ -20,23 +20,19 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Segoe UI', 'Avenir', Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background: var(--background);
+  min-height: 100vh;
   text-align: center;
-  color: #2c3e50;
+  position: relative;
+  z-index: 1;
 }
 
-nav {
-  padding: 30px;
-}
+/* Remove default nav styles, use Bootstrap's navbar instead */
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+/* Optional: add a subtle fade for router transitions */
+.router-view {
+  transition: opacity 0.3s;
 }
 </style>

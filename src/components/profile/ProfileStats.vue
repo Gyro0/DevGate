@@ -50,30 +50,60 @@
     display: flex;
     justify-content: space-between;
     margin-top: 1.5rem;
+    gap: 1.2rem;
   }
   
   .stat-card {
-    background: white;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: var(--surface-card);
+    border-radius: 1rem;
+    padding: 1.2rem 1rem;
+    box-shadow: 0 2px 16px 0 rgba(0,0,0,0.25), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
+    border: 1.5px solid var(--border-color, #23272e);
     flex: 1;
-    margin: 0 0.5rem;
+    margin: 0;
     text-align: center;
+    color: var(--text);
+    transition: box-shadow 0.18s, border-color 0.18s;
+  }
+  .stat-card:hover {
+    box-shadow: 0 0 24px 2px var(--primary-glow), 0 0 0 2.5px var(--primary-glow);
+    border-color: var(--primary-glow);
   }
   
   .stat-value {
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-shadow: 0 0 8px var(--primary-glow);
   }
   
   .stat-label {
-    font-size: 0.875rem;
-    color: #6b7280;
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-top: 0.2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
   
   .stat-icon {
-    font-size: 1.5rem;
-    margin-top: 0.5rem;
+    font-size: 1.6rem;
+    margin-top: 0.7rem;
+    color: var(--circuit-accent, var(--secondary));
+    filter: drop-shadow(0 0 6px var(--primary-glow));
+  }
+  
+  .skill-icon i { color: var(--primary); }
+  .project-icon i { color: var(--secondary); }
+  .objective-icon i { color: var(--highlight); }
+  .activity-icon i { color: var(--circuit-accent); }
+  
+  @media (max-width: 700px) {
+    .profile-stats {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .stat-card {
+      margin: 0;
+    }
   }
   </style>

@@ -135,6 +135,13 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--surface-card);
+  border-radius: 1rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.35), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
+  border: 1.5px solid var(--border-color, #23272e);
+  padding: 1.5rem 1.25rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .widget-header {
@@ -142,27 +149,39 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color, #23272e);
+  padding-bottom: 0.75rem;
 }
 
 .widget-header h2 {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
 }
 
 .view-all {
-  color: #4f46e5;
+  color: var(--primary);
   text-decoration: none;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  background: var(--primary-fade, rgba(79,70,229,0.08));
+  box-shadow: 0 0 6px 0 var(--primary-glow);
+  transition: background 0.18s, color 0.18s;
 }
 
 .view-all:hover {
-  text-decoration: underline;
+  background: var(--primary-glow);
+  color: #fff;
 }
 
 .skills-content {
   flex: 1;
   display: flex;
+  color: var(--text-secondary);
 }
 
 .skills-data {
@@ -175,12 +194,18 @@ export default {
   height: 200px;
   position: relative;
   margin-bottom: 1.5rem;
+  background: var(--surface-2);
+  border-radius: 0.75rem;
+  box-shadow: 0 0 0 1.5px var(--primary-glow), 0 0 12px 0 var(--circuit-accent-fade, #2e8b57cc);
+  padding: 0.5rem;
 }
+
 .top-skills h3 {
   font-size: 1rem;
   font-weight: 600;
   margin-top: 0;
   margin-bottom: 1rem;
+  color: var(--text-primary);
 }
 
 .skill-list {
@@ -194,15 +219,23 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color, #23272e);
+  transition: background 0.15s;
 }
 
 .skill-item:last-child {
   border-bottom: none;
 }
 
+.skill-item:hover {
+  background: var(--surface-2);
+  box-shadow: 0 0 0 1px var(--primary-glow);
+}
+
 .skill-name {
   font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: 0.01em;
 }
 
 .skill-rating {
@@ -212,17 +245,20 @@ export default {
 }
 
 .stars {
-  color: #fbbf24;
+  color: var(--star-color, #fbbf24);
   margin-bottom: 0.25rem;
+  filter: drop-shadow(0 0 2px var(--primary-glow));
 }
 
 .stars .empty {
-  color: #e5e7eb;
+  color: var(--star-empty, #444a57);
+  opacity: 0.5;
 }
 
 .skill-category {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--text-tertiary, #7a869a);
+  font-style: italic;
 }
 
 .empty-state {
@@ -234,12 +270,16 @@ export default {
   justify-content: center;
   text-align: center;
   padding: 2rem 1rem;
+  background: var(--surface-2);
+  border-radius: 0.75rem;
+  box-shadow: 0 0 0 1.5px var(--primary-glow), 0 0 8px 0 var(--circuit-accent-fade, #2e8b57cc);
 }
 
 .empty-icon {
   font-size: 3rem;
   margin-bottom: 1rem;
-  color: #d1d5db;
+  color: var(--primary-glow);
+  filter: drop-shadow(0 0 6px var(--primary-glow));
 }
 
 .empty-state h3 {
@@ -247,25 +287,30 @@ export default {
   margin-bottom: 0.5rem;
   font-size: 1.125rem;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .empty-state p {
   margin: 0;
   margin-bottom: 1.5rem;
-  color: #6b7280;
+  color: var(--text-tertiary, #7a869a);
   max-width: 24rem;
 }
 
 .add-btn {
   display: inline-flex;
   align-items: center;
-  padding: 0.5rem 1rem;
-  background-color: #4f46e5;
-  color: white;
+  padding: 0.5rem 1.1rem;
+  background: var(--primary);
+  color: #fff;
   border-radius: 0.375rem;
   text-decoration: none;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  font-size: 1rem;
+  box-shadow: 0 0 8px 0 var(--primary-glow);
+  border: none;
+  transition: background 0.18s, box-shadow 0.18s;
+  letter-spacing: 0.01em;
 }
 
 .add-btn i {
@@ -273,7 +318,9 @@ export default {
 }
 
 .add-btn:hover {
-  background-color: #4338ca;
+  background: var(--primary-glow);
+  color: #fff;
+  box-shadow: 0 0 16px 2px var(--primary-glow);
 }
 
 .loading-state {
@@ -282,13 +329,13 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: #6b7280;
-  font-size: 0.875rem;
+  color: var(--text-tertiary, #7a869a);
+  font-size: 0.95rem;
 }
 
 .spinner {
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-top: 3px solid #4f46e5;
+  border: 3px solid rgba(60, 65, 80, 0.18);
+  border-top: 3px solid var(--primary-glow);
   border-radius: 50%;
   width: 24px;
   height: 24px;

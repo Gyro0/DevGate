@@ -155,84 +155,102 @@ export default {
   align-items: center;
   justify-content: center;
   padding: 3rem 2rem;
-  background-color: white;
-  border-radius: 8px;
+  background-color: var(--card-bg);
+  border-radius: 12px;
   text-align: center;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .empty-icon {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background-color: #f3f4f6;
+  background-color: var(--bg-darker);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
+  border: 1px solid var(--border-color);
 }
 
 .empty-icon i {
   font-size: 1.5rem;
-  color: #9ca3af;
+  color: var(--primary-color);
 }
 
 .empty-state h3 {
   margin: 0 0 0.5rem 0;
-  color: #374151;
+  color: var(--text-color);
+  font-weight: 600;
 }
 
 .empty-state p {
-  color: #6b7280;
+  color: var(--text-secondary);
   margin: 0;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
 }
 
 .projects-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
-  border-radius: 8px;
+  background-color: var(--card-bg);
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-color);
 }
 
 .projects-table th, 
 .projects-table td {
-  padding: 1rem;
+  padding: 1.25rem;
   text-align: left;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .projects-table th {
-  background-color: #f9fafb;
-  color: #4b5563;
-  font-weight: 500;
-  font-size: 0.875rem;
+  background-color: var(--bg-darker);
+  color: var(--text-color);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .projects-table tr:last-child td {
   border-bottom: none;
 }
 
+.projects-table tr:hover {
+  background-color: var(--bg-darker);
+}
+
 .project-cell {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   width: 40%;
 }
 
 .project-thumb {
   width: 48px;
   height: 48px;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-darker);
 }
 
 .project-thumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.projects-table tr:hover .project-thumb img {
+  transform: scale(1.05);
 }
 
 .project-info {
@@ -240,16 +258,20 @@ export default {
 }
 
 .project-title {
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
+  color: var(--text-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 0.25rem;
 }
 
 .project-description {
-  font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .tech-cell {
@@ -263,94 +285,115 @@ export default {
 }
 
 .tech-tag {
-  background-color: #f3f4f6;
-  color: #4b5563;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  white-space: nowrap;
+  background-color: var(--bg-darker);
+  color: var(--text-color);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.tech-tag:hover {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
 }
 
 .tech-more {
-  background-color: #e5e7eb;
-  color: #6b7280;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
+  background-color: var(--bg-darker);
+  color: var(--text-secondary);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  border: 1px solid var(--border-color);
 }
 
 .date-cell {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
   width: 15%;
-  font-size: 0.875rem;
-  color: #6b7280;
 }
 
 .status-cell {
-  width: 10%;
+  width: 15%;
 }
 
 .status-badge {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  text-align: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .status-active {
-  background-color: #dcfce7;
-  color: #16a34a;
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
 }
 
 .status-completed {
-  background-color: #dbeafe;
-  color: #2563eb;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
 }
 
 .status-paused {
-  background-color: #fef3c7;
-  color: #d97706;
+  background-color: rgba(234, 179, 8, 0.1);
+  color: #eab308;
 }
 
 .status-archived {
-  background-color: #f3f4f6;
+  background-color: rgba(107, 114, 128, 0.1);
   color: #6b7280;
 }
 
 .actions-cell {
   width: 10%;
-  white-space: nowrap;
-  text-align: right;
 }
 
 .action-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  display: inline-flex;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  border: none;
+  background: var(--bg-darker);
+  border: 1px solid var(--border-color);
   cursor: pointer;
-  color: #6b7280;
-  margin-left: 0.25rem;
+  transition: all 0.3s ease;
+  color: var(--text-color);
+  margin-right: 0.5rem;
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(79, 70, 229, 0.3);
 }
 
 .edit-btn:hover {
-  background-color: #f3f4f6;
-  color: #4f46e5;
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
 }
 
 .delete-btn:hover {
-  background-color: #fee2e2;
-  color: #ef4444;
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .projects-table {
     display: block;
     overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .projects-table th,
+  .projects-table td {
+    min-width: 200px;
   }
 }
 </style>

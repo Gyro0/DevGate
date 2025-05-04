@@ -243,6 +243,12 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--surface);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px 0 rgba(30, 203, 225, 0.10), 0 0 0 2px var(--highlight);
+  border: 1.5px solid var(--highlight);
+  padding: 2rem 1.5rem;
+  color: var(--text);
 }
 
 .widget-header {
@@ -255,18 +261,23 @@ export default {
 .widget-header h2 {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px var(--highlight);
 }
 
 .view-all {
-  font-size: 0.875rem;
-  color: #4f46e5;
+  font-size: 0.95rem;
+  color: var(--highlight);
   text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
 }
 
 .view-all:hover {
   text-decoration: underline;
+  color: var(--secondary);
 }
 
 .objectives-content {
@@ -293,15 +304,16 @@ export default {
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: conic-gradient(#4f46e5 0%, #4f46e5 calc(var(--percentage) * 1%), #e5e7eb calc(var(--percentage) * 1%), #e5e7eb 100%);
+  background: conic-gradient(var(--primary) 0%, var(--primary) calc(var(--percentage) * 1%), var(--highlight) calc(var(--percentage) * 1%), var(--highlight) 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
-  font-size: 0.875rem;
-  color: #4b5563;
+  font-size: 0.95rem;
+  color: var(--text);
   --percentage: v-bind(completionPercentage);
+  box-shadow: 0 0 12px var(--highlight);
 }
 
 .progress-circle::before {
@@ -309,7 +321,7 @@ export default {
   position: absolute;
   inset: 8px;
   border-radius: 50%;
-  background: white;
+  background: var(--surface);
 }
 
 .progress-value, .progress-label {
@@ -320,7 +332,7 @@ export default {
 .progress-value {
   font-size: 1.25rem;
   font-weight: bold;
-  color: #111827;
+  color: var(--primary);
 }
 
 .status-summary {
@@ -341,11 +353,11 @@ export default {
 }
 
 .status-dot.planned {
-  background-color: #9ca3af;
+  background-color: var(--highlight);
 }
 
 .status-dot.in-progress {
-  background-color: #3b82f6;
+  background-color: var(--primary);
 }
 
 .status-dot.completed {
@@ -354,18 +366,20 @@ export default {
 
 .status-label {
   flex: 1;
-  font-size: 0.875rem;
-  color: #4b5563;
+  font-size: 0.95rem;
+  color: var(--text);
 }
 
 .status-count {
   font-weight: bold;
-  color: #111827;
+  color: var(--primary);
 }
 
 h3 {
   font-size: 1rem;
   margin: 1rem 0 0.5rem;
+  color: var(--primary);
+  font-weight: 700;
 }
 
 .objectives-list {
@@ -379,7 +393,7 @@ h3 {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1.5px solid var(--border);
 }
 
 .objective-item:last-child {
@@ -387,30 +401,30 @@ h3 {
 }
 
 .objective-title {
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
+  color: var(--primary);
   margin-bottom: 0.25rem;
 }
 
 .objective-details {
   display: flex;
   gap: 1rem;
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 0.95rem;
+  color: var(--highlight);
 }
 
 .objective-status {
   display: inline-flex;
   align-items: center;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .objective-status.status-planned {
-  color: #9ca3af;
+  color: var(--highlight);
 }
 
 .objective-status.status-in-progress {
-  color: #3b82f6;
+  color: var(--primary);
 }
 
 .objective-status.status-completed {
@@ -422,19 +436,19 @@ h3 {
 }
 
 .view-objective {
-  color: #9ca3af;
+  color: var(--highlight);
   display: flex;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  transition: background-color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .view-objective:hover {
-  background-color: #f3f4f6;
-  color: #4f46e5;
+  background: var(--highlight);
+  color: var(--background);
 }
 
 .loading-state, .error-state, .empty-state {
@@ -445,15 +459,15 @@ h3 {
   height: 100%;
   padding: 1.5rem;
   text-align: center;
-  color: #6b7280;
+  color: var(--highlight);
 }
 
 .spinner {
   width: 24px;
   height: 24px;
-  border: 3px solid rgba(99, 102, 241, 0.2);
+  border: 3px solid rgba(63, 208, 212, 0.15);
   border-radius: 50%;
-  border-top-color: #6366f1;
+  border-top-color: var(--primary);
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
@@ -461,7 +475,7 @@ h3 {
 .error-icon, .empty-icon {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #d1d5db;
+  color: var(--highlight);
 }
 
 .error-state p {
@@ -473,18 +487,22 @@ h3 {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: var(--highlight);
+  border: 1.5px solid var(--primary);
   border-radius: 0.375rem;
-  color: #4b5563;
-  font-size: 0.875rem;
+  color: var(--background);
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
   text-decoration: none;
+  box-shadow: 0 0 8px var(--highlight);
 }
 
 .retry-btn:hover, .add-btn:hover {
-  background-color: #e5e7eb;
+  background: var(--primary);
+  color: var(--background);
+  border-color: var(--highlight);
 }
 
 @keyframes spin {

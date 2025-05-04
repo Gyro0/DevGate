@@ -230,6 +230,12 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background: var(--surface);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 24px 0 rgba(30, 203, 225, 0.10), 0 0 0 2px var(--highlight);
+  border: 1.5px solid var(--highlight);
+  padding: 2rem 1.5rem;
+  color: var(--text);
 }
 
 .widget-header {
@@ -242,18 +248,23 @@ export default {
 .widget-header h2 {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 600;
-  color: #111827;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px var(--highlight);
 }
 
 .view-all {
-  font-size: 0.875rem;
-  color: #4f46e5;
+  font-size: 0.95rem;
+  color: var(--highlight);
   text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s;
 }
 
 .view-all:hover {
   text-decoration: underline;
+  color: var(--secondary);
 }
 
 .projects-content {
@@ -268,22 +279,24 @@ export default {
 }
 
 .stat-box {
-  background-color: #f3f4f6;
+  background: var(--background);
   border-radius: 8px;
   flex: 1;
   padding: 0.75rem;
   text-align: center;
+  box-shadow: 0 0 8px var(--highlight);
+  border: 1.5px solid var(--highlight);
 }
 
 .stat-value {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #111827;
+  color: var(--primary);
 }
 
 .stat-label {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 0.85rem;
+  color: var(--highlight);
   margin-top: 0.25rem;
 }
 
@@ -298,7 +311,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1.5px solid var(--border);
 }
 
 .project-item:last-child {
@@ -306,26 +319,26 @@ export default {
 }
 
 .project-name {
-  font-weight: 500;
-  color: #111827;
+  font-weight: 600;
+  color: var(--primary);
   margin-bottom: 0.25rem;
 }
 
 .project-details {
   display: flex;
   gap: 1rem;
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 0.95rem;
+  color: var(--highlight);
 }
 
 .project-status {
   display: inline-flex;
   align-items: center;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .status-active, .status-in-progress {
-  color: #2563eb;
+  color: var(--primary);
 }
 
 .status-completed {
@@ -333,27 +346,27 @@ export default {
 }
 
 .status-paused {
-  color: #f59e0b;
+  color: var(--secondary);
 }
 
 .status-archived {
-  color: #6b7280;
+  color: var(--highlight);
 }
 
 .view-project {
-  color: #9ca3af;
+  color: var(--highlight);
   display: flex;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  transition: background-color 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .view-project:hover {
-  background-color: #f3f4f6;
-  color: #4f46e5;
+  background: var(--highlight);
+  color: var(--background);
 }
 
 .loading-state, .error-state, .empty-state {
@@ -364,15 +377,15 @@ export default {
   height: 100%;
   padding: 1.5rem;
   text-align: center;
-  color: #6b7280;
+  color: var(--highlight);
 }
 
 .spinner {
   width: 24px;
   height: 24px;
-  border: 3px solid rgba(99, 102, 241, 0.2);
+  border: 3px solid rgba(63, 208, 212, 0.15);
   border-radius: 50%;
-  border-top-color: #6366f1;
+  border-top-color: var(--primary);
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
@@ -380,7 +393,7 @@ export default {
 .error-icon, .empty-icon {
   font-size: 2rem;
   margin-bottom: 1rem;
-  color: #d1d5db;
+  color: var(--highlight);
 }
 
 .error-state p {
@@ -392,18 +405,22 @@ export default {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
+  background: var(--highlight);
+  border: 1.5px solid var(--primary);
   border-radius: 0.375rem;
-  color: #4b5563;
-  font-size: 0.875rem;
+  color: var(--background);
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
   text-decoration: none;
+  box-shadow: 0 0 8px var(--highlight);
 }
 
 .retry-btn:hover, .add-btn:hover {
-  background-color: #e5e7eb;
+  background: var(--primary);
+  color: var(--background);
+  border-color: var(--highlight);
 }
 
 @keyframes spin {

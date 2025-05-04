@@ -124,6 +124,12 @@ export default {
 .skill-progress-chart {
   position: relative;
   height: 300px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  border: 1px solid var(--border-color);
+  padding: 1.5rem 1rem 1rem 1rem;
+  overflow: hidden;
 }
 
 .no-data-message {
@@ -135,7 +141,9 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #9CA3AF;
-  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  background: var(--card-bg);
+  border-radius: 12px;
 }
 </style>

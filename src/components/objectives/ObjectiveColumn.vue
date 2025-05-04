@@ -98,33 +98,44 @@ export default {
 
 <style scoped>
 .objective-column {
-  background-color: #f9fafb;
-  border-radius: 8px;
-  padding: 1rem;
+  background: var(--surface);
+  border-radius: 1.1rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.18), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
+  padding: 1.2rem 1rem;
   display: flex;
   flex-direction: column;
+  border: 1.5px solid var(--border-color);
 }
 
 .column-title {
   font-size: 1.1rem;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0 0 1rem 0;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1.5px solid var(--border-color);
+  color: var(--primary);
+  text-shadow: 0 0 8px var(--primary-glow);
 }
 
 .column-content {
   flex: 1;
   overflow-y: auto;
-  padding-right: 0.5rem; /* For scrollbar */
+  padding-right: 0.5rem;
 }
 
 .objective-card {
-  background-color: #ffffff;
-  border-radius: 6px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  background: var(--surface);
+  border-radius: 0.8rem;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.14), 0 0 0 1.5px var(--primary-glow);
   padding: 1rem;
   margin-bottom: 1rem;
+  border: 1.5px solid var(--border-color);
+  color: var(--text-color);
+  transition: box-shadow 0.18s, border-color 0.18s;
+}
+.objective-card:hover {
+  box-shadow: 0 0 16px 2px var(--primary-glow);
+  border-color: var(--primary-glow);
 }
 
 .card-header {
@@ -135,11 +146,13 @@ export default {
 }
 
 .objective-title {
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.08rem;
+  font-weight: 700;
   margin: 0;
   flex: 1;
   margin-right: 0.5rem;
+  color: var(--secondary);
+  text-shadow: 0 0 8px var(--primary-glow);
 }
 
 .card-actions {
@@ -151,25 +164,24 @@ export default {
   background: none;
   border: none;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--highlight);
   padding: 0.25rem;
+  font-size: 1.1rem;
+  transition: color 0.18s;
 }
-
 .action-btn:hover {
-  color: #111827;
+  color: var(--primary-glow);
 }
-
 .edit-btn:hover {
-  color: #4f46e5;
+  color: var(--primary);
 }
-
 .delete-btn:hover {
-  color: #ef4444;
+  color: #ff4d4f;
 }
 
 .objective-description {
-  font-size: 0.875rem;
-  color: #4b5563;
+  font-size: 0.97rem;
+  color: var(--text-secondary);
   margin-bottom: 1rem;
   line-height: 1.5;
 }
@@ -178,8 +190,8 @@ export default {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 0.85rem;
+  color: var(--highlight);
   margin-bottom: 1rem;
 }
 
@@ -192,7 +204,7 @@ export default {
   margin-right: 0.3rem;
 }
 
-.priority-high { color: #ef4444; }
+.priority-high { color: #ff4d4f; }
 .priority-medium { color: #f59e0b; }
 .priority-low { color: #10b981; }
 
@@ -202,20 +214,27 @@ export default {
 
 .progress-section label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   margin-bottom: 0.25rem;
-  color: #6b7280;
+  color: var(--highlight);
 }
 
 .progress-slider {
   width: 100%;
   cursor: pointer;
+  accent-color: var(--primary);
+  background: var(--surface-card);
+  border-radius: 1rem;
+  height: 4px;
+  margin-top: 0.2rem;
 }
 
 .empty-column {
   text-align: center;
-  color: #9ca3af;
-  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
   padding: 2rem 0;
+  background: transparent;
+  border-radius: 0.8rem;
 }
 </style>

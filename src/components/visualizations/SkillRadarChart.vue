@@ -152,10 +152,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    border: 1px solid var(--border-color);
   }
   
   .no-data-message {
-    color: #9CA3AF;
+    color: var(--text-secondary);
     font-size: 0.875rem;
     text-align: center;
   }

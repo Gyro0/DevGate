@@ -55,8 +55,14 @@ export default {
 
 <style scoped>
 .completion-rate-chart {
-  height: 250px; /* Ensure height is defined */
+  height: 250px;
   position: relative;
-  width: 100%; /* Make sure it takes full width */
+  width: 100%;
+  background: var(--surface-card);
+  border-radius: 1.1rem;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.25), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
+  border: 1.5px solid var(--border-color, #23272e);
+  padding: 1.2rem 1rem;
+  color: var(--text);
 }
 </style>

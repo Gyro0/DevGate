@@ -175,7 +175,7 @@ export default {
 <style scoped>
 .timeline-view {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: var(--bg-main);
 }
 
 .main-layout {
@@ -193,12 +193,20 @@ export default {
   margin-bottom: 1.5rem;
 }
 
+.page-header h1 {
+  color: var(--text-color);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
 .filter-bar {
   margin-bottom: 1.5rem;
-  background: white;
+  background: var(--card-bg);
   padding: 1rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  border: 1px solid var(--border-color);
 }
 
 .timeline-chart-section {
@@ -206,19 +214,19 @@ export default {
 }
 
 .chart-card {
-  background: white;
-  border-radius: 8px;
+  background: var(--card-bg);
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  border: 1px solid var(--border-color);
   height: 300px;
 }
 
 .chart-card h3 {
-  font-size: 1.125rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: #374151;
+  margin: 0 0 1rem 0;
+  color: var(--text-color);
 }
 
 .timeline-content {
@@ -232,8 +240,8 @@ export default {
 .month-title {
   margin-bottom: 1rem;
   font-size: 1.25rem;
-  color: #4b5563;
-  border-bottom: 1px solid #e5e7eb;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
 }
 
@@ -246,7 +254,7 @@ export default {
 .empty-state {
   text-align: center;
   padding: 3rem 0;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .action-buttons {
@@ -259,17 +267,20 @@ export default {
 .action-btn {
   display: inline-flex;
   align-items: center;
-  padding: 0.5rem 1rem;
-  background-color: #4f46e5;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary-color);
   color: white;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
+  border-radius: 8px;
+  font-size: 1rem;
   font-weight: 500;
   text-decoration: none;
-  transition: background-color 0.2s;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.12);
+  transition: all 0.3s ease;
 }
 
 .action-btn:hover {
-  background-color: #4338ca;
+  background-color: var(--primary-color-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.18);
 }
 </style>

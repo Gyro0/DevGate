@@ -75,28 +75,32 @@ export default {
   gap: 0.75rem;
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-  position: relative; /* For absolute positioning of button */
+  border-top: 1.5px solid var(--highlight);
+  position: relative;
 }
 .comment-avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
   margin-top: 0.25rem;
+  border: 2px solid var(--highlight);
+  box-shadow: 0 0 8px var(--highlight);
+  background: var(--background);
 }
 .input-wrapper {
   flex: 1;
   position: relative;
   display: flex;
-  align-items: flex-end; /* Align button with bottom */
-  border: 1px solid #d1d5db;
-  border-radius: 1.5rem; /* Pill shape */
-  padding: 0.3rem 0.5rem 0.3rem 1rem; /* Adjust padding */
-  background-color: #fff;
+  align-items: flex-end;
+  border: 1.5px solid var(--highlight);
+  border-radius: 1.5rem;
+  padding: 0.3rem 0.5rem 0.3rem 1rem;
+  background: var(--surface);
+  box-shadow: 0 0 8px var(--highlight);
 }
 .input-wrapper:focus-within {
-   border-color: #4f46e5;
-   box-shadow: 0 0 0 1px #4f46e5;
+   border-color: var(--primary);
+   box-shadow: 0 0 0 2px var(--highlight);
 }
 
 textarea {
@@ -104,55 +108,62 @@ textarea {
   border: none;
   outline: none;
   resize: none;
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   line-height: 1.4;
   background: none;
-  padding: 0.25rem 0; /* Minimal vertical padding */
-  max-height: 150px; /* Limit max height */
-  overflow-y: auto; /* Allow scrolling if needed */
-  align-self: center; /* Center text vertically */
+  color: var(--text);
+  padding: 0.25rem 0;
+  max-height: 150px;
+  overflow-y: auto;
+  align-self: center;
 }
 textarea:disabled {
-  background-color: #f9fafb;
+  background: var(--background);
   cursor: not-allowed;
 }
 
 .submit-btn {
-  background-color: #4f46e5;
-  color: white;
-  border: none;
-  border-radius: 1rem; /* Pill shape */
+  background: var(--primary);
+  color: var(--background);
+  border: 1.5px solid var(--highlight);
+  border-radius: 1rem;
   padding: 0.4rem 1rem;
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-left: 0.5rem; /* Space between textarea and button */
-  height: fit-content; /* Match height to content */
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  margin-left: 0.5rem;
+  height: fit-content;
+  box-shadow: 0 0 8px var(--highlight);
 }
 .submit-btn:disabled {
-  background-color: #a5b4fc;
+  background: var(--surface);
+  color: var(--highlight);
   cursor: not-allowed;
+  opacity: 0.7;
 }
 .submit-btn:hover:not(:disabled) {
-  background-color: #4338ca;
+  background: var(--secondary);
+  color: var(--background);
+  border-color: var(--primary);
+  box-shadow: 0 0 12px var(--primary);
 }
 .error-message {
   color: #ef4444;
   font-size: 0.75rem;
   position: absolute;
   bottom: -1.5rem;
-  left: 50px; /* Align with input area */
+  left: 50px;
 }
 .login-prompt {
    font-size: 0.8rem;
-   color: #6b7280;
+   color: var(--highlight);
    margin-top: 0.5rem;
    width: 100%;
    text-align: center;
 }
 .login-prompt a {
-   color: #4f46e5;
+   color: var(--primary);
    text-decoration: underline;
 }
 

@@ -126,19 +126,118 @@ export default {
 </script>
 
 <style scoped>
-/* Keep existing styles for dashboard-view, main-layout, feed-layout */
-.dashboard-view { min-height: 100vh; background-color: #f8f9fa; }
-.main-layout { display: flex; min-height: calc(100vh - 64px); }
-.content-area.feed-layout { flex: 1; padding: 1.5rem; overflow-y: auto; max-width: 700px; margin: 0 auto; }
+.dashboard-view {
+  min-height: 100vh;
+  background: var(--background);
+}
+.main-layout {
+  display: flex;
+  min-height: calc(100vh - 64px);
+}
+.content-area.feed-layout {
+  flex: 1;
+  padding: 3rem 1.5rem 3rem 1.5rem;
+  overflow-y: auto;
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+}
+.feed-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: rgba(22, 27, 34, 0.92);
+  border-radius: 2rem;
+  box-shadow: 0 8px 32px 0 rgba(30, 203, 225, 0.12);
+  padding: 2.5rem 2.5rem 2.5rem 2.5rem;
+  border: 1.5px solid var(--border);
+  min-height: 60vh;
+}
+.feed-container h2 {
+  font-size: 2rem;
+  margin-bottom: 2.5rem;
+  color: var(--primary);
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 18px var(--highlight);
+  align-self: center;
+}
+.create-post-btn, .create-post-card {
+  background: var(--surface);
+  border-radius: 1rem;
+  box-shadow: 0 2px 16px 0 rgba(30, 203, 225, 0.10);
+  border: 1.5px solid var(--highlight);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 2.5rem;
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  color: var(--primary);
+  font-weight: 700;
+  cursor: pointer;
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+}
+.create-post-btn:hover, .create-post-card:hover {
+  box-shadow: 0 0 24px var(--primary);
+  border-color: var(--primary);
+  background: var(--background);
+}
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  width: 100%;
+}
 
-/* Styles for feed container */
-.feed-container h2 { font-size: 1.25rem; margin-bottom: 1rem; color: #374151; font-weight: 600; }
-.post-list { display: flex; flex-direction: column; gap: 1.5rem; }
-
-/* Loading/Error/Empty States (mostly unchanged) */
-.loading-state, .error-state, .empty-state { text-align: center; padding: 3rem 1rem; color: #6b7280; background-color: #fff; border-radius: 8px; border: 1px solid #e5e7eb; display: flex; flex-direction: column; align-items: center; gap: 0.75rem; }
-.loading-state .spinner { width: 24px; height: 24px; border: 3px solid rgba(79, 70, 229, 0.2); border-radius: 50%; border-top-color: #4f46e5; animation: spin 1s linear infinite; }
-.error-state i, .empty-state i { font-size: 2rem; color: #d1d5db; }
-.retry-btn { background-color: #e5e7eb; color: #374151; border: none; border-radius: 6px; padding: 0.5rem 1rem; font-size: 0.85rem; cursor: pointer; }
+.loading-state, .error-state, .empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text);
+  background: var(--surface);
+  border-radius: 1rem;
+  border: 1.5px solid var(--highlight);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 0 16px var(--highlight);
+}
+.loading-state .spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(63, 208, 212, 0.15);
+  border-radius: 50%;
+  border-top-color: var(--primary);
+  border-left-color: var(--secondary);
+  background: transparent;
+  box-shadow: 0 0 8px var(--highlight);
+  animation: spin 1s linear infinite;
+}
+.error-state i, .empty-state i {
+  font-size: 2rem;
+  color: var(--highlight);
+}
+.retry-btn {
+  background: var(--highlight);
+  color: var(--background);
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--highlight);
+  transition: background 0.2s, color 0.2s;
+}
+.retry-btn:hover {
+  background: var(--primary);
+  color: var(--background);
+}
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>

@@ -76,43 +76,48 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #6b7280;
+  color: var(--highlight);
 }
 .vote-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 1rem; /* Pill shape */
+  background: var(--background);
+  border: 1.5px solid var(--highlight);
+  border-radius: 1rem;
   padding: 0.25rem 0.75rem;
-  font-size: 0.8rem;
-  color: #4b5563;
+  font-size: 0.9rem;
+  color: var(--text);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 8px var(--highlight);
 }
 .vote-btn:hover:not(.disabled) {
-  background-color: #e5e7eb;
-  border-color: #d1d5db;
+  background: var(--highlight);
+  color: var(--background);
+  border-color: var(--primary);
+  box-shadow: 0 0 12px var(--primary);
 }
 .vote-btn.disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 .vote-btn .count {
-  font-weight: 500;
-  min-width: 10px; /* Ensure space for number */
+  font-weight: 600;
+  min-width: 10px;
   text-align: center;
 }
 .vote-btn.upvote.active {
-  background-color: #dbeafe; /* Light blue */
-  border-color: #93c5fd;
-  color: #2563eb;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--background);
+  box-shadow: 0 0 12px var(--primary);
 }
 .vote-btn.downvote.active {
-  background-color: #fee2e2; /* Light red */
-  border-color: #fca5a5;
-  color: #dc2626;
+  background: var(--secondary);
+  border-color: var(--secondary);
+  color: var(--background);
+  box-shadow: 0 0 12px var(--secondary);
 }
 .vote-error {
   color: #ef4444;
