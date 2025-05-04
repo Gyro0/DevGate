@@ -1,66 +1,88 @@
 <template>
-  <div class="objectives-view">
+  <div class="objectives-view bg-light min-vh-100">
     <AppHeader />
-    <div class="main-layout">
-      <AppSidebar :active-page="'objectives'" />
-      
-      <div class="content-area">
-        <div class="page-header">
-          <h1>My Objectives</h1>
-          <button class="btn-primary" @click="showAddObjectiveModal = true">
-            <span class="icon">+</span> Add Objective
-          </button>
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 bg-white p-0">
+          <AppSidebar :active-page="'objectives'" />
         </div>
-        
-        <div class="charts-section">
-          <div class="chart-card">
-            <h3>Completion Rate</h3>
-            <ObjectiveCompletionRate :objectives="objectives" />
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 py-4">
+          <!-- Page Header -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h4 fw-bold">My Objectives</h1>
+            <button class="btn btn-primary" @click="showAddObjectiveModal = true">
+              <i class="fas fa-plus me-2"></i> Add Objective
+            </button>
           </div>
-          
-          <div class="chart-card">
-            <h3>Objective Timeline</h3>
-            <ObjectiveTimeline :objectives="objectives" />
+
+          <!-- Charts Section -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <div class="card shadow-sm border-0">
+                <div class="card-body">
+                  <h5 class="card-title fw-bold">Completion Rate</h5>
+                  <ObjectiveCompletionRate :objectives="objectives" />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="card shadow-sm border-0">
+                <div class="card-body">
+                  <h5 class="card-title fw-bold">Objective Timeline</h5>
+                  <ObjectiveTimeline :objectives="objectives" />
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        
-        <div class="objectives-board">
-          <div class="kanban-columns">
-            <ObjectiveColumn 
-              title="Planned"
-              :objectives="plannedObjectives"
-              @edit="editObjective"
-              @delete="confirmDeleteObjective"
-              @update-progress="updateObjectiveProgress"
-            />
-            
-            <ObjectiveColumn 
-              title="In Progress"
-              :objectives="inProgressObjectives"
-              @edit="editObjective"
-              @delete="confirmDeleteObjective"
-              @update-progress="updateObjectiveProgress"
-            />
-            
-            <ObjectiveColumn 
-              title="Completed"
-              :objectives="completedObjectives"
-              @edit="editObjective"
-              @delete="confirmDeleteObjective"
-              @update-progress="updateObjectiveProgress"
-            />
+
+          <!-- Objectives Board -->
+          <div class="card shadow-sm border-0">
+            <div class="card-body">
+              <div class="row g-4">
+                <div class="col-md-4">
+                  <ObjectiveColumn
+                    title="Planned"
+                    :objectives="plannedObjectives"
+                    @edit="editObjective"
+                    @delete="confirmDeleteObjective"
+                    @update-progress="updateObjectiveProgress"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <ObjectiveColumn
+                    title="In Progress"
+                    :objectives="inProgressObjectives"
+                    @edit="editObjective"
+                    @delete="confirmDeleteObjective"
+                    @update-progress="updateObjectiveProgress"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <ObjectiveColumn
+                    title="Completed"
+                    :objectives="completedObjectives"
+                    @edit="editObjective"
+                    @delete="confirmDeleteObjective"
+                    @update-progress="updateObjectiveProgress"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-    
+
+    <!-- Modals -->
     <ObjectiveFormModal
       v-if="showAddObjectiveModal"
       :objective="selectedObjective"
       @save="saveObjective"
       @close="closeObjectiveModal"
     />
-    
     <ConfirmDialog
       v-if="showDeleteConfirm"
       :message="`Delete objective '${objectiveToDelete?.title}'?`"
@@ -91,19 +113,19 @@ export default {
     ObjectiveCompletionRate,
     ObjectiveTimeline,
     ObjectiveFormModal,
-    ConfirmDialog
+    ConfirmDialog,
   },
   setup() {
-    const { 
-      objectives, 
+    const {
+      objectives,
       plannedObjectives,
-      inProgressObjectives, 
+      inProgressObjectives,
       completedObjectives,
-      fetchUserObjectives, 
-      addObjective, 
-      updateObjective, 
+      fetchUserObjectives,
+      addObjective,
+      updateObjective,
       deleteObjective: removeObjective,
-      updateProgress
+      updateProgress,
     } = useObjectives();
 
     const { recordEvent } = useTimeline();
@@ -118,19 +140,16 @@ export default {
       await fetchUserObjectives();
     });
 
-    // Open edit modal for an objective
     const editObjective = (objective) => {
       selectedObjective.value = { ...objective };
       showAddObjectiveModal.value = true;
     };
 
-    // Initialize deletion process for an objective
     const confirmDeleteObjective = (objective) => {
       objectiveToDelete.value = objective;
       showDeleteConfirm.value = true;
     };
 
-    // Delete the objective after confirmation
     const deleteObjective = async () => {
       try {
         await removeObjective(objectiveToDelete.value.id);
@@ -142,15 +161,12 @@ export default {
       }
     };
 
-    // Save new or updated objective
     const saveObjective = async (objectiveData) => {
       try {
         if (selectedObjective.value?.id) {
-          // Update existing objective
           const updated = await updateObjective(selectedObjective.value.id, objectiveData);
           await recordEvent('objective', 'updated', updated.id, updated);
         } else {
-          // Add new objective
           const created = await addObjective(objectiveData);
           await recordEvent('objective', 'added', created.id, created);
         }
@@ -160,21 +176,15 @@ export default {
       }
     };
 
-    // Update objective progress
     const updateObjectiveProgress = async (objectiveId, progress) => {
       try {
         const updatedObjective = await updateProgress(objectiveId, progress);
-        
-        // If objective is completed, record a 'completed' event
-        // Check status from the returned updated objective or refetch/find
-        if (updatedObjective?.status === 'completed' || progress >= 100) { 
-          const objective = objectives.value.find(o => o.id === objectiveId) || updatedObjective;
+        if (updatedObjective?.status === 'completed' || progress >= 100) {
+          const objective = objectives.value.find((o) => o.id === objectiveId) || updatedObjective;
           if (objective) {
-             // Avoid duplicate 'completed' events if status was already 'completed'
-             // This check might need refinement based on how updateProgress handles status changes
-             if (objective.status !== 'completed' || progress >= 100) { 
-                await recordEvent('objective', 'completed', objectiveId, objective);
-             }
+            if (objective.status !== 'completed' || progress >= 100) {
+              await recordEvent('objective', 'completed', objectiveId, objective);
+            }
           }
         }
       } catch (error) {
@@ -182,13 +192,11 @@ export default {
       }
     };
 
-    // Close objective modal and reset selection
     const closeObjectiveModal = () => {
       selectedObjective.value = null;
       showAddObjectiveModal.value = false;
     };
 
-    // Return reactive state and methods
     return {
       objectives,
       plannedObjectives,
@@ -203,95 +211,29 @@ export default {
       deleteObjective,
       saveObjective,
       updateObjectiveProgress,
-      closeObjectiveModal
+      closeObjectiveModal,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
 .objectives-view {
-  min-height: 100vh;
   background-color: #f8f9fa;
 }
 
-.main-layout {
-  display: flex;
-  min-height: calc(100vh - 64px);
-}
-
-.content-area {
-  flex: 1;
-  padding: 1.5rem;
-  overflow-y: auto;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.charts-section {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.chart-card {
-  background: white;
-  padding: 1.5rem;
+.card {
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.objectives-board {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 1.5rem;
-  overflow-x: auto;
-}
-
-.kanban-columns {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  min-height: 400px;
-}
-
-.btn-primary {
-  background-color: #4f46e5;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 0.6rem 1.2rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  background-color: #4338ca;
-}
-
-.icon {
-  font-size: 1.2rem;
+.card-title {
+  font-size: 1.25rem;
   font-weight: bold;
 }
 
-@media (max-width: 768px) {
-  .charts-section {
-    grid-template-columns: 1fr;
-  }
-  
-  .kanban-columns {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 </style>

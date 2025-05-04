@@ -1,27 +1,53 @@
 <template>
   <div class="connected-accounts">
-    <h3>Connected Accounts</h3>
-    <!-- Fix: Use connectedAccounts prop directly instead of userProfile.connectedAccounts -->
-    <div class="account-item" :class="{ 'connected': connectedAccounts?.github }">
-      <i class="fab fa-github"></i>
-      <span>GitHub</span>
-      <button v-if="connectedAccounts?.github" class="disconnect-btn" @click="disconnectAccount('github')">
-        Disconnect
-      </button>
-      <button v-else class="connect-btn" @click="connectAccount('github')">
-        Connect
-      </button>
+    <h3 class="h5 fw-bold mb-4">Connected Accounts</h3>
+
+    <!-- GitHub Account -->
+    <div class="d-flex align-items-center justify-content-between mb-3 p-3 border rounded">
+      <div class="d-flex align-items-center">
+        <i class="fab fa-github fa-2x text-dark me-3"></i>
+        <span class="fw-bold">GitHub</span>
+      </div>
+      <div>
+        <button
+          v-if="connectedAccounts?.github"
+          class="btn btn-outline-danger btn-sm"
+          @click="disconnectAccount('github')"
+        >
+          Disconnect
+        </button>
+        <button
+          v-else
+          class="btn btn-outline-primary btn-sm"
+          @click="connectAccount('github')"
+        >
+          Connect
+        </button>
+      </div>
     </div>
-    
-    <div class="account-item" :class="{ 'connected': connectedAccounts?.google }">
-      <i class="fab fa-google"></i>
-      <span>Google</span>
-      <button v-if="connectedAccounts?.google" class="disconnect-btn" @click="disconnectAccount('google')">
-        Disconnect
-      </button>
-      <button v-else class="connect-btn" @click="connectAccount('google')">
-        Connect
-      </button>
+
+    <!-- Google Account -->
+    <div class="d-flex align-items-center justify-content-between mb-3 p-3 border rounded">
+      <div class="d-flex align-items-center">
+        <i class="fab fa-google fa-2x text-danger me-3"></i>
+        <span class="fw-bold">Google</span>
+      </div>
+      <div>
+        <button
+          v-if="connectedAccounts?.google"
+          class="btn btn-outline-danger btn-sm"
+          @click="disconnectAccount('google')"
+        >
+          Disconnect
+        </button>
+        <button
+          v-else
+          class="btn btn-outline-primary btn-sm"
+          @click="connectAccount('google')"
+        >
+          Connect
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -31,24 +57,29 @@ export default {
   props: {
     connectedAccounts: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   emits: ['connect', 'disconnect'],
   setup(props, { emit }) {
-    // Methods to connect and disconnect accounts
     const connectAccount = (provider) => {
       emit('connect', provider);
     };
-    
+
     const disconnectAccount = (provider) => {
       emit('disconnect', provider);
     };
-    
+
     return {
       connectAccount,
-      disconnectAccount
+      disconnectAccount,
     };
-  }
-}
+  },
+};
 </script>
+
+<style scoped>
+.connected-accounts {
+  background-color: #ffffff;
+}
+</style>

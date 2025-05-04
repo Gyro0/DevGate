@@ -1,356 +1,197 @@
 <template>
   <div class="project-list">
-    <div v-if="projects.length === 0" class="empty-state">
-      <div class="empty-icon">
-        <i class="fas fa-folder-open"></i>
+    <!-- Empty State -->
+    <div v-if="projects.length === 0" class="text-center py-5">
+      <div class="mb-3">
+        <i class="fas fa-folder-open fa-3x text-muted"></i>
       </div>
-      <h3>No Projects Found</h3>
-      <p>Create your first project to get started or adjust your filters.</p>
+      <h3 class="text-secondary">No Projects Found</h3>
+      <p class="text-muted">Create your first project to get started or adjust your filters.</p>
     </div>
-    
-    <table v-else class="projects-table">
-      <thead>
-        <tr>
-          <th>Project</th>
-          <th>Technologies</th>
-          <th>Date Created</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="project in projects" :key="project.id">
-          <td class="project-cell">
-            <div class="project-thumb" v-if="project.imageUrl">
-              <img :src="project.imageUrl" alt="" @error="onImageError" />
-            </div>
-            <div class="project-info">
-              <div class="project-title">{{ project.title }}</div>
-              <div v-if="project.description" class="project-description">
-                {{ truncateDescription(project.description) }}
+
+    <!-- Projects Table -->
+    <div v-else class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">Project</th>
+            <th scope="col">Technologies</th>
+            <th scope="col">Date Created</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="project in projects" :key="project.id">
+            <!-- Project Info -->
+            <td>
+              <div class="d-flex align-items-center">
+                <img
+                  v-if="project.imageUrl"
+                  :src="project.imageUrl"
+                  alt="Project Thumbnail"
+                  class="rounded me-3"
+                  style="width: 48px; height: 48px; object-fit: cover;"
+                  @error="onImageError"
+                />
+                <div>
+                  <div class="fw-bold text-truncate" style="max-width: 200px;">
+                    {{ project.title }}
+                  </div>
+                  <small v-if="project.description" class="text-muted">
+                    {{ truncateDescription(project.description) }}
+                  </small>
+                </div>
               </div>
-            </div>
-          </td>
-          <td class="tech-cell">
-            <div class="tech-stack">
-              <div v-for="tech in project.techStack.slice(0, 2)" :key="tech" class="tech-tag">
-                {{ tech }}
+            </td>
+
+            <!-- Technologies -->
+            <td>
+              <div class="d-flex flex-wrap gap-2">
+                <span
+                  v-for="tech in project.techStack.slice(0, 2)"
+                  :key="tech"
+                  class="badge bg-primary"
+                >
+                  {{ tech }}
+                </span>
+                <span
+                  v-if="project.techStack.length > 2"
+                  class="badge bg-secondary"
+                >
+                  +{{ project.techStack.length - 2 }}
+                </span>
               </div>
-              <div v-if="project.techStack.length > 2" class="tech-more">
-                +{{ project.techStack.length - 2 }}
-              </div>
-            </div>
-          </td>
-          <td class="date-cell">
-            {{ formatDate(project.createdAt) }}
-          </td>
-          <td class="status-cell">
-            <span 
-              v-if="project.status" 
-              :class="['status-badge', `status-${project.status}`]"
-            >
-              {{ formatStatus(project.status) }}
-            </span>
-            <span v-else class="status-badge">—</span>
-          </td>
-          <td class="actions-cell">
-            <button @click="$emit('edit', project)" class="action-btn edit-btn" title="Edit">
-              <i class="fas fa-pen"></i>
-            </button>
-            <button @click="$emit('delete', project)" class="action-btn delete-btn" title="Delete">
-              <i class="fas fa-trash"></i>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+
+            <!-- Date Created -->
+            <td>
+              <small class="text-muted">{{ formatDate(project.createdAt) }}</small>
+            </td>
+
+            <!-- Status -->
+            <td>
+              <span
+                v-if="project.status"
+                :class="['badge', getStatusClass(project.status)]"
+              >
+                {{ formatStatus(project.status) }}
+              </span>
+              <span v-else class="badge bg-light text-muted">—</span>
+            </td>
+
+            <!-- Actions -->
+            <td class="text-end">
+              <button
+                @click="$emit('edit', project)"
+                class="btn btn-sm btn-outline-primary me-2"
+                title="Edit"
+              >
+                <i class="fas fa-pen"></i>
+              </button>
+              <button
+                @click="$emit('delete', project)"
+                class="btn btn-sm btn-outline-danger"
+                title="Delete"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue'; // Removed defineProps, defineEmits
+import { ref } from 'vue';
 
 export default {
   name: 'ProjectList',
   props: {
     projects: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
   emits: ['edit', 'delete'],
-  setup(props) { // props is automatically available here
+  setup() {
     const defaultImage = ref('/path/to/default-project.jpg');
 
-    // Format date for display
     const formatDate = (timestamp) => {
       if (!timestamp) return 'N/A';
-      
-      let date;
-      if (timestamp.seconds) {
-        date = new Date(timestamp.seconds * 1000);
-      } else {
-        date = new Date(timestamp);
-      }
-      
-      // Check if date is valid
-      if (isNaN(date.getTime())) {
-         return 'Invalid Date';
-      }
-      
+      const date = timestamp.seconds
+        ? new Date(timestamp.seconds * 1000)
+        : new Date(timestamp);
+      if (isNaN(date.getTime())) return 'Invalid Date';
       return date.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
-        year: 'numeric'
+        year: 'numeric',
       });
     };
 
-    // Format project status
     const formatStatus = (status) => {
       const statusMap = {
-        'active': 'Active',
-        'completed': 'Completed',
-        'paused': 'Paused',
-        'archived': 'Archived',
-        'in-progress': 'In Progress', // Added for consistency
-        'planning': 'Planning' // Added for consistency
+        active: 'Active',
+        completed: 'Completed',
+        paused: 'Paused',
+        archived: 'Archived',
       };
-      
       return statusMap[status] || status;
     };
 
-    // Truncate description text
-    const truncateDescription = (text) => {
-      if (!text || typeof text !== 'string') return ''; // Added check
-      if (text.length <= 50) return text;
-      return text.substring(0, 50) + '...';
+    const getStatusClass = (status) => {
+      const statusClassMap = {
+        active: 'bg-success text-white',
+        completed: 'bg-primary text-white',
+        paused: 'bg-warning text-dark',
+        archived: 'bg-secondary text-white',
+      };
+      return statusClassMap[status] || 'bg-light text-dark';
     };
 
-    // Handle image loading errors
+    const truncateDescription = (text) => {
+      if (!text || typeof text !== 'string') return '';
+      return text.length > 50 ? `${text.substring(0, 50)}...` : text;
+    };
+
     const onImageError = (e) => {
       e.target.src = defaultImage.value;
     };
 
-    // Return everything needed by the template
     return {
       defaultImage,
       formatDate,
       formatStatus,
+      getStatusClass,
       truncateDescription,
-      onImageError
-      // props.projects is automatically available in the template
+      onImageError,
     };
-  }
-}
+  },
+};
 </script>
 
 <style scoped>
-.project-list {
-  width: 100%;
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem 2rem;
-  background-color: white;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.empty-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: #f3f4f6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.empty-icon i {
-  font-size: 1.5rem;
-  color: #9ca3af;
-}
-
-.empty-state h3 {
-  margin: 0 0 0.5rem 0;
-  color: #374151;
-}
-
-.empty-state p {
-  color: #6b7280;
-  margin: 0;
-  font-size: 0.875rem;
-}
-
-.projects-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: white;
+.table-responsive {
+  background-color: #ffffff;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.projects-table th, 
-.projects-table td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #f3f4f6;
+.table {
+  margin-bottom: 0;
 }
 
-.projects-table th {
-  background-color: #f9fafb;
-  color: #4b5563;
-  font-weight: 500;
-  font-size: 0.875rem;
+.badge {
+  font-size: 0.75rem;
 }
 
-.projects-table tr:last-child td {
-  border-bottom: none;
-}
-
-.project-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  width: 40%;
-}
-
-.project-thumb {
-  width: 48px;
-  height: 48px;
-  border-radius: 6px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.project-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.project-info {
-  min-width: 0;
-}
-
-.project-title {
-  font-weight: 500;
-  color: #111827;
+.text-truncate {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.project-description {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.tech-cell {
-  width: 25%;
-}
-
-.tech-stack {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.tech-tag {
-  background-color: #f3f4f6;
-  color: #4b5563;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  white-space: nowrap;
-}
-
-.tech-more {
-  background-color: #e5e7eb;
-  color: #6b7280;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-}
-
-.date-cell {
-  width: 15%;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.status-cell {
-  width: 10%;
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  text-align: center;
-}
-
-.status-active {
-  background-color: #dcfce7;
-  color: #16a34a;
-}
-
-.status-completed {
-  background-color: #dbeafe;
-  color: #2563eb;
-}
-
-.status-paused {
-  background-color: #fef3c7;
-  color: #d97706;
-}
-
-.status-archived {
-  background-color: #f3f4f6;
-  color: #6b7280;
-}
-
-.actions-cell {
-  width: 10%;
-  white-space: nowrap;
-  text-align: right;
-}
-
-.action-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: #6b7280;
-  margin-left: 0.25rem;
-}
-
-.edit-btn:hover {
-  background-color: #f3f4f6;
-  color: #4f46e5;
-}
-
-.delete-btn:hover {
-  background-color: #fee2e2;
-  color: #ef4444;
-}
-
-@media (max-width: 768px) {
-  .projects-table {
-    display: block;
-    overflow-x: auto;
-  }
 }
 </style>

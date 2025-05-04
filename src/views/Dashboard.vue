@@ -1,37 +1,44 @@
 <template>
-    <div class="dashboard-view">
-      <AppHeader />
-      <div class="main-layout">
-        <AppSidebar :active-page="'dashboard'" />
-        
-        <div class="content-area">
-          <div class="welcome-section">
+  <div class="dashboard-view bg-light min-vh-100">
+    <!-- Header -->
+    <AppHeader />
+
+    <div class="container-fluid">
+      <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 bg-white p-0">
+          <AppSidebar :active-page="'dashboard'" />
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 col-lg-10 py-4">
+          <!-- Welcome Section -->
+          <div class="mb-4">
             <UserSummary />
           </div>
-          
-          <div class="dashboard-grid">
-            <div class="dashboard-widget skills-widget">
+
+          <!-- Dashboard Widgets -->
+          <div class="row g-4">
+            <div class="col-md-6">
               <SkillSummaryWidget />
             </div>
-            
-            <div class="dashboard-widget projects-widget">
+            <div class="col-md-6">
               <ProjectSummaryWidget />
             </div>
-            
-            <div class="dashboard-widget activity-widget">
+            <div class="col-md-6">
               <ActivityFeedWidget />
             </div>
-            
-            <div class="dashboard-widget objectives-widget">
+            <div class="col-md-6">
               <ObjectivesProgressWidget />
             </div>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script>
+  </div>
+</template>
+
+<script>
 import AppHeader from '@/components/common/AppHeader.vue';
 import AppSidebar from '@/components/common/AppSidebar.vue';
 import UserSummary from '@/components/dashboard/UserSummary.vue';
@@ -55,70 +62,52 @@ export default {
     SkillSummaryWidget,
     ProjectSummaryWidget,
     ActivityFeedWidget,
-    ObjectivesProgressWidget
+    ObjectivesProgressWidget,
   },
   setup() {
-    const { user } = useAuth(); // Keep user if needed directly in setup, though likely used by child components
     const { fetchUserSkills } = useSkills();
     const { fetchUserProjects } = useProjects();
     const { fetchUserObjectives } = useObjectives();
     const { fetchUserTimeline } = useTimeline();
-    
+
     onMounted(async () => {
       // Load all user data for dashboard
       await Promise.all([
         fetchUserSkills(),
         fetchUserProjects(),
         fetchUserObjectives(),
-        fetchUserTimeline(10) // Just recent activities
+        fetchUserTimeline(10), // Fetch recent activities
       ]);
     });
 
-    // No reactive state or methods needed directly by the template in this case
-    return {
-      // user // Only return if used directly in the Dashboard template
-    };
-  }
-}
+    return {};
+  },
+};
 </script>
-  
-  <style scoped>
-  .dashboard-view {
-    min-height: 100vh;
-    background-color: #f8f9fa;
-  }
-  
-  .main-layout {
-    display: flex;
-    min-height: calc(100vh - 64px); /* Account for header height */
-  }
-  
-  .content-area {
-    flex: 1;
-    padding: 1.5rem;
-    overflow-y: auto;
-  }
-  
-  .welcome-section {
-    margin-bottom: 1.5rem;
-  }
-  
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 1.5rem;
-  }
-  
-  .dashboard-widget {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    padding: 1.5rem;
-  }
-  
-  @media (max-width: 768px) {
-    .dashboard-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-  </style>
+
+<style scoped>
+.dashboard-view {
+  background-color: #f8f9fa; /* Light background */
+}
+
+.container-fluid {
+  padding: 0;
+}
+
+.row {
+  margin: 0;
+}
+
+.col-md-3 {
+  border-right: 1px solid #e9ecef; /* Light gray border for sidebar */
+}
+
+.py-4 {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+.g-4 {
+  gap: 1.5rem !important; /* Bootstrap gap utility for spacing */
+}
+</style>

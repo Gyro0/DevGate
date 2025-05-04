@@ -1,34 +1,31 @@
 <template>
   <button
     @click="handleSocialLogin"
-    class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+    class="btn btn-light w-100 d-flex align-items-center justify-content-center py-2 px-4 border rounded shadow-sm"
     :disabled="loading"
   >
-    <span v-if="loading" class="mr-2">
-      <svg class="animate-spin h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-    </span>
-    <span class="sr-only">Se connecter avec {{ provider }}</span>
+    <span v-if="loading" class="spinner-border spinner-border-sm text-primary me-2" role="status" aria-hidden="true"></span>
     <img
-      v-if="provider === 'google' && !loading"
-      style="height: 24px; width: 24px;"
+      v-if="!loading && provider === 'google'"
       src="https://www.svgrepo.com/show/475656/google-color.svg"
       alt="Google"
+      class="me-2"
+      style="height: 24px; width: 24px;"
     />
     <img
-      v-else-if="provider === 'github' && !loading"
-      style="height: 24px; width: 24px;"
+      v-if="!loading && provider === 'github'"
       src="https://www.svgrepo.com/show/512317/github-142.svg"
       alt="GitHub"
+      class="me-2"
+      style="height: 24px; width: 24px;"
     />
+    <span v-if="!loading">Sign in with {{ provider }}</span>
   </button>
 </template>
 
 <script>
-import { ref } from 'vue'
-import useAuth from '@/composables/useAuth'
+import { ref } from 'vue';
+import useAuth from '@/composables/useAuth';
 
 export default {
   name: 'SocialLoginButton',
@@ -36,40 +33,41 @@ export default {
     provider: {
       type: String,
       required: true,
-      validator: (value) => ['google', 'github'].includes(value)
-    }
+      validator: (value) => ['google', 'github'].includes(value),
+    },
   },
   emits: ['success', 'error'],
   setup(props, { emit }) {
-    const { loginWithGoogle, loginWithGithub, error: authError } = useAuth()
-    const loading = ref(false)
-    const error = ref('')
+    const { loginWithGoogle, loginWithGithub } = useAuth();
+    const loading = ref(false);
 
     const handleSocialLogin = async () => {
-      loading.value = true
-      error.value = ''
-      
+      loading.value = true;
       try {
         if (props.provider === 'google') {
-          await loginWithGoogle()
+          await loginWithGoogle();
         } else if (props.provider === 'github') {
-          await loginWithGithub()
+          await loginWithGithub();
         }
-        
-        emit('success')
+        emit('success');
       } catch (err) {
-        console.error(`${props.provider} login error:`, err)
-        error.value = err.message || 'Authentication failed'
-        emit('error', error.value)
+        console.error(`${props.provider} login error:`, err);
+        emit('error', err.message || 'Authentication failed');
       } finally {
-        loading.value = false
+        loading.value = false;
       }
-    }
+    };
 
     return {
       loading,
-      handleSocialLogin
-    }
-  }
-}
+      handleSocialLogin,
+    };
+  },
+};
 </script>
+
+<style scoped>
+button {
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+</style>

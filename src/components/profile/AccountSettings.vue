@@ -1,33 +1,35 @@
 <template>
-  <div class="account-settings">
-    <h2>Account Settings</h2>
-    
-    <div class="settings-section">
-      <h3>Email Address</h3>
-      <p class="settings-value">{{ userProfile?.email || 'No email set' }}</p>
-      <button @click="$emit('changeEmail')" class="settings-button">
+  <div class="account-settings card shadow-sm border-0 p-4">
+    <h2 class="h5 fw-bold mb-4">Account Settings</h2>
+
+    <!-- Email Section -->
+    <div class="mb-4">
+      <h3 class="h6 fw-bold">Email Address</h3>
+      <p class="text-muted">{{ userProfile?.email || 'No email set' }}</p>
+      <button @click="$emit('changeEmail')" class="btn btn-outline-primary btn-sm">
         Change Email
       </button>
     </div>
-    
-    <div class="settings-section">
-      <h3>Password</h3>
-      <p class="settings-value">••••••••</p>
-      <button @click="$emit('changePassword')" class="settings-button">
+
+    <!-- Password Section -->
+    <div class="mb-4">
+      <h3 class="h6 fw-bold">Password</h3>
+      <p class="text-muted">••••••••</p>
+      <button @click="$emit('changePassword')" class="btn btn-outline-primary btn-sm">
         Change Password
       </button>
     </div>
-    
-    <div class="settings-section">
-      <h3>Connected Accounts</h3>
-      <!-- Only render if connectedAccounts exists -->
-      <ConnectedAccounts v-if="userProfile?.connectedAccounts" 
-                         :accounts="userProfile.connectedAccounts" />
+
+    <!-- Connected Accounts -->
+    <div class="mb-4">
+      <h3 class="h6 fw-bold">Connected Accounts</h3>
+      <ConnectedAccounts v-if="userProfile?.connectedAccounts" :accounts="userProfile.connectedAccounts" />
     </div>
-    
-    <div class="settings-section danger-zone">
-      <h3>Danger Zone</h3>
-      <button @click="$emit('deleteAccount')" class="danger-button">
+
+    <!-- Danger Zone -->
+    <div class="mb-4">
+      <h3 class="h6 fw-bold text-danger">Danger Zone</h3>
+      <button @click="$emit('deleteAccount')" class="btn btn-danger btn-sm">
         Delete Account
       </button>
     </div>
@@ -40,7 +42,7 @@ import ConnectedAccounts from './ConnectedAccounts.vue';
 export default {
   name: 'AccountSettings',
   components: {
-    ConnectedAccounts
+    ConnectedAccounts,
   },
   props: {
     userProfile: {
@@ -48,13 +50,17 @@ export default {
       required: true,
       default: () => ({
         email: '',
-        connectedAccounts: {}
-      })
-    }
+        connectedAccounts: {},
+      }),
+    },
   },
   emits: ['changeEmail', 'changePassword', 'deleteAccount'],
-  setup() {
-    return {};
-  }
-}
+};
 </script>
+
+<style scoped>
+.account-settings {
+  background-color: #ffffff;
+  border-radius: 8px;
+}
+</style>
