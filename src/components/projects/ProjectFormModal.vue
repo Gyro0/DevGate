@@ -280,26 +280,26 @@ export default {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.7); /* Keep backdrop dark */
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
     backdrop-filter: blur(4px);
   }
-  
+
   .modal-content {
-    background-color: var(--card-bg);
+    background-color: var(--surface-card, #2a2a2e); /* Use surface-card variable */
     border-radius: 12px;
     width: 90%;
-    max-width: 600px;
+    max-width: 700px;
     max-height: 90vh;
     overflow-y: auto;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #444); /* Use border-color variable */
     position: relative;
   }
-  
+
   .modal-content::before {
     content: '';
     position: absolute;
@@ -307,135 +307,140 @@ export default {
     left: 0;
     right: 0;
     height: 2px;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    /* Use primary/secondary variables if defined, otherwise fallback */
+    background: linear-gradient(90deg, var(--primary, #4f46e5), var(--secondary, #7c3aed));
     opacity: 0.7;
   }
-  
+
   .modal-header {
     padding: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color, #444); /* Use border-color variable */
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
-  
+
   .modal-header h3 {
     margin: 0;
-    color: var(--text-color);
+    color: var(--primary, #4f46e5); /* Use primary color for header */
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700; /* Make header bolder */
+    text-shadow: 0 0 6px var(--primary-glow, rgba(79, 70, 229, 0.5)); /* Add glow if variable exists */
   }
-  
+
   .modal-close {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
+    color: var(--text-secondary, #ccc); /* Use text-secondary variable */
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 50%;
     transition: all 0.3s ease;
   }
-  
+
   .modal-close:hover {
-    background-color: var(--bg-darker);
-    color: var(--text-color);
+    background-color: var(--surface-hover, #3a3a3e); /* Use surface-hover variable */
+    color: var(--text, #fff); /* Use text variable */
     transform: rotate(90deg);
   }
-  
+
   .modal-body {
     padding: 1.5rem;
   }
-  
+
   .form-group {
     margin-bottom: 1.5rem;
   }
-  
+
   .form-group label {
     display: block;
     margin-bottom: 0.5rem;
-    color: var(--text-color);
-    font-weight: 500;
+    color: var(--text, #e0e0e0); /* Use text variable */
+    font-weight: 600; /* Make labels bolder, matching table headers */
+    font-size: 0.95rem; /* Slightly adjust size if needed */
+    text-transform: uppercase; /* Match table header style */
+    letter-spacing: 0.05em; /* Match table header style */
   }
-  
+
   .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
   }
-  
+
   input, textarea, select {
     width: 100%;
     padding: 0.75rem 1rem;
     border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-darker);
-    color: var(--text-color);
+    border: 1px solid var(--border-color, #444); /* Use border-color variable */
+    background-color: var(--surface-ground, #1e1e20); /* Use surface-ground or bg-darker */
+    color: var(--text, #e0e0e0); /* Use text variable */
     font-size: 0.9rem;
     transition: all 0.3s ease;
   }
-  
+
   input:focus, textarea:focus, select:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    border-color: var(--primary, #4f46e5); /* Use primary variable */
+    box-shadow: 0 0 0 2px var(--primary-glow, rgba(79, 70, 229, 0.2)); /* Use primary-glow variable */
   }
-  
+
   input::placeholder, textarea::placeholder {
-    color: var(--text-secondary);
+    color: var(--text-secondary, #aaa); /* Use text-secondary variable */
   }
-  
+
   .tech-selection {
-    background-color: var(--bg-darker);
+    background-color: var(--surface-ground, #1e1e20); /* Use surface-ground or bg-darker */
     border-radius: 8px;
     padding: 1rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #444); /* Use border-color variable */
   }
-  
+
   .selected-techs {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 1rem;
   }
-  
+
   .tech-tag {
-    background-color: var(--card-bg);
-    color: var(--text-color);
+    background-color: var(--surface-section, #333); /* Use surface-section or card-bg */
+    color: var(--text, #e0e0e0); /* Use text variable */
     padding: 0.35rem 0.75rem;
     border-radius: 6px;
     font-size: 0.8rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #444); /* Use border-color variable */
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
-  
+
   .remove-tech {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
+    color: var(--text-secondary, #ccc); /* Use text-secondary variable */
     cursor: pointer;
     padding: 0;
     font-size: 0.8rem;
     transition: color 0.3s ease;
   }
-  
+
   .remove-tech:hover {
-    color: #ef4444;
+    color: #ef4444; /* Keep danger color */
   }
-  
+
   .tech-input-wrapper {
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1rem;
   }
-  
+
   .tech-input-wrapper input {
     flex: 1;
   }
-  
+
   .add-tech-btn {
-    background-color: var(--primary-color);
+    background-color: var(--primary, #4f46e5); /* Use primary variable */
     color: white;
     border: none;
     padding: 0 1rem;
@@ -443,48 +448,48 @@ export default {
     cursor: pointer;
     transition: all 0.3s ease;
   }
-  
+
   .add-tech-btn:hover:not(:disabled) {
-    background-color: var(--primary-color-dark);
+    background-color: var(--primary-dark, #4338ca); /* Use primary-dark variable if exists */
     transform: translateY(-1px);
   }
-  
+
   .add-tech-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   .tech-suggestions {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
   }
-  
+
   .suggestion-btn {
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
+    background-color: var(--surface-section, #333); /* Use surface-section or card-bg */
+    color: var(--text, #e0e0e0); /* Use text variable */
+    border: 1px solid var(--border-color, #444); /* Use border-color variable */
     padding: 0.35rem 0.75rem;
     border-radius: 6px;
     font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.3s ease;
   }
-  
+
   .suggestion-btn:hover {
-    background-color: var(--primary-color);
+    background-color: var(--primary, #4f46e5); /* Use primary variable */
     color: white;
-    border-color: var(--primary-color);
+    border-color: var(--primary, #4f46e5); /* Use primary variable */
     transform: translateY(-1px);
   }
-  
+
   .image-upload {
-    background-color: var(--bg-darker);
+    background-color: var(--surface-ground, #1e1e20); /* Use surface-ground or bg-darker */
     border-radius: 8px;
     padding: 1rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color, #444); /* Use border-color variable */
   }
-  
+
   .image-preview {
     position: relative;
     width: 100%;
@@ -492,13 +497,13 @@ export default {
     border-radius: 8px;
     overflow: hidden;
   }
-  
+
   .image-preview img {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  
+
   .clear-image {
     position: absolute;
     top: 0.5rem;
@@ -515,77 +520,78 @@ export default {
     cursor: pointer;
     transition: all 0.3s ease;
   }
-  
+
   .clear-image:hover {
-    background-color: #ef4444;
+    background-color: #ef4444; /* Keep danger color */
     transform: scale(1.1);
   }
-  
+
   .upload-area {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 200px;
-    border: 2px dashed var(--border-color);
+    border: 2px dashed var(--border-color, #444); /* Use border-color variable */
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
   }
-  
+
   .upload-area:hover {
-    border-color: var(--primary-color);
-    background-color: rgba(79, 70, 229, 0.05);
+    border-color: var(--primary, #4f46e5); /* Use primary variable */
+    background-color: var(--surface-hover, rgba(79, 70, 229, 0.05)); /* Use surface-hover variable */
   }
-  
+
   .upload-area i {
     font-size: 2rem;
-    color: var(--primary-color);
+    color: var(--primary, #4f46e5); /* Use primary variable */
     margin-bottom: 0.5rem;
   }
-  
+
   .upload-area span {
-    color: var(--text-secondary);
+    color: var(--text-secondary, #aaa); /* Use text-secondary variable */
     font-size: 0.9rem;
   }
-  
+
   .form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
     margin-top: 2rem;
   }
-  
+
   .btn-primary {
-    background-color: var(--primary-color);
+    background-color: var(--primary, #4f46e5); /* Use primary variable */
     color: white;
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
-    font-weight: 500;
+    font-weight: 600; /* Match label weight */
     cursor: pointer;
     transition: all 0.3s ease;
+    box-shadow: 0 0 8px var(--primary-glow, rgba(79, 70, 229, 0.5)); /* Add glow */
   }
-  
+
   .btn-primary:hover {
-    background-color: var(--primary-color-dark);
+    background-color: var(--primary-dark, #4338ca); /* Use primary-dark variable if exists */
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 4px 12px var(--primary-glow, rgba(79, 70, 229, 0.3)); /* Enhance glow */
   }
-  
+
   .btn-secondary {
-    background-color: var(--bg-darker);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
+    background-color: var(--surface-section, #333); /* Use surface-section or similar */
+    color: var(--text, #e0e0e0); /* Use text variable */
+    border: 1px solid var(--border-color, #444); /* Use border-color variable */
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
-    font-weight: 500;
+    font-weight: 600; /* Match label weight */
     cursor: pointer;
     transition: all 0.3s ease;
   }
-  
+
   .btn-secondary:hover {
-    background-color: var(--card-bg);
+    background-color: var(--surface-hover, #3a3a3e); /* Use surface-hover variable */
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }

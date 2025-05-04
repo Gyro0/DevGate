@@ -15,7 +15,10 @@
           <h3>Top Skills</h3>
           <ul class="skill-list">
             <li v-for="skill in topSkills" :key="skill.id" class="skill-item">
-              <div class="skill-name">{{ skill.name }}</div>
+              <div class="skill-info">
+                <div class="skill-name">{{ skill.name }}</div>
+                <div class="skill-category">{{ getCategoryName(skill.category) }}</div>
+              </div>
               <div class="skill-rating">
                 <div class="stars">
                   <i 
@@ -24,7 +27,6 @@
                     :class="['fas', n <= skill.level ? 'fa-star' : 'fa-star empty']"
                   ></i>
                 </div>
-                <div class="skill-category">{{ getCategoryName(skill.category) }}</div>
               </div>
             </li>
           </ul>
@@ -136,11 +138,11 @@ export default {
   display: flex;
   flex-direction: column;
   background: var(--surface-card);
-  border-radius: 1rem;
-  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.35), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
-  border: 1.5px solid var(--border-color, #23272e);
-  padding: 1.5rem 1.25rem;
-  position: relative;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  color: var(--text);
   overflow: hidden;
 }
 
@@ -149,63 +151,79 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border-color, #23272e);
-  padding-bottom: 0.75rem;
+  flex-shrink: 0;
 }
 
 .widget-header h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--text-primary);
-  letter-spacing: 0.01em;
 }
 
 .view-all {
+  font-size: 0.85rem;
   color: var(--primary);
   text-decoration: none;
-  font-size: 0.95rem;
   font-weight: 500;
-  padding: 0.25rem 0.75rem;
-  border-radius: 0.375rem;
-  background: var(--primary-fade, rgba(79,70,229,0.08));
-  box-shadow: 0 0 6px 0 var(--primary-glow);
-  transition: background 0.18s, color 0.18s;
+  transition: color 0.2s;
 }
 
 .view-all:hover {
-  background: var(--primary-glow);
-  color: #fff;
+  color: var(--primary-hover);
+  text-decoration: underline;
 }
 
 .skills-content {
   flex: 1;
-  display: flex;
-  color: var(--text-secondary);
+  overflow-y: auto; /* Allow scroll if needed */
+  display: flex; /* Use flex for layout */
+  flex-direction: column; /* Stack chart and list */
 }
 
 .skills-data {
-  width: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: column; /* Stack chart and list */
+  flex: 1; /* Allow data section to grow */
+  gap: 1.5rem; /* Space between chart and list */
 }
 
 .skill-chart {
-  height: 200px;
-  position: relative;
-  margin-bottom: 1.5rem;
-  background: var(--surface-2);
-  border-radius: 0.75rem;
-  box-shadow: 0 0 0 1.5px var(--primary-glow), 0 0 12px 0 var(--circuit-accent-fade, #2e8b57cc);
-  padding: 0.5rem;
+  /* Adjust height or aspect ratio as needed */
+  height: 200px; /* Example height */
+  position: relative; /* Needed for chart responsiveness */
+  margin-bottom: 1rem; /* Space below chart */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* Ensure radar chart component itself is responsive */
+.skill-chart > :deep(div) { /* Target nested chart container */
+  max-width: 100%;
+  max-height: 100%;
 }
 
-.top-skills h3 {
-  font-size: 1rem;
+.top-skills {
+  flex: 1; /* Allow list to take remaining space */
+  min-height: 0; /* Prevent flex item from overflowing */
+  overflow-y: auto; /* Scroll if list is long */
+  /* Custom scrollbar styling (optional) */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-light) var(--surface-ground);
+}
+/* Webkit scrollbar styling */
+.top-skills::-webkit-scrollbar { width: 6px; }
+.top-skills::-webkit-scrollbar-track { background: var(--surface-ground); border-radius: 3px; }
+.top-skills::-webkit-scrollbar-thumb { background-color: var(--primary-light); border-radius: 3px; }
+
+
+h3 { /* Style for "Top Skills" */
+  font-size: 0.9rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text-secondary);
   font-weight: 600;
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .skill-list {
@@ -218,139 +236,108 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--border-color, #23272e);
-  transition: background 0.15s;
+  padding: 0.6rem 0.25rem; /* Adjust padding */
+  border-bottom: 1px solid var(--border-color);
 }
-
 .skill-item:last-child {
   border-bottom: none;
 }
 
-.skill-item:hover {
-  background: var(--surface-2);
-  box-shadow: 0 0 0 1px var(--primary-glow);
+.skill-info {
+  flex: 1;
+  margin-right: 1rem;
+  text-align: left; 
 }
 
 .skill-name {
   font-weight: 500;
   color: var(--text-primary);
-  letter-spacing: 0.01em;
-}
-
-.skill-rating {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.stars {
-  color: var(--star-color, #fbbf24);
-  margin-bottom: 0.25rem;
-  filter: drop-shadow(0 0 2px var(--primary-glow));
-}
-
-.stars .empty {
-  color: var(--star-empty, #444a57);
-  opacity: 0.5;
+  font-size: 0.9rem;
+  margin-bottom: 0.1rem;
 }
 
 .skill-category {
   font-size: 0.75rem;
-  color: var(--text-tertiary, #7a869a);
-  font-style: italic;
+  color: var(--text-secondary);
 }
 
-.empty-state {
-  width: 100%;
-  height: 100%;
+.skill-rating {
+  flex-shrink: 0;
+}
+
+.stars {
+  color: var(--warning, #ffc107); /* Star color */
+  font-size: 0.8rem; /* Adjust star size */
+}
+
+.stars .empty {
+  color: var(--surface-border); /* Empty star color */
+}
+
+/* Loading/Error/Empty States (Consistent style) */
+.loading-state, .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex: 1;
+  padding: 1.5rem;
   text-align: center;
-  padding: 2rem 1rem;
-  background: var(--surface-2);
-  border-radius: 0.75rem;
-  box-shadow: 0 0 0 1.5px var(--primary-glow), 0 0 8px 0 var(--circuit-accent-fade, #2e8b57cc);
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--primary-light);
+  border-radius: 50%;
+  border-top-color: var(--primary);
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
 }
 
 .empty-icon {
-  font-size: 3rem;
+  font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: var(--primary-glow);
-  filter: drop-shadow(0 0 6px var(--primary-glow));
+  color: var(--text-disabled);
 }
 
+.empty-state h3, .empty-state p {
+  margin-bottom: 1rem;
+}
 .empty-state h3 {
-  margin: 0;
-  margin-bottom: 0.5rem;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
 }
-
 .empty-state p {
-  margin: 0;
-  margin-bottom: 1.5rem;
-  color: var(--text-tertiary, #7a869a);
-  max-width: 24rem;
+  font-size: 0.9rem;
+  max-width: 300px;
 }
 
 .add-btn {
   display: inline-flex;
   align-items: center;
-  padding: 0.5rem 1.1rem;
-  background: var(--primary);
-  color: #fff;
-  border-radius: 0.375rem;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 1rem;
-  box-shadow: 0 0 8px 0 var(--primary-glow);
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--primary);
   border: none;
-  transition: background 0.18s, box-shadow 0.18s;
-  letter-spacing: 0.01em;
-}
-
-.add-btn i {
-  margin-right: 0.5rem;
+  border-radius: 6px;
+  color: var(--primary-contrast, #fff);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.2);
 }
 
 .add-btn:hover {
-  background: var(--primary-glow);
-  color: #fff;
-  box-shadow: 0 0 16px 2px var(--primary-glow);
-}
-
-.loading-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-tertiary, #7a869a);
-  font-size: 0.95rem;
-}
-
-.spinner {
-  border: 3px solid rgba(60, 65, 80, 0.18);
-  border-top: 3px solid var(--primary-glow);
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 0.5rem;
+  background-color: var(--primary-hover);
+  box-shadow: 0 4px 8px rgba(var(--primary-rgb), 0.3);
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@media (max-width: 640px) {
-  .skill-chart {
-    height: 180px;
-  }
+  to { transform: rotate(360deg); }
 }
 </style>

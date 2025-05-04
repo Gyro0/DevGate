@@ -312,7 +312,9 @@ export default {
   padding: 1.5rem;
   overflow-x: auto;
 }
-
+.objectives-board{
+  background-color: var(--bg-main);
+}
 .kanban-columns {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));

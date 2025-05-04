@@ -16,7 +16,7 @@
           <!-- Re-use PostItem structure or create detailed view -->
           <div class="post-card detailed">
              <div class="post-header">
-               <img :src="post.authorPhotoURL || '/default-avatar.png'" alt="Author" class="post-avatar">
+               <img :src="post.authorPhotoURL || '/default.jpg'" alt="Author" class="post-avatar">
                <div>
                  <span class="post-author">{{ post.authorName }}</span>
                  <span class="post-timestamp">{{ formatTimestamp(post.createdAt) }}</span>
@@ -186,8 +186,11 @@ export default {
   border-radius: 1.1rem;
   box-shadow: 0 2px 16px 0 rgba(0,0,0,0.35), 0 0 0 2px var(--primary-glow), 0 0 8px 2px var(--circuit-accent);
   border: 1.5px solid var(--border-color, #23272e);
-  padding-bottom: 0;
-  margin-bottom: 2rem;
+  padding-bottom: 0; /* Remove bottom padding */
+  margin-bottom: 0; /* Remove margin-bottom, comment section will handle spacing */
+  border-bottom-left-radius: 0; /* Flatten bottom corners to merge with comments */
+  border-bottom-right-radius: 0;
+  border-bottom: none; /* Remove bottom border */
   color: var(--text);
   position: relative;
   overflow: hidden;
@@ -266,11 +269,12 @@ export default {
 }
 .post-footer {
   padding: 0.75rem 1.5rem;
-  border-top: 1px solid var(--border-color, #23272e);
   background: var(--surface-2);
   display: flex;
   align-items: center;
   gap: 1.2rem;
+  border-bottom-left-radius: 0; /* Match card */
+  border-bottom-right-radius: 0; /* Match card */
 }
 
 /* Loading/Error States */

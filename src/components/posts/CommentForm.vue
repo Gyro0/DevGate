@@ -73,105 +73,108 @@ export default {
 .comment-form {
   display: flex;
   gap: 0.75rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1.5px solid var(--highlight);
   position: relative;
+  align-items: flex-start; /* Align avatar top */
 }
 .comment-avatar {
-  width: 32px;
-  height: 32px;
+  width: 36px; /* Slightly larger */
+  height: 36px;
   border-radius: 50%;
-  margin-top: 0.25rem;
-  border: 2px solid var(--highlight);
-  box-shadow: 0 0 8px var(--highlight);
+  margin-top: 0; /* Align with top of textarea */
+  border: 2px solid var(--primary-glow); /* Use primary glow */
+  box-shadow: 0 0 6px var(--primary-glow); /* Use primary glow */
   background: var(--background);
+  flex-shrink: 0; /* Prevent shrinking */
 }
 .input-wrapper {
   flex: 1;
   position: relative;
   display: flex;
-  align-items: flex-end;
-  border: 1.5px solid var(--highlight);
-  border-radius: 1.5rem;
-  padding: 0.3rem 0.5rem 0.3rem 1rem;
-  background: var(--surface);
-  box-shadow: 0 0 8px var(--highlight);
+  align-items: flex-end; /* Align button bottom */
+  border: 1.5px solid var(--primary); /* Use standard border color */
+  border-radius: 8px; /* Standard border radius */
+  padding: 0; /* Remove padding, handle internally */
+  background-color: var(--surface-ground); /* Use ground background */
+  transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s; /* Added background-color transition */
 }
 .input-wrapper:focus-within {
-   border-color: var(--primary);
-   box-shadow: 0 0 0 2px var(--highlight);
+  background-color: var(--surface-section); /* Slightly change background on focus */
+  box-shadow: 0 0 0 3px var(--primary-glow, rgba(79, 72, 211, 0.3)); /* Enhanced glow on focus */
 }
 
 textarea {
   flex: 1;
+  background: transparent; /* Inherit background */
   border: none;
-  outline: none;
-  resize: none;
-  font-size: 0.95rem;
-  line-height: 1.4;
-  background: none;
+  padding: 0.75rem 1rem; /* Internal padding */
   color: var(--text);
-  padding: 0.25rem 0;
-  max-height: 150px;
-  overflow-y: auto;
-  align-self: center;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  resize: none; /* Disable manual resize */
+  overflow-y: hidden; /* Hide scrollbar, rely on autoResize */
+  min-height: 40px; /* Adjust min-height */
+  max-height: 150px; /* Add max-height */
+  outline: none;
+}
+textarea::placeholder {
+  color: var(--text-secondary);
 }
 textarea:disabled {
-  background: var(--background);
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
 .submit-btn {
-  background: var(--primary);
-  color: var(--background);
-  border: 1.5px solid var(--highlight);
-  border-radius: 1rem;
-  padding: 0.4rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 600;
+  background: var(--primary); /* Use primary color */
+  color: white;
+  border: none;
+  border-radius: 6px; /* Match inner radius */
+  padding: 0.5rem 1rem; /* Adjust padding */
+  margin: 0.4rem; /* Margin inside wrapper */
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
-  margin-left: 0.5rem;
-  height: fit-content;
-  box-shadow: 0 0 8px var(--highlight);
+  font-weight: 600;
+  transition: background-color 0.2s, transform 0.1s;
+  height: fit-content; /* Fit button height */
+  display: inline-flex; /* For spinner */
+  align-items: center; /* For spinner */
+  justify-content: center; /* For spinner */
+  min-width: 60px; /* Ensure minimum width */
+}
+.submit-btn:hover:not(:disabled) {
+  background: var(--primary-dark); /* Darken on hover */
+  transform: scale(1.02);
 }
 .submit-btn:disabled {
-  background: var(--surface);
-  color: var(--highlight);
+  background: var(--surface-section); /* Use section background */
+  color: var(--text-secondary);
   cursor: not-allowed;
   opacity: 0.7;
 }
-.submit-btn:hover:not(:disabled) {
-  background: var(--secondary);
-  color: var(--background);
-  border-color: var(--primary);
-  box-shadow: 0 0 12px var(--primary);
-}
+
 .error-message {
   color: #ef4444;
-  font-size: 0.75rem;
-  position: absolute;
-  bottom: -1.5rem;
-  left: 50px;
+  font-size: 0.8rem;
+  position: absolute; /* Position below input */
+  bottom: -1.4rem;
+  left: calc(36px + 0.75rem); /* Align with input start */
 }
 .login-prompt {
-   font-size: 0.8rem;
-   color: var(--highlight);
-   margin-top: 0.5rem;
-   width: 100%;
-   text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  position: absolute; /* Position below input */
+  bottom: -1.4rem;
+  left: calc(36px + 0.75rem); /* Align with input start */
 }
 .login-prompt a {
-   color: var(--primary);
-   text-decoration: underline;
+  color: var(--primary);
+  text-decoration: underline;
 }
 
 /* Spinner */
 .spinner.small {
   width: 1em; height: 1em; border-width: 2px;
   border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: #fff;
-  animation: spin 1s linear infinite; display: inline-block;
+  animation: spin 1s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 </style>

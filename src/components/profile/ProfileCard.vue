@@ -3,7 +3,7 @@
     <div class="profile-banner">
       <div class="profile-avatar-container">
         <!-- Use root-relative path for the default avatar -->
-        <img :src="userProfile.photoURL || '/default-avatar.png'" alt="Profile" class="profile-avatar" />
+        <img :src="userProfile.photoURL || '/default.jpg'" alt="Profile" class="profile-avatar" />
         <button v-if="editMode" class="change-photo-btn" @click="triggerPhotoUpload">
           <i class="fas fa-camera"></i>
         </button>

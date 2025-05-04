@@ -16,6 +16,7 @@
             @changeEmail="showChangeEmailModal = true"
             @changePassword="showChangePasswordModal = true"
             @deleteAccount="showDeleteAccountModal = true"
+            @updateProfile="handleProfileUpdate"
           />
         </div>
 
@@ -26,18 +27,19 @@
             @connect="connectProvider"
             @disconnect="disconnectProvider"
           />
-          <!-- Add error/success messages for connect/disconnect -->
           <p v-if="connectError" class="error-message">{{ connectError }}</p>
+          <p v-if="connectSuccess" class="success-message">{{ connectSuccess }}</p>
         </div>
 
       </div>
-      <div class="content-area loading-state" v-else-if="loading">
+      <div class="content-area state-container loading-state" v-else-if="loading">
+        <div class="spinner"></div>
         <p>Loading settings...</p>
-        <!-- Add spinner -->
       </div>
-       <div class="content-area error-state" v-else>
+       <div class="content-area state-container error-state" v-else>
+         <i class="fas fa-exclamation-triangle"></i>
          <p>Could not load user settings. {{ error }}</p>
-         <button @click="fetchUserProfile">Retry</button>
+         <button @click="fetchUserProfile" class="btn btn-secondary">Retry</button>
       </div>
     </div>
 
@@ -94,6 +96,9 @@ export default {
     const showChangePasswordModal = ref(false);
     const showDeleteAccountModal = ref(false);
     const connectError = ref(null);
+    const connectSuccess = ref(null);
+    const profileUpdateError = ref(null);
+    const profileUpdateSuccess = ref(null);
 
     // Fetch profile data when authenticated
     const loadData = () => {
@@ -127,9 +132,23 @@ export default {
       router.push('/login'); // Redirect after deletion
     };
 
+    const handleProfileUpdate = async (payload) => {
+      profileUpdateError.value = null;
+      profileUpdateSuccess.value = null;
+      try {
+        console.log("Settings.vue: Received updateProfile event with payload:", payload);
+        await updateUserProfile(payload);
+        profileUpdateSuccess.value = "Profile updated successfully!";
+      } catch (err) {
+        console.error("Settings.vue: Error calling updateUserProfile:", err);
+        profileUpdateError.value = `Failed to update profile: ${err.message}`;
+      }
+    };
+
     // --- Connected Accounts Handlers ---
      const connectProvider = async (provider) => {
       connectError.value = null;
+      connectSuccess.value = null;
       try {
         let authFunction;
         if (provider === 'google') {
@@ -143,7 +162,7 @@ export default {
         await authFunction();
         // Profile update (linking) is handled within useAuth's login methods
         await fetchUserProfile(); // Refresh profile to show connection
-        alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} connected successfully!`);
+        connectSuccess.value = `${provider.charAt(0).toUpperCase() + provider.slice(1)} connected successfully!`;
       } catch (err) {
         console.error(`Error connecting ${provider}:`, err);
         connectError.value = `Failed to connect ${provider}: ${err.message}`;
@@ -152,6 +171,7 @@ export default {
 
     const disconnectProvider = async (provider) => {
        connectError.value = null;
+       connectSuccess.value = null;
        if (!userProfile.value || !userProfile.value.connectedAccounts) return;
 
        const updatedAccounts = { ...userProfile.value.connectedAccounts };
@@ -160,7 +180,7 @@ export default {
        try {
          await updateUserProfile({ connectedAccounts: updatedAccounts });
          await fetchUserProfile(); // Refresh profile
-         alert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} disconnected.`);
+         connectSuccess.value = `${provider.charAt(0).toUpperCase() + provider.slice(1)} disconnected successfully.`;
        } catch (err) {
          console.error(`Error disconnecting ${provider}:`, err);
          connectError.value = `Failed to disconnect ${provider}: ${err.message}`;
@@ -177,9 +197,13 @@ export default {
       showChangePasswordModal,
       showDeleteAccountModal,
       connectError,
+      connectSuccess,
+      profileUpdateError,
+      profileUpdateSuccess,
       handleEmailChanged,
       handlePasswordChanged,
       handleAccountDeleted,
+      handleProfileUpdate,
       connectProvider,
       disconnectProvider
     };

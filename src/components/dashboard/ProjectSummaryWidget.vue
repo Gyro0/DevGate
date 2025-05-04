@@ -51,7 +51,7 @@
                 </span>
               </div>
             </div>
-            <router-link :to="`/projects/${project.id}`" class="view-project">
+            <router-link :to="`/projects/`" class="view-project">
               <i class="fas fa-chevron-right"></i>
             </router-link>
           </li>
@@ -230,160 +230,202 @@ export default {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: var(--surface);
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 24px 0 rgba(30, 203, 225, 0.10), 0 0 0 2px var(--highlight);
-  border: 1.5px solid var(--highlight);
-  padding: 2rem 1.5rem;
+  background: var(--surface-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
   color: var(--text);
+  overflow: hidden;
 }
 
 .widget-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  flex-shrink: 0;
 }
 
 .widget-header h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--primary);
-  letter-spacing: 1px;
-  text-shadow: 0 0 8px var(--highlight);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .view-all {
-  font-size: 0.95rem;
-  color: var(--highlight);
+  font-size: 0.85rem;
+  color: var(--primary);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
   transition: color 0.2s;
 }
 
 .view-all:hover {
+  color: var(--primary-hover);
   text-decoration: underline;
-  color: var(--secondary);
 }
 
 .projects-content {
   flex: 1;
-  overflow: auto;
+  overflow-y: auto;
+  /* Custom scrollbar styling (optional) */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-light) var(--surface-ground);
+}
+/* Webkit scrollbar styling */
+.projects-content::-webkit-scrollbar {
+  width: 6px;
+}
+.projects-content::-webkit-scrollbar-track {
+  background: var(--surface-ground);
+  border-radius: 3px;
+}
+.projects-content::-webkit-scrollbar-thumb {
+  background-color: var(--primary-light);
+  border-radius: 3px;
+}
+
+.projects-list-container { /* Renamed for clarity */
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ensure it fills content area */
 }
 
 .project-stats {
-  display: flex;
-  margin-bottom: 1rem;
-  gap: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); /* Responsive columns */
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .stat-box {
-  background: var(--background);
-  border-radius: 8px;
-  flex: 1;
-  padding: 0.75rem;
   text-align: center;
-  box-shadow: 0 0 8px var(--highlight);
-  border: 1.5px solid var(--highlight);
+  padding: 0.5rem;
+  background-color: var(--surface-ground); /* Subtle background */
+  border-radius: 8px;
 }
 
 .stat-value {
-  font-size: 1.5rem;
-  font-weight: bold;
+  font-size: 1.5rem; /* Larger stat value */
+  font-weight: 600;
   color: var(--primary);
+  line-height: 1.2;
 }
 
 .stat-label {
-  font-size: 0.85rem;
-  color: var(--highlight);
+  font-size: 0.75rem; /* Smaller label */
+  color: var(--text-secondary);
+  text-transform: uppercase;
   margin-top: 0.25rem;
+}
+
+h3 { /* Style for "Latest Projects" */
+  font-size: 0.9rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .projects-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  flex: 1; /* Allow list to take remaining space */
 }
 
 .project-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  border-bottom: 1.5px solid var(--border);
+  padding: 0.75rem 0.25rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+.project-item:hover {
+  background-color: var(--surface-hover);
 }
 
 .project-item:last-child {
   border-bottom: none;
 }
 
+.project-info {
+  flex: 1;
+  margin-right: 1rem;
+}
+
 .project-name {
-  font-weight: 600;
-  color: var(--primary);
+  font-weight: 500;
+  color: var(--text-primary);
   margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  text-align: left;
 }
 
 .project-details {
   display: flex;
-  gap: 1rem;
-  font-size: 0.95rem;
-  color: var(--highlight);
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
 }
 
 .project-status {
   display: inline-flex;
   align-items: center;
-  font-weight: 600;
+  font-weight: 500;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  /* Use consistent status colors */
+  /* Assuming these classes exist or define them */
 }
+.project-status.status-active,
+.project-status.status-in-progress { color: var(--primary-dark, #6f42c1); background-color: var(--primary-light, #e0cffc); }
+.project-status.status-completed { color: var(--success-dark, #146c43); background-color: var(--success-light, #d1e7dd); }
+.project-status.status-paused { color: var(--warning-dark, #664d03); background-color: var(--warning-light, #fff3cd); }
+.project-status.status-archived { color: var(--secondary-dark, #495057); background-color: var(--secondary-light, #e2e3e5); }
 
-.status-active, .status-in-progress {
-  color: var(--primary);
-}
-
-.status-completed {
-  color: #10b981;
-}
-
-.status-paused {
-  color: var(--secondary);
-}
-
-.status-archived {
-  color: var(--highlight);
-}
 
 .view-project {
-  color: var(--highlight);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  transition: background 0.2s, color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
+  flex-shrink: 0;
 }
 
 .view-project:hover {
-  background: var(--highlight);
-  color: var(--background);
+  background-color: var(--primary-light);
+  color: var(--primary);
 }
 
+/* Loading/Error/Empty States (Mostly copied from Objectives widget for consistency) */
 .loading-state, .error-state, .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  flex: 1;
   padding: 1.5rem;
   text-align: center;
-  color: var(--highlight);
+  color: var(--text-secondary);
 }
 
 .spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid rgba(63, 208, 212, 0.15);
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--primary-light);
   border-radius: 50%;
   border-top-color: var(--primary);
   animation: spin 1s linear infinite;
@@ -391,36 +433,44 @@ export default {
 }
 
 .error-icon, .empty-icon {
-  font-size: 2rem;
+  font-size: 2.5rem;
   margin-bottom: 1rem;
-  color: var(--highlight);
+  color: var(--text-disabled);
 }
 
-.error-state p {
+.error-state p, .empty-state h3, .empty-state p {
   margin-bottom: 1rem;
+}
+.empty-state h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.empty-state p {
+  font-size: 0.9rem;
+  max-width: 300px;
 }
 
 .retry-btn, .add-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: var(--highlight);
-  border: 1.5px solid var(--primary);
-  border-radius: 0.375rem;
-  color: var(--background);
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  background-color: var(--primary);
+  border: none;
+  border-radius: 6px;
+  color: var(--primary-contrast, #fff);
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition: background-color 0.2s, box-shadow 0.2s;
   text-decoration: none;
-  box-shadow: 0 0 8px var(--highlight);
+  box-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.2);
 }
 
 .retry-btn:hover, .add-btn:hover {
-  background: var(--primary);
-  color: var(--background);
-  border-color: var(--highlight);
+  background-color: var(--primary-hover);
+  box-shadow: 0 4px 8px rgba(var(--primary-rgb), 0.3);
 }
 
 @keyframes spin {

@@ -240,59 +240,77 @@ export default {
 
 <style scoped>
 .objectives-widget {
-  height: 100%;
+  height: 100%; /* Ensure widget fills grid cell */
   display: flex;
   flex-direction: column;
-  background: var(--surface);
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 24px 0 rgba(30, 203, 225, 0.10), 0 0 0 2px var(--highlight);
-  border: 1.5px solid var(--highlight);
-  padding: 2rem 1.5rem;
+  background: var(--surface-card); /* Use card background */
+  border-radius: 12px; /* Consistent border radius */
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem; /* Consistent padding */
   color: var(--text);
+  overflow: hidden; /* Prevent content overflow */
 }
 
 .widget-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem; /* Increased space below header */
+  flex-shrink: 0; /* Prevent header shrinking */
 }
 
 .widget-header h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--primary);
-  letter-spacing: 1px;
-  text-shadow: 0 0 8px var(--highlight);
+  font-size: 1.1rem; /* Slightly smaller header */
+  font-weight: 600; /* Standard weight */
+  color: var(--text-primary); /* Use primary text color */
 }
 
 .view-all {
-  font-size: 0.95rem;
-  color: var(--highlight);
+  font-size: 0.85rem; /* Smaller link */
+  color: var(--primary); /* Use primary color */
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
   transition: color 0.2s;
 }
 
 .view-all:hover {
+  color: var(--primary-hover); /* Use hover variable */
   text-decoration: underline;
-  color: var(--secondary);
 }
 
 .objectives-content {
-  flex: 1;
-  overflow: auto;
+  flex: 1; /* Allow content to grow */
+  overflow-y: auto; /* Enable scrolling if content overflows */
+  /* Custom scrollbar styling (optional) */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-light) var(--surface-ground);
+}
+/* Webkit scrollbar styling */
+.objectives-content::-webkit-scrollbar {
+  width: 6px;
+}
+.objectives-content::-webkit-scrollbar-track {
+  background: var(--surface-ground);
+  border-radius: 3px;
+}
+.objectives-content::-webkit-scrollbar-thumb {
+  background-color: var(--primary-light);
+  border-radius: 3px;
 }
 
 .objectives-summary {
   margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color); /* Separator */
+  padding-bottom: 1.5rem;
 }
 
 .progress-container {
   display: flex;
   align-items: center;
   gap: 1.5rem;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens if needed */
 }
 
 .progress-ring {
@@ -301,85 +319,93 @@ export default {
 }
 
 .progress-circle {
-  width: 100px;
-  height: 100px;
+  width: 90px; /* Slightly smaller */
+  height: 90px;
   border-radius: 50%;
-  background: conic-gradient(var(--primary) 0%, var(--primary) calc(var(--percentage) * 1%), var(--highlight) calc(var(--percentage) * 1%), var(--highlight) 100%);
+  /* Use CSS variable for percentage */
+  background: conic-gradient(var(--primary) calc(var(--percentage) * 1%), var(--surface-border) calc(var(--percentage) * 1%));
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
-  font-size: 0.95rem;
-  color: var(--text);
-  --percentage: v-bind(completionPercentage);
-  box-shadow: 0 0 12px var(--highlight);
+  font-size: 0.8rem; /* Smaller text */
+  color: var(--text-secondary);
+  --percentage: v-bind(completionPercentage); /* Bind percentage */
+  box-shadow: 0 0 8px rgba(var(--primary-rgb), 0.2); /* Softer shadow */
 }
 
 .progress-circle::before {
   content: '';
   position: absolute;
-  inset: 8px;
+  inset: 6px; /* Thinner ring */
   border-radius: 50%;
-  background: var(--surface);
+  background: var(--surface-card); /* Match card background */
 }
 
 .progress-value, .progress-label {
   position: relative;
   z-index: 1;
+  line-height: 1.2;
 }
 
 .progress-value {
-  font-size: 1.25rem;
-  font-weight: bold;
+  font-size: 1.4rem; /* Larger percentage */
+  font-weight: 600;
   color: var(--primary);
+}
+.progress-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
 }
 
 .status-summary {
   flex: 1;
+  min-width: 150px; /* Ensure minimum width */
 }
 
 .status-item {
   display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem; /* Increased spacing */
+}
+.status-item:last-child {
+  margin-bottom: 0;
 }
 
 .status-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px; /* Smaller dot */
+  height: 8px;
   border-radius: 50%;
-  margin-right: 0.5rem;
+  margin-right: 0.6rem;
+  flex-shrink: 0;
 }
 
-.status-dot.planned {
-  background-color: var(--highlight);
-}
-
-.status-dot.in-progress {
-  background-color: var(--primary);
-}
-
-.status-dot.completed {
-  background-color: #10b981;
-}
+/* Use more distinct status colors if available, otherwise use theme colors */
+.status-dot.planned { background-color: var(--info, #0dcaf0); }
+.status-dot.in-progress { background-color: var(--primary); }
+.status-dot.completed { background-color: var(--success, #198754); }
 
 .status-label {
   flex: 1;
-  font-size: 0.95rem;
-  color: var(--text);
+  font-size: 0.85rem; /* Slightly smaller */
+  color: var(--text-secondary);
+  margin-right: 0.5rem;
 }
 
 .status-count {
-  font-weight: bold;
-  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-primary);
 }
 
-h3 {
-  font-size: 1rem;
-  margin: 1rem 0 0.5rem;
-  color: var(--primary);
-  font-weight: 700;
+h3 { /* Style for "Recent Objectives" */
+  font-size: 0.9rem;
+  margin: 0 0 0.75rem 0; /* Adjusted margin */
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .objectives-list {
@@ -392,80 +418,86 @@ h3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem;
-  border-bottom: 1.5px solid var(--border);
+  padding: 0.75rem 0.25rem; /* Adjust padding */
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+.objective-item:hover {
+  background-color: var(--surface-hover);
 }
 
 .objective-item:last-child {
   border-bottom: none;
 }
 
+.objective-info {
+  flex: 1;
+  margin-right: 1rem;
+}
+
 .objective-title {
-  font-weight: 600;
-  color: var(--primary);
+  font-weight: 500; /* Standard weight */
+  color: var(--text-primary);
   margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+  text-align: left;
 }
 
 .objective-details {
   display: flex;
-  gap: 1rem;
-  font-size: 0.95rem;
-  color: var(--highlight);
+  gap: 0.75rem; /* Reduced gap */
+  font-size: 0.8rem; /* Smaller details */
+  color: var(--text-secondary);
+  flex-wrap: wrap;
 }
 
 .objective-status {
   display: inline-flex;
   align-items: center;
-  font-weight: 600;
+  font-weight: 500;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
 }
-
-.objective-status.status-planned {
-  color: var(--highlight);
-}
-
-.objective-status.status-in-progress {
-  color: var(--primary);
-}
-
-.objective-status.status-completed {
-  color: #10b981;
-}
-
-.objective-status.status-cancelled {
-  color: #ef4444;
-}
+/* Status background/text colors */
+.objective-status.status-planned { color: var(--info-dark, #0a58ca); background-color: var(--info-light, #cfe2ff); }
+.objective-status.status-in-progress { color: var(--primary-dark, #6f42c1); background-color: var(--primary-light, #e0cffc); }
+.objective-status.status-completed { color: var(--success-dark, #146c43); background-color: var(--success-light, #d1e7dd); }
+.objective-status.status-cancelled { color: var(--danger-dark, #b02a37); background-color: var(--danger-light, #f8d7da); }
 
 .view-objective {
-  color: var(--highlight);
+  color: var(--text-secondary);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 28px; /* Slightly larger */
+  height: 28px;
   border-radius: 50%;
-  transition: background 0.2s, color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
+  flex-shrink: 0;
 }
 
 .view-objective:hover {
-  background: var(--highlight);
-  color: var(--background);
+  background-color: var(--primary-light);
+  color: var(--primary);
 }
 
+/* Loading/Error/Empty States */
 .loading-state, .error-state, .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  flex: 1; /* Take remaining space */
   padding: 1.5rem;
   text-align: center;
-  color: var(--highlight);
+  color: var(--text-secondary);
 }
 
 .spinner {
-  width: 24px;
-  height: 24px;
-  border: 3px solid rgba(63, 208, 212, 0.15);
+  width: 28px; /* Larger spinner */
+  height: 28px;
+  border: 3px solid var(--primary-light); /* Lighter border */
   border-radius: 50%;
   border-top-color: var(--primary);
   animation: spin 1s linear infinite;
@@ -473,36 +505,45 @@ h3 {
 }
 
 .error-icon, .empty-icon {
-  font-size: 2rem;
+  font-size: 2.5rem; /* Larger icon */
   margin-bottom: 1rem;
-  color: var(--highlight);
+  color: var(--text-disabled); /* More subtle color */
 }
 
-.error-state p {
+.error-state p, .empty-state h3, .empty-state p {
   margin-bottom: 1rem;
+}
+.empty-state h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.empty-state p {
+  font-size: 0.9rem;
+  max-width: 300px; /* Limit width */
 }
 
 .retry-btn, .add-btn {
+  /* Use common button styles if available, otherwise define here */
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: var(--highlight);
-  border: 1.5px solid var(--primary);
-  border-radius: 0.375rem;
-  color: var(--background);
-  font-size: 0.95rem;
-  font-weight: 600;
+  padding: 0.6rem 1.2rem; /* Adjust padding */
+  background-color: var(--primary);
+  border: none;
+  border-radius: 6px; /* Consistent radius */
+  color: var(--primary-contrast, #fff); /* Contrast color */
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  transition: background-color 0.2s, box-shadow 0.2s;
   text-decoration: none;
-  box-shadow: 0 0 8px var(--highlight);
+  box-shadow: 0 2px 4px rgba(var(--primary-rgb), 0.2);
 }
 
 .retry-btn:hover, .add-btn:hover {
-  background: var(--primary);
-  color: var(--background);
-  border-color: var(--highlight);
+  background-color: var(--primary-hover);
+  box-shadow: 0 4px 8px rgba(var(--primary-rgb), 0.3);
 }
 
 @keyframes spin {

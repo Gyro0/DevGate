@@ -142,20 +142,26 @@ select, input {
   border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 0.9rem;
-  background-color: var(--bg-darker);
+  background-color: var(--bg-darker); /* This styles the box */
   color: var(--text-color);
   transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Attempt to style options (limited browser support) */
+select option {
+  background-color: var(--bg-darker); /* Try setting background */
+  color: var(--text-color); /* Ensure text is readable */
 }
 
 select:focus, input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.1), 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.75rem center;
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;

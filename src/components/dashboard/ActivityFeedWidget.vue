@@ -5,18 +5,18 @@
       <router-link to="/timeline" class="view-all">View All</router-link>
     </div>
     
-    <div class="activities-content" v-if="!loading">
-      <div v-if="events && events.length > 0" class="activity-list-container">
-        <ul class="activity-list">
-          <li v-for="event in recentEvents" :key="event.id" class="activity-item">
-            <div class="activity-icon" :class="eventTypeClass(event)">
+    <div class="feed-content" v-if="!loading">
+      <div v-if="events && events.length > 0" class="feed-list-container">
+        <ul class="feed-list">
+          <li v-for="event in recentEvents" :key="event.id" class="feed-item">
+            <div class="event-icon" :class="eventTypeClass(event)">
               <i :class="eventTypeIcon(event)"></i>
             </div>
-            <div class="activity-details">
-              <div class="activity-description">
+            <div class="event-details">
+              <div class="event-description">
                 {{ formatEventDescription(event) }}
               </div>
-              <div class="activity-time">
+              <div class="event-time">
                 {{ formatEventTime(event.timestamp) }}
               </div>
             </div>
@@ -124,7 +124,7 @@ export default {
         case 'objective':
           return 'event-objective';
         default:
-          return '';
+          return 'event-default';
       }
     };
 
@@ -157,15 +157,16 @@ export default {
 
 <style scoped>
 .activity-feed-widget {
-  height: 100%;
+  height: 100%; /* Ensure widget fills grid cell */
   display: flex;
   flex-direction: column;
-  background: var(--surface);
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 24px 0 rgba(30, 203, 225, 0.10), 0 0 0 2px var(--highlight);
-  border: 1.5px solid var(--highlight);
-  padding: 2rem 1.5rem;
+  background: var(--surface-card); /* Use card background */
+  border-radius: 12px; /* Consistent radius */
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem; /* Consistent padding */
   color: var(--text);
+  overflow: hidden; /* Prevent content overflow */
 }
 
 .widget-header {
@@ -173,162 +174,160 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-shrink: 0;
 }
 
 .widget-header h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--primary);
-  letter-spacing: 1px;
-  text-shadow: 0 0 8px var(--highlight);
+  font-size: 1.1rem; /* Consistent header size */
+  font-weight: 600; /* Consistent weight */
+  color: var(--text-primary); /* Use primary text color */
 }
 
 .view-all {
-  color: var(--highlight);
+  font-size: 0.85rem; /* Consistent link size */
+  color: var(--primary); /* Use primary color */
   text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 500;
   transition: color 0.2s;
 }
 
 .view-all:hover {
+  color: var(--primary-hover); /* Use hover variable */
   text-decoration: underline;
-  color: var(--secondary);
 }
 
-.activities-content {
-  flex: 1;
-  overflow: hidden;
+/* Renamed from activities-content for consistency */
+.feed-content {
+  flex: 1; /* Allow content to grow */
+  overflow: hidden; /* Hide overflow, inner container will scroll */
+  display: flex; /* Use flex for layout */
+  flex-direction: column; /* Stack list/empty state */
 }
 
-.activity-list-container {
-  height: 100%;
-  overflow-y: auto;
+/* Renamed from activity-list-container */
+.feed-list-container {
+  flex: 1; /* Allow list container to grow */
+  overflow-y: auto; /* Enable scrolling for the list */
+  margin: 0 -0.5rem; /* Negative margin to counteract item padding */
+  padding: 0 0.5rem; /* Padding to contain items */
+  /* Custom scrollbar styling (optional) */
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-light) var(--surface-ground);
 }
+/* Webkit scrollbar styling */
+.feed-list-container::-webkit-scrollbar { width: 6px; }
+.feed-list-container::-webkit-scrollbar-track { background: var(--surface-ground); border-radius: 3px; }
+.feed-list-container::-webkit-scrollbar-thumb { background-color: var(--primary-light); border-radius: 3px; }
 
-.activity-list {
+/* Renamed from activity-list */
+.feed-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.activity-item {
+/* Renamed from activity-item */
+.feed-item {
   display: flex;
-  padding: 0.75rem 0;
-  border-bottom: 1.5px solid var(--border);
+  align-items: flex-start; /* Align icon and text to top */
+  padding: 0.85rem 0.5rem; /* Adjust padding */
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem; /* Space between icon and details */
 }
-
-.activity-item:last-child {
+.feed-item:last-child {
   border-bottom: none;
 }
 
-.activity-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
+/* Renamed from activity-icon */
+.event-icon {
+  flex-shrink: 0;
+  width: 32px; /* Consistent icon container size */
   height: 32px;
   border-radius: 50%;
-  margin-right: 1rem;
-  flex-shrink: 0;
-  background: var(--background);
-  border: 1.5px solid var(--highlight);
-  box-shadow: 0 0 8px var(--highlight);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem; /* Icon size */
+  margin-top: 0.1rem; /* Align icon slightly lower */
+}
+/* Use consistent status colors/variables */
+.event-skill { background-color: var(--info-light, #cfe2ff); color: var(--info-dark, #0a58ca); }
+.event-project { background-color: var(--primary-light, #e0cffc); color: var(--primary-dark, #6f42c1); }
+.event-objective { background-color: var(--success-light, #d1e7dd); color: var(--success-dark, #146c43); }
+.event-default { background-color: var(--secondary-light, #e2e3e5); color: var(--secondary-dark, #495057); } /* Fallback */
+
+/* Renamed from activity-details */
+.event-details {
+  flex: 1; /* Take remaining space */
+  min-width: 0; /* Prevent overflow issues */
 }
 
-.activity-icon i {
-  font-size: 1rem;
-}
-
-.event-skill {
-  background: rgba(30, 203, 225, 0.10);
-  color: var(--primary);
-}
-
-.event-project {
-  background: rgba(255, 153, 0, 0.10);
-  color: var(--secondary);
-}
-
-.event-objective {
-  background: rgba(16, 185, 129, 0.10);
-  color: #10b981;
-}
-
-.activity-details {
-  flex: 1;
-  min-width: 0;
-}
-
-.activity-description {
-  font-size: 1rem;
+/* Renamed from activity-description */
+.event-description {
+  font-size: 0.9rem; /* Consistent font size */
+  color: var(--text-primary);
+  line-height: 1.4;
   margin-bottom: 0.25rem;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* Removed text overflow for now, can be added back if needed */
+  /* white-space: nowrap; */
+  /* overflow: hidden; */
+  /* text-overflow: ellipsis; */
 }
-
-.activity-time {
-  font-size: 0.85rem;
-  color: var(--highlight);
-}
-
-.empty-state {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 2rem 1rem;
-  color: var(--highlight);
-}
-
-.empty-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  color: var(--highlight);
-}
-
-.empty-state h3 {
-  margin: 0;
-  margin-bottom: 0.5rem;
-  font-size: 1.125rem;
-  font-weight: 700;
+/* Optional: Highlight parts of the description */
+.event-description strong {
+  font-weight: 600;
   color: var(--primary);
 }
 
-.empty-state p {
-  margin: 0;
-  color: var(--text);
-  max-width: 24rem;
+/* Renamed from activity-time */
+.event-time {
+  font-size: 0.8rem; /* Consistent smaller time */
+  color: var(--text-secondary);
 }
 
-.loading-state {
-  flex: 1;
+/* Loading/Empty States (Consistent style) */
+.loading-state, .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  color: var(--highlight);
-  font-size: 0.95rem;
+  flex: 1; /* Take remaining space */
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
 }
 
 .spinner {
-  border: 3px solid rgba(63, 208, 212, 0.15);
-  border-top: 3px solid var(--primary);
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--primary-light);
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  border-top-color: var(--primary);
   animation: spin 1s linear infinite;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.empty-icon {
+  font-size: 2.5rem; /* Consistent icon size */
+  margin-bottom: 1rem;
+  color: var(--text-disabled); /* Consistent color */
+}
+
+.empty-state h3, .empty-state p {
+  margin-bottom: 1rem;
+}
+.empty-state h3 {
+  font-size: 1rem; /* Consistent empty state header */
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.empty-state p {
+  font-size: 0.9rem; /* Consistent empty state text */
+  max-width: 300px; /* Limit width */
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

@@ -1,7 +1,12 @@
 <template>
   <div class="comment-section">
     <h4>Comments ({{ comments.length }})</h4>
-
+    
+    <CommentForm
+      :adding-comment="addingComment"
+      :add-error="addError"
+      @submit-comment="handleCommentSubmit"
+    />
     <div v-if="loading" class="loading-state small">
       <div class="spinner"></div> Loading comments...
     </div>
@@ -15,11 +20,6 @@
       <CommentItem v-for="comment in comments" :key="comment.id" :comment="comment" />
     </div>
 
-    <CommentForm
-      :adding-comment="addingComment"
-      :add-error="addError"
-      @submit-comment="handleCommentSubmit"
-    />
   </div>
 </template>
 
@@ -69,34 +69,48 @@ export default {
 
 <style scoped>
 .comment-section {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1.5px solid var(--highlight);
+  background: var(--surface-card); /* Match post card background */
+  border: 1.5px solid var(--border-color, #23272e); /* Add border */
+  border-top: none; /* Remove top border specifically */
+  border-bottom-left-radius: 1.1rem; /* Match post card bottom radius */
+  border-bottom-right-radius: 1.1rem; /* Match post card bottom radius */
+  padding: 1.5rem; /* Add padding inside the section */
+  box-shadow: 0 8px 16px -4px rgba(0,0,0,0.2); /* Add subtle shadow continuation */
 }
 .comment-section h4 {
   margin-top: 0;
-  margin-bottom: 1rem;
-  font-size: 1rem;
+  margin-bottom: 1.5rem; /* Increased bottom margin */
+  font-size: 1.1rem; /* Slightly larger */
   font-weight: 700;
-  color: var(--primary);
+  color: var(--secondary); /* Use secondary color */
   letter-spacing: 0.5px;
-  text-shadow: 0 0 8px var(--highlight);
+  text-shadow: 0 0 6px var(--secondary-glow, rgba(124, 58, 237, 0.4)); /* Use secondary glow */
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color); /* Add underline */
 }
 .comment-list {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem; /* More space before the form */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Add gap between comment items */
 }
+
 /* Small states for inline display */
 .loading-state.small, .error-state.small, .empty-state.small {
   font-size: 0.95rem;
-  color: var(--highlight);
-  padding: 1rem 0;
+  color: var(--text-secondary); /* Use secondary text color */
+  padding: 1.5rem 0; /* More padding */
   text-align: center;
-  background: none;
-  border: none;
+  background: var(--surface-ground); /* Use ground background */
+  border-radius: 8px; /* Add rounding */
+  border: 1px dashed var(--border-color); /* Dashed border */
+  margin-bottom: 2rem; /* Match list margin */
 }
 .loading-state.small .spinner {
-   width: 16px; height: 16px; border-width: 2px; display: inline-block; margin-right: 0.5rem; vertical-align: middle;
-   border: 2px solid rgba(63, 208, 212, 0.15); border-radius: 50%; border-top-color: var(--primary); border-left-color: var(--secondary);
+   width: 18px; height: 18px; border-width: 2px; display: inline-block; margin-right: 0.5rem; vertical-align: middle;
+   border: 2px solid var(--primary-glow, rgba(79, 70, 229, 0.2)); /* Use primary glow */
+   border-radius: 50%;
+   border-top-color: var(--primary); /* Use primary */
    animation: spin 1s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }

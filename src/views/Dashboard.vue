@@ -138,7 +138,7 @@ export default {
   flex: 1;
   padding: 3rem 1.5rem 3rem 1.5rem;
   overflow-y: auto;
-  max-width: 900px;
+  max-width: 80%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -146,8 +146,7 @@ export default {
   background: none;
 }
 .feed-container {
-  width: 100%;
-  max-width: 600px;
+  width: 80%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;

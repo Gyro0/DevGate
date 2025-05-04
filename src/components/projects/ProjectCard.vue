@@ -2,7 +2,7 @@
   <div class="project-card">
     <div class="card-image">
       <img 
-        :src="project.imageUrl || '/default-project.png'" 
+        :src="project.imageUrl || '/default-project.jpg'" 
         :alt="project.title" 
         @error="onImageError"
       />

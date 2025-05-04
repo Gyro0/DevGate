@@ -14,14 +14,14 @@
                 @click="viewMode = 'gallery'"
                 title="Gallery View"
               >
-                <span class="material-icons">grid_view</span>
+                <i class="fas fa-th-large"></i>
               </button>
               <button 
                 :class="{ active: viewMode === 'list' }"
                 @click="viewMode = 'list'"
                 title="List View"
               >
-                <span class="material-icons">view_list</span>
+                <i class="fas fa-list"></i>
               </button>
             </div>
             <button class="btn-primary" @click="showAddProjectModal = true">
@@ -31,7 +31,11 @@
         </div>
         
         <div class="filter-bar">
-          <ProjectFilterBar v-model="filters" />
+          <ProjectFilterBar
+            :modelValue="filters"
+            @update:modelValue="handleFilterUpdate"
+            :all-project-techs="allProjectTechnologies"
+          />
         </div>
         
         <div v-if="loading" class="loading-container">
@@ -99,7 +103,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, reactive, watch } from 'vue';
 import AppHeader from '@/components/common/AppHeader.vue';
 import AppSidebar from '@/components/common/AppSidebar.vue';
 import ProjectFilterBar from '@/components/projects/ProjectFilterBar.vue';
@@ -123,90 +127,176 @@ export default {
     ConfirmDialog
   },
   setup() {
-    const { 
-      projects, 
+    const {
+      projects,
       loading,
       error,
-      fetchUserProjects, 
-      addProject, 
-      updateProject, 
-      deleteProject: removeProject  
+      fetchUserProjects,
+      addProject,
+      updateProject,
+      deleteProject: removeProject
     } = useProjects();
-    
+
     const { recordEvent } = useTimeline();
     const { isAuthenticated, loading: authLoading } = useAuth();
-    
+
     // UI state management
     const viewMode = ref('gallery');
-    const filters = ref({ status: 'all', search: '' });
+    const filters = reactive({
+      search: '',
+      tech: [],
+      dateRange: null,
+    });
     const showAddProjectModal = ref(false);
     const showDeleteConfirm = ref(false);
     const selectedProject = ref(null);
     const projectToDelete = ref(null);
-    
+
     // Combined loading state
     const isLoading = computed(() => loading.value || authLoading.value);
-    
-    // Load projects on component mount with better error handling
+
+    // Load projects on component mount
     onMounted(async () => {
       console.log("Projects component mounted, fetching projects...");
       try {
         await fetchUserProjects();
         console.log("Projects loaded:", projects.value?.length || 0);
-      } catch (error) {
-        console.error("Error in Projects onMounted:", error);
+      } catch (err) {
+        console.error("Error in Projects onMounted:", err);
       }
     });
-    
-    // Filter projects based on selected filters
+
+    // --- Add the update handler ---
+    const handleFilterUpdate = (newFilters) => {
+      console.log(">>> Projects.vue: handleFilterUpdate received:", JSON.stringify(newFilters));
+
+      // Update the existing reactive object's properties
+      // This preserves the reactive proxy and ensures dependents update.
+      filters.search = newFilters.search || '';
+      // Replace the array content reactively
+      filters.tech.splice(0, filters.tech.length, ...(newFilters.tech || []));
+      // Update or clear the dateRange object
+      filters.dateRange = newFilters.dateRange ? { ...newFilters.dateRange } : null;
+
+      // Note: No need to manually trigger filteredProjects recalculation,
+      // modifying the 'filters' object's properties will do it automatically.
+    };
+    // --- End update handler ---
+
     const filteredProjects = computed(() => {
-      if (!projects.value) return [];
-      
-      return projects.value.filter(project => {
-        // Filter by status
-        if (filters.value.status !== 'all' && project.status !== filters.value.status) {
-          return false;
+      console.log(`--- Recalculating filteredProjects ---`);
+      console.log(`Current Filters:`, JSON.stringify(filters));
+
+      // Start with all projects if available, otherwise empty array
+      const baseProjects = Array.isArray(projects.value) ? projects.value : [];
+      if (baseProjects.length === 0) {
+        console.log("No base projects to filter.");
+        return [];
+      }
+      console.log(`Starting with ${baseProjects.length} projects.`);
+
+      // Apply filters sequentially
+      let result = baseProjects.filter(project => {
+        // Ensure project is valid
+        if (!project || !project.id) return false;
+
+        // --- 1. Search Filter ---
+        const searchFilter = filters.search?.trim().toLowerCase();
+        if (searchFilter) {
+          const titleMatch = project.title?.toLowerCase().includes(searchFilter);
+          const descMatch = project.description?.toLowerCase().includes(searchFilter);
+          if (!titleMatch && !descMatch) {
+            return false; // Does not match search term
+          }
         }
-        
-        // Filter by search term
-        if (filters.value.search && 
-            !project.title.toLowerCase().includes(filters.value.search.toLowerCase()) &&
-            !project.description?.toLowerCase().includes(filters.value.search.toLowerCase())) {
-          return false;
+
+        // --- 2. Technology Filter ---
+        const techFilter = filters.tech;
+        if (Array.isArray(techFilter) && techFilter.length > 0) {
+          const projectTechs = Array.isArray(project.techStack) ? project.techStack : [];
+          // Check if projectTechs includes ALL techs from techFilter
+          const techMatch = techFilter.every(filterTech => projectTechs.includes(filterTech));
+          if (!techMatch) {
+            return false; // Does not match all required techs
+          }
         }
-        
+
+        // --- 3. Date Range Filter ---
+        const dateFilter = filters.dateRange;
+        if (dateFilter && (dateFilter.start || dateFilter.end)) {
+          let projectTimestamp = null;
+          // Convert project createdAt to timestamp (handle Date objects and Firestore Timestamps)
+          if (project.createdAt instanceof Date) {
+            projectTimestamp = project.createdAt.getTime();
+          } else if (project.createdAt?.seconds) {
+            projectTimestamp = project.createdAt.seconds * 1000;
+          }
+
+          if (projectTimestamp) {
+            // Get start of the start day
+            const startDate = dateFilter.start
+              ? new Date(new Date(dateFilter.start).setHours(0, 0, 0, 0)).getTime()
+              : null;
+            // Get end of the end day
+            const endDate = dateFilter.end
+              ? new Date(new Date(dateFilter.end).setHours(23, 59, 59, 999)).getTime()
+              : null;
+
+            if (startDate && projectTimestamp < startDate) {
+              return false; // Before start date
+            }
+            if (endDate && projectTimestamp > endDate) {
+              return false; // After end date
+            }
+          } else {
+             // Decide if projects without a date should be excluded when date filter is active
+             // return false; // Uncomment to exclude projects without a date if a date filter is set
+          }
+        }
+
+        // If we reach here, the project passes all active filters
         return true;
       });
+
+      console.log(`Finished filtering. Result count: ${result.length}`);
+      console.log(`--- End Recalculating ---`);
+      return result;
     });
-    
-    // Project actions
+
+    const allProjectTechnologies = computed(() => {
+      if (!projects.value || projects.value.length === 0) {
+        return [];
+      }
+      const allTechs = projects.value.flatMap(p => p.techStack || []);
+      return [...new Set(allTechs)].sort((a, b) => a.localeCompare(b));
+    });
+
     const editProject = (project) => {
       selectedProject.value = { ...project };
       showAddProjectModal.value = true;
     };
-    
+
     const confirmDeleteProject = (project) => {
       projectToDelete.value = project;
       showDeleteConfirm.value = true;
     };
-    
+
     const cancelDelete = () => {
       projectToDelete.value = null;
       showDeleteConfirm.value = false;
     };
-    
+
     const saveProject = async (projectData, imageFile) => {
       console.log("Saving project:", projectData);
       try {
+        let savedProject;
         if (selectedProject.value?.id) {
-          // Update existing project
-          const updatedProject = await updateProject(selectedProject.value.id, projectData, imageFile);
-          await recordEvent('project', 'updated', updatedProject.id, { title: updatedProject.title });
+          savedProject = await updateProject(selectedProject.value.id, projectData, imageFile);
+          await recordEvent('project', 'updated', savedProject.id, { title: savedProject.title });
         } else {
-          // Add new project
-          const newProject = await addProject(projectData, imageFile);
-          console.log("Project created:", newProject);
-          await recordEvent('project', 'added', newProject.id, { title: newProject.title });
+          savedProject = await addProject(projectData, imageFile);
+          console.log("Project created:", savedProject);
+          await recordEvent('project', 'added', savedProject.id, { title: savedProject.title });
         }
         closeProjectModal();
       } catch (err) {
@@ -214,33 +304,33 @@ export default {
         alert(`Failed to save project: ${err.message}`);
       }
     };
-    
+
     const deleteProject = async () => {
       if (!projectToDelete.value?.id) return;
-      
+
       try {
         await removeProject(projectToDelete.value.id);
         await recordEvent('project', 'deleted', projectToDelete.value.id, { title: projectToDelete.value.title });
-        showDeleteConfirm.value = false;
-        projectToDelete.value = null;
+        cancelDelete();
       } catch (err) {
         console.error("Error deleting project:", err);
         alert(`Failed to delete project: ${err.message}`);
       }
     };
-    
+
     const closeProjectModal = () => {
       showAddProjectModal.value = false;
       selectedProject.value = null;
     };
-    
+
     return {
       projects,
-      loading: isLoading, // Use the combined loading state
+      loading: isLoading,
       error,
       viewMode,
       filters,
       filteredProjects,
+      allProjectTechnologies,
       showAddProjectModal,
       showDeleteConfirm,
       selectedProject,
@@ -250,7 +340,8 @@ export default {
       saveProject,
       deleteProject,
       cancelDelete,
-      closeProjectModal
+      closeProjectModal,
+      handleFilterUpdate
     };
   }
 }
@@ -269,7 +360,7 @@ export default {
 
 .content-area {
   flex: 1;
-  padding: 1.5rem;
+  padding: 1.5rem 2rem;
   overflow-y: auto;
 }
 
@@ -278,11 +369,13 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .page-header h1 {
   color: var(--text-color);
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
   margin: 0;
 }
@@ -296,69 +389,78 @@ export default {
 .view-toggle {
   display: flex;
   gap: 0.5rem;
-  background: var(--bg-darker);
+  background: var(--surface-ground);
   border-radius: 8px;
   border: 1px solid var(--border-color);
-  padding: 0.25rem 0.5rem;
+  padding: 0.25rem;
 }
 
 .view-toggle button {
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   padding: 0.4rem 0.7rem;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
+  line-height: 1;
 }
 
 .view-toggle button.active, .view-toggle button:hover {
-  background: var(--primary-color);
+  background: var(--primary);
   color: white;
+  box-shadow: 0 0 8px var(--primary-glow);
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
+  background-color: var(--primary);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 8px;
-  font-weight: 500;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 2px 8px var(--primary-glow, rgba(79, 70, 229, 0.2));
   transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-color-dark);
+  background-color: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.18);
+  box-shadow: 0 4px 16px var(--primary-glow, rgba(79, 70, 229, 0.3));
 }
 
-.icon {
+.btn-primary .icon {
   font-size: 1.2rem;
   font-weight: bold;
+  line-height: 1;
 }
 
 .filter-bar {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.projects-gallery, .projects-list {
+.projects-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .empty-state {
-  background: var(--card-bg);
+  background: var(--surface-card);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   border: 1px solid var(--border-color);
   padding: 2.5rem 1.5rem;
   text-align: center;
@@ -366,13 +468,14 @@ export default {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  margin-top: 2rem;
 }
 
 .empty-icon {
-  width: 64px;
-  height: 64px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background-color: var(--bg-darker);
+  background-color: var(--surface-ground);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -382,41 +485,41 @@ export default {
 
 .empty-icon i {
   font-size: 1.5rem;
-  color: var(--primary-color);
+  color: var(--primary);
 }
 
 .empty-state h3 {
   margin: 0 0 0.5rem 0;
-  color: var(--text-color);
+  color: var(--text);
   font-weight: 600;
 }
 
 .empty-state p {
   color: var(--text-secondary);
-  margin: 0;
+  margin: 0 0 1rem 0;
   font-size: 0.95rem;
 }
 
 .empty-state .action-btn {
-  background: var(--primary-color);
+  background-color: var(--primary);
   color: white;
   border: none;
-  border-radius: 8px;
   padding: 0.75rem 1.5rem;
-  font-weight: 500;
-  font-size: 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.12);
+  box-shadow: 0 2px 8px var(--primary-glow, rgba(79, 70, 229, 0.2));
   transition: all 0.3s ease;
 }
 
 .empty-state .action-btn:hover {
-  background: var(--primary-color-dark);
+  background-color: var(--primary-dark);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.18);
+  box-shadow: 0 4px 16px var(--primary-glow, rgba(79, 70, 229, 0.3));
 }
 
 .loading-container {
@@ -424,15 +527,15 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
+  min-height: 300px;
   color: var(--text-secondary);
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid var(--border-color);
-  border-top: 4px solid var(--primary-color);
+  border: 4px solid var(--surface-ground);
+  border-top: 4px solid var(--primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
@@ -443,8 +546,20 @@ export default {
   100% { transform: rotate(360deg); }
 }
 
-@media (max-width: 900px) {
-  .projects-gallery, .projects-list {
+@media (max-width: 768px) {
+  .content-area {
+    padding: 1rem;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .projects-gallery {
     grid-template-columns: 1fr;
   }
 }

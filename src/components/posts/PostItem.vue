@@ -1,7 +1,7 @@
 <template>
   <div class="post-card">
     <div class="post-header">
-      <img :src="post.authorPhotoURL || '/default-avatar.png'" alt="Author" class="post-avatar">
+      <img :src="post.authorPhotoURL || '/default.jpg'" alt="Author" class="post-avatar">
       <div>
         <span class="post-author">{{ post.authorName }}</span>
         <span class="post-timestamp">{{ formatTimestamp(post.createdAt) }}</span>
@@ -19,7 +19,7 @@
           <i :class="getEntityTypeIcon(post.linkedEntityType)"></i>
           Linked {{ post.linkedEntityType }}:
           <!-- Link to the actual entity page -->
-          <router-link :to="`/${post.linkedEntityType}s/${post.linkedEntityId}`" @click.stop>
+          <router-link :to="`/${post.linkedEntityType}s/`" @click.stop>
             {{ post.linkedEntity.name || post.linkedEntity.title }}
           </router-link>
         </div>
@@ -99,6 +99,10 @@ export default {
   transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
   position: relative;
   overflow: hidden;
+  width: 100%;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 }
 .post-card:hover {
   box-shadow: 0 0 32px 2px var(--primary-glow), 0 0 0 2.5px var(--primary-glow);
@@ -110,6 +114,7 @@ export default {
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.1rem;
+  margin-left: 0.5rem;
 }
 .post-avatar {
   width: 44px;
@@ -136,9 +141,11 @@ export default {
 .post-link-wrapper {
   text-decoration: none;
   color: inherit;
+  display: block;
 }
 .post-content {
   margin-bottom: 1rem;
+  text-align: left;
 }
 .post-title {
   font-size: 1.25rem;
@@ -147,18 +154,25 @@ export default {
   margin-bottom: 0.4rem;
   letter-spacing: 0.5px;
   text-shadow: 0 0 8px var(--primary-glow);
+  margin-left: 0.5rem;
+  text-align: left;
 }
 .post-description {
   color: var(--text-secondary);
   margin-bottom: 0.8rem;
   font-size: 1.08rem;
+  margin-left: 0.5rem;
+  text-align: left;
 }
 .post-image {
-  width: 100%;
-  max-height: 350px;
+  width: calc(100% - 1rem);
+  max-height: 400px;
   object-fit: cover;
   border-radius: 0.75rem;
+  margin-top: 0.5rem;
   margin-bottom: 1rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
   border: 1.5px solid var(--primary-glow);
   box-shadow: 0 0 8px var(--primary-glow);
 }
@@ -169,6 +183,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  margin-left: 0.5rem;
 }
 .linked-entity i {
   color: var(--primary-glow);
@@ -186,6 +201,8 @@ export default {
   margin-top: 0.5rem;
   border-top: 1px solid var(--border-color, #23272e);
   padding-top: 0.7rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
 }
 .comment-btn {
   background: var(--surface-2);
@@ -213,12 +230,35 @@ export default {
   font-size: 1.05rem;
   margin-left: 0.3rem;
 }
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .post-card {
-    padding: 1rem 0.5rem;
+    padding: 1.25rem 1rem;
+    max-width: 95%;
   }
   .post-title {
-    font-size: 1.05rem;
+    font-size: 1.15rem;
+    margin-left: 0.25rem;
+  }
+  .post-description {
+    font-size: 1rem;
+    margin-left: 0.25rem;
+  }
+  .post-header, .linked-entity, .post-footer {
+    margin-left: 0.25rem;
+    padding-left: 0;
+  }
+  .post-image {
+    width: calc(100% - 0.5rem);
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+  }
+}
+@media (max-width: 600px) {
+  .post-card {
+    padding: 1rem 0.75rem;
+  }
+  .post-title {
+    font-size: 1.1rem;
   }
 }
 </style>

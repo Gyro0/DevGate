@@ -2,22 +2,22 @@
   <div class="vote-buttons">
     <button
       @click="handleVote('up')"
-      :class="{ 'active': userVote === 'up', 'disabled': loading }"
+      :class="{ 'green': userVote === 'up', 'disabled': loading }"
       :disabled="loading || !isLoggedIn"
-      class="vote-btn upvote"
-      title="Upvote"
+      class="btn"
+      title="Like"
     >
-      <i class="fas fa-arrow-up"></i>
+      <i class="fa fa-thumbs-up fa-lg" aria-hidden="true"></i>
       <span class="count">{{ upvotesCount }}</span>
     </button>
     <button
       @click="handleVote('down')"
-      :class="{ 'active': userVote === 'down', 'disabled': loading }"
+      :class="{ 'red': userVote === 'down', 'disabled': loading }"
       :disabled="loading || !isLoggedIn"
-      class="vote-btn downvote"
-      title="Downvote"
+      class="btn"
+      title="Dislike"
     >
-      <i class="fas fa-arrow-down"></i>
+      <i class="fa fa-thumbs-down fa-lg" aria-hidden="true"></i>
       <span class="count">{{ downvotesCount }}</span>
     </button>
     <p v-if="error" class="vote-error">{{ error }}</p>
@@ -52,10 +52,15 @@ export default {
 
     const handleVote = (type) => {
       if (!isLoggedIn.value) {
-         alert('Please log in to vote.');
+         // Consider using a more integrated notification system instead of alert
+         console.warn('User not logged in, cannot vote.');
+         // Optionally emit an event to show a login prompt
+         // emit('requestLogin');
          return;
       }
-      castVote(type);
+      // Determine the new vote type: if clicking the same button, undo (null), otherwise set new type
+      const newVoteType = userVote.value === type ? null : type;
+      castVote(newVoteType); // Pass null to undo
     };
 
     return {
@@ -75,53 +80,66 @@ export default {
 .vote-buttons {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--highlight);
+  gap: 0.75rem; /* Increased gap slightly */
 }
-.vote-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  background: var(--background);
-  border: 1.5px solid var(--highlight);
-  border-radius: 1rem;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.9rem;
-  color: var(--text);
+
+.btn {
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
-  box-shadow: 0 0 8px var(--highlight);
+  outline: 0;
+  color: var(--text-secondary, #AAA); /* Default icon color */
+  background: none; /* Transparent background */
+  border: none; /* No border */
+  padding: 0.4rem 0.6rem; /* Adjust padding */
+  display: inline-flex; /* Align icon and count */
+  align-items: center;
+  gap: 0.4rem; /* Space between icon and count */
+  border-radius: 4px; /* Optional: slight rounding */
+  transition: color 0.2s ease-in-out, transform 0.1s ease;
 }
-.vote-btn:hover:not(.disabled) {
-  background: var(--highlight);
-  color: var(--background);
-  border-color: var(--primary);
-  box-shadow: 0 0 12px var(--primary);
+
+.btn:focus {
+  outline: none; /* Remove default focus outline */
+  /* Optional: Add custom focus style if needed */
+  /* box-shadow: 0 0 0 2px var(--primary-glow); */
 }
-.vote-btn.disabled {
-  opacity: 0.7;
+
+.btn:hover:not(.disabled) {
+  color: var(--text, #DDD); /* Slightly brighter on hover */
+  transform: scale(1.1); /* Add slight scale effect */
+}
+
+.btn.disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
-.vote-btn .count {
+
+.btn .count {
+  font-size: 0.9em; /* Adjust count size */
   font-weight: 600;
+  color: var(--text-secondary, #AAA); /* Match default icon color */
   min-width: 10px;
   text-align: center;
+  transition: color 0.2s ease-in-out;
 }
-.vote-btn.upvote.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--background);
-  box-shadow: 0 0 12px var(--primary);
+
+/* Active state colors */
+.btn.green {
+  color: #28a745; /* Green color for active upvote */
 }
-.vote-btn.downvote.active {
-  background: var(--secondary);
-  border-color: var(--secondary);
-  color: var(--background);
-  box-shadow: 0 0 12px var(--secondary);
+.btn.green .count {
+  color: #28a745; /* Match count color */
 }
+
+.btn.red {
+  color: #dc3545; /* Red color for active downvote */
+}
+.btn.red .count {
+  color: #dc3545; /* Match count color */
+}
+
 .vote-error {
-  color: #ef4444;
-  font-size: 0.75rem;
+  color: #ef4444; /* Keep error styling */
+  font-size: 0.8rem;
   margin-left: 0.5rem;
 }
 </style>

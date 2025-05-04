@@ -19,16 +19,21 @@
         <div class="charts-section">
           <div class="chart-card">
             <h3>Skill Categories</h3>
-            <SkillRadarChart :skills="filteredSkills" />
+            <!-- Add loading state -->
+            <div v-if="skillsLoading" class="loading-state small">Loading Chart...</div>
+            <SkillRadarChart v-else :skills="filteredSkills" />
           </div>
           
           <div class="chart-card">
             <h3>Skill Progression</h3>
-            <SkillProgressChart :skills="filteredSkills" />
+            <!-- Add loading state -->
+            <div v-if="skillsLoading" class="loading-state small">Loading Chart...</div>
+            <SkillProgressChart v-else :skills="filteredSkills" />
           </div>
         </div>
         
-        <div class="skills-grid">
+        <div v-if="skillsLoading" class="loading-state">Loading Skills...</div>
+        <div v-else class="skills-grid">
           <SkillCard 
             v-for="skill in filteredSkills" 
             :key="skill.id" 
@@ -291,6 +296,17 @@ export default {
 .icon {
   font-size: 1.2rem;
   font-weight: bold;
+}
+
+.loading-state {
+  text-align: center;
+  color: var(--text-color-light);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.loading-state.small {
+  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {

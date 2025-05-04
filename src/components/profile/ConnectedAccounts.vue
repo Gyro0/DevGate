@@ -1,7 +1,5 @@
 <template>
   <div class="connected-accounts">
-    <h3>Connected Accounts</h3>
-    <!-- Fix: Use connectedAccounts prop directly instead of userProfile.connectedAccounts -->
     <div class="account-item" :class="{ 'connected': connectedAccounts?.github }">
       <i class="fab fa-github"></i>
       <span>GitHub</span>

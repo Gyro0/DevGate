@@ -23,7 +23,7 @@
         
         <div class="user-menu" @click="showUserMenu = !showUserMenu">
           <img 
-            :src="user?.photoURL || '/default-avatar.png'" 
+            :src="user?.photoURL || '/default.jpg'" 
             alt="Profile" 
             class="user-avatar"
           />
@@ -34,7 +34,7 @@
         <!-- User Menu Dropdown -->
         <div v-if="showUserMenu" class="user-dropdown">
           <div class="dropdown-header">
-            <span>Signed in as</span>
+            <span>Signed in as : </span>
             <strong>{{ user?.displayName }}</strong>
           </div>
           <div class="dropdown-divider"></div>
@@ -260,7 +260,6 @@ export default {
 .dropdown-header {
   padding: 0.5rem 1rem;
   color: var(--text);
-  border-bottom: 1px solid var(--border);
   margin-bottom: 0.5rem;
 }
 .dropdown-divider {
