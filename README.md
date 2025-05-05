@@ -10,6 +10,7 @@ Badr Abaouz
 ```
 npm install
 npm install firebase@8.0.0
+npm install bootstrap
 npm install chartjs
 ```
 
